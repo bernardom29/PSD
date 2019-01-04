@@ -27,6 +27,8 @@ public class Notifier implements Runnable{
 
     public void subscricao(String tipo, String empresas){
         String[] array = empresas.split(" ");
+        if (array.length == 0)
+            sub.subscribe(tipo);
         for (int i = 0; i < 10 && i < array.length ;i++)
             sub.subscribe(tipo+"-"+array[i]);
     }

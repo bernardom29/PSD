@@ -37,14 +37,11 @@ public class Client {
                 os.write(authReq.toByteArray());
                 System.out.println("auth req enviado");
                 os.flush();
-                byte[] in = new byte[4096];
-
-                is.read(in);
-
-                authRep = AuthRep.parseFrom(in);
-                if (authRep.getSuccess()) {
+                byte [] response = this.recv();
+                authRep = AuthRep.parseFrom(response);
+                if (authRep.getSucesso()) {
                     this.auth = true;
-                    this.type = authRep.getType();
+                    this.type = authRep.getTipo();
                     System.out.println("login");
                     break;
                 }
@@ -66,7 +63,7 @@ public class Client {
             System.out.println(
                     "1- Criar leilão\n" +
                             "2- Emissão de taxa fixa\n" +
-                            "3- Notificações" +
+                            "3- Notificações\n" +
                             "0- Logout"
 
             );
@@ -102,16 +99,13 @@ public class Client {
                 .setTipo("leilao")
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            leilaoReq.writeDelimitedTo(this.os);
-            rep = Reply.parseDelimitedFrom(this.is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(rep != null && rep.getSuccess()) {
+        rep = getReply(rep, leilaoReq);
+        if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso no leilão");
         }
     }
+
+
 
     public void emissao(){
         System.out.println("Quantia: ");
@@ -120,13 +114,8 @@ public class Client {
         Mensagem emissaoReq = Mensagem.newBuilder()
                 .setTipo("emissao")
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            emissaoReq.writeDelimitedTo(this.os);
-            rep = Reply.parseDelimitedFrom(this.is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(rep != null && rep.getSuccess()) {
+        rep = getReply(rep, emissaoReq);
+        if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso na emissao");
         }
     }
@@ -138,7 +127,7 @@ public class Client {
             System.out.println(
                     "1- Licitar leilão\n" +
                             "2- Subscrição de empréstimo a taxa fixa\n" +
-                            "3- Notificações" +
+                            "3- Notificações\n" +
                             "0- Logout\n"
             );
             String userInput = this.input.next();
@@ -174,13 +163,8 @@ public class Client {
                 .setEmpresa(empresa)
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            licitarReq.writeDelimitedTo(this.os);
-            rep = Reply.parseDelimitedFrom(this.is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(rep != null && rep.getSuccess()) {
+        rep = getReply(rep, licitarReq);
+        if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso na licitação");
         }
     }
@@ -195,13 +179,8 @@ public class Client {
                 .setTipo("emprestimo")
                 .setEmpresa(empresa)
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            emprestimoReq.writeDelimitedTo(this.os);
-            rep = Reply.parseDelimitedFrom(this.is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(rep != null && rep.getSuccess()) {
+        rep = getReply(rep, emprestimoReq);
+        if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso no emprestimo");
         }
     }
@@ -223,6 +202,33 @@ public class Client {
             empresa();
         }
 
+    }
+
+    private Reply getReply(Reply rep, Mensagem mensagem) {
+        try {
+            this.os.write(mensagem.toByteArray());
+            byte[] response = this.recv();
+            rep = Reply.parseFrom(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rep;
+    }
+
+    public byte[] recv(){
+        byte[] tmp = new byte[4096];
+        int len = 0;
+        try {
+            len = is.read(tmp);
+            byte[] response = new byte[len];
+
+            for(int i = 0; i < len; i++)
+                response[i] = tmp[i];
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args)

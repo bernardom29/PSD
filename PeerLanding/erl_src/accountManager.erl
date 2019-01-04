@@ -3,7 +3,7 @@
 
 
 accountService() ->
-    register(?MODULE, erlang:spawn(fun() -> loop(#{'rabeta' => {'mongo', 1, false} , 'nabo' => {'mongo', 2, false}} ) end)).
+    register(?MODULE, erlang:spawn(fun() -> loop(#{"rabeta" => {"mongo", 1, false} , "nabo" => {"mongo", 2, false}} ) end)).
 
 
 loop(Map) ->
@@ -11,8 +11,8 @@ loop(Map) ->
         {{User, Password,login}, From} ->
             case maps:find(User,Map) of
                 {ok, {Password, Tipo, false}} ->
-                    loop(maps:update(User, {Password, Tipo, true}, Map)),
-                    from ! Tipo;
+                    From ! Tipo,
+                    loop(maps:update(User, {Password, Tipo, true}, Map));
                 _ -> From ! invalid, loop(Map)
             end;
         {{User,logout}, From} ->

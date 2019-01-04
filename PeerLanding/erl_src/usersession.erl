@@ -10,47 +10,66 @@
 -author("trident").
 
 %% API
--export([usersession/1, usersession/2]).
+-export([usersession/2, usersession/3]).
 
 
-usersession(Sock) ->
+usersession(Sock, Empresas) ->
   receive
     {tcp, Sock, Packet} ->
       io:format("Auth req ~w\n",[Packet]),
       AuthReq = protocolo:decode_msg(Packet, 'AuthReq'),
       Username = maps:get(username, AuthReq),
+      Password = maps:get(password, AuthReq),
       Tipo = accountManager:login(Username, maps:get(password, AuthReq)),
       io:format("Auth req ~w\n",[Tipo]),
+      io:format("user ~s\n",[Username]),
+      io:format("pass ~s\n",[Password]),
       case Tipo of
         invalid ->
           io:format("Login insucesso\n"),
-          OutPacket = protocolo:encode_msg(#{success => true, type => 0 },'AuthRep'),
+          OutPacket = protocolo:encode_msg(#{sucesso => false, tipo => 0 },'AuthRep'),
           gen_tcp:send(Sock,OutPacket),
-          usersession(Sock);
+          usersession(Sock,Empresas);
         _ ->
           io:format("Login sucesso\n"),
-          OutPacket = protocolo:encode_msg(#{success => true, type=>Tipo},'AuthRep'),
+          OutPacket = protocolo:encode_msg(#{sucesso => true, tipo=>Tipo},'AuthRep'),
           gen_tcp:send(Sock, OutPacket),
-          usersession(Sock,Username)
+          usersession(Sock,Username,Empresas)
       end;
     _ ->
       io:format("erro")
   end.
 
-usersession(Sock, Username) ->
-  case gen_tcp:recv(Sock, []) of
-    {ok, Packet} ->
-      Msg = protocolo:decode_msg(Packet, 'Message'),
-      Tipo = maps:get(type, Msg),
+usersession(Sock, Username, Empresas) ->
+  receive
+    {tcp, Sock, Packet} ->
+      Msg = protocolo:decode_msg(Packet, 'Mensagem'),
+      Tipo = maps:get(tipo, Msg),
       case Tipo of
-        %% licitar
-        "licitar" -> io:format("Licitar");
-        %% emprestimo
-        "emprestimo"->io:format("Emprestimo");
-        %% criar leilao
-        "leilao"->io:format("Criar leilao");
-        %% emissao
-        "emissao"->io:format("Emissao")
+
+        "licitar" ->
+          Pedido = maps:put(investidor, Username, Msg),
+          producer:run(Empresas, Pedido, self()),
+          io:format("Licitar"),
+          usersession(Sock,Username);
+
+        "emprestimo"->
+          Pedido = maps:put(investidor, Username, Msg),
+          producer:run(Empresas, Pedido, self()),
+          io:format("Emprestimo"),
+          usersession(Sock,Username);
+
+        "leilao"->
+          Pedido = maps:put(empresa, Username, Msg),
+          producer:run(Empresas, Pedido, self()),
+          io:format("Criar leilao"),
+          usersession(Sock,Username);
+
+        "emissao"->
+          Pedido = maps:put(empresa, Username, Msg),
+          producer:run(Empresas, Pedido, self()),
+          io:format("Emissao"),
+          usersession(Sock,Username)
       end,
       usersession(Sock, Username)
   end.

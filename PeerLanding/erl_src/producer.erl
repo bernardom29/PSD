@@ -10,10 +10,20 @@
 -author("trident").
 
 %% API
--export([]).
+-export([run/3]).
 
 
 %%% determinar a port
 %%% connect a socket push
 %%% send pelo socket "serializar"
 %%% morre
+
+run(Map, Msg, Pid) ->
+  Empresa = maps:get(empresa, Msg),
+  Endereco = maps:get(Empresa, Map),
+  {ok, Context} = erlzmq:context(),
+  {ok, Sock} = erlzmq:socket(Context, [push, {active, false}]),
+  erlzmq:connect(Sock,Endereco),
+  Packet = protocolo:encode_msg(#{pid => Pid, mensagem => Msg}, ExchangeRequest),
+  erlzmq:send(Sock, Packet).
+
