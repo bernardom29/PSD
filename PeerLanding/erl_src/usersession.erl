@@ -46,32 +46,29 @@ usersession(Sock, Username, Empresas) ->
       Msg = protocolo:decode_msg(Packet, 'Mensagem'),
       Tipo = maps:get(tipo, Msg),
       case Tipo of
-
         "licitar" ->
           Pedido = maps:put(investidor, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Licitar"),
-          usersession(Sock,Username);
-
+          io:format("Licitar");
         "emprestimo"->
           Pedido = maps:put(investidor, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Emprestimo"),
-          usersession(Sock,Username);
-
+          io:format("Emprestimo");
         "leilao"->
           Pedido = maps:put(empresa, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Criar leilao"),
-          usersession(Sock,Username);
-
+          io:format("Criar leilao");
         "emissao"->
           Pedido = maps:put(empresa, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Emissao"),
-          usersession(Sock,Username)
+          io:format("Emissao")
       end,
-      usersession(Sock, Username)
+      usersession(Sock,Username, Empresas);
+    {consumer, Msg} ->
+      Packet = protocolo:encode_msg(Msg,'Reply'),
+      gen_tcp:send(Sock,Packet),
+      usersession(Sock,Username, Empresas)
+
   end.
 
 

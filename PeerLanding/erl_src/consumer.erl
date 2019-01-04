@@ -29,7 +29,7 @@ consumerLoop(Sock) ->
     {ok, Packet} ->
       Msg = protocolo:decode_msg(Packet,'ExchangeReply'),
       Pid = maps:get(pid, Msg),
-      Pid ! maps:get(sucesso,Msg),
+      Pid ! {consumer,maps:get(sucesso,Msg)},
       consumerLoop(Sock);
     _ ->
       io:format("Erro receive consumer")

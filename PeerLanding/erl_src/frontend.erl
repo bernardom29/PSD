@@ -28,9 +28,9 @@ server() ->
 
 
 createConsumers()->
-  createConsumers(0,5,4000).
+  createConsumers(0,5,5000).
 createConsumers(Start, End, Port) when Start < End ->
-  spawn( fun() -> consumer:run(Port+Start) end ),
+  spawn( fun() -> consumer:run(string:concat("tcp://*:",integer_to_list(Port+Start))) end ),
   createConsumers(Start+1, End, Port).
 
 
@@ -38,4 +38,10 @@ acceptorService(LSock) ->
   {ok, Sock} = gen_tcp:accept(LSock),
   spawn(fun () -> acceptorService(LSock) end),
   io:format("conexão recebida\n"),
-  usersession:usersession(Sock).
+  usersession:usersession(Sock,#{
+    'CanecaLda' => "tcp://*:4000",'SapatoLda' => "tcp://*:4000",
+    'IsqueiroLda' => "tcp://*:4001", 'MesasLda' => "tcp://*:4001",
+    'AguaLda' => "tcp://*:4002", 'VinhoLda' => "tcp://*:4002",
+    'SandesLda' => "tcp://*:4003", 'OreoLda' => "tcp://*:4003",
+    'MongoLda' => "tcp://*:4004", 'RelogioLda' => "tcp://*:4004"
+    }).
