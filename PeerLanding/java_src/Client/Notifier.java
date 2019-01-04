@@ -1,15 +1,33 @@
 package Client;
 
-public class Notifier {
+import org.zeromq.ZMQ;
+import java.util.Vector;
 
-    /*
-    * socket SUB
-    * while true
-    *   recv
-    *   apresentar info
-    *
-    * metodo subscribe
-    *
-    *
-    * */
+public class Notifier implements Runnable{
+    ZMQ.Socket sub;
+    ZMQ.Context context;
+    Vector<String> mailbox;
+
+    public Notifier()
+    {
+        this.context = ZMQ.context(1);
+        this.sub = context.socket(ZMQ.SUB);
+        this.sub.connect("tcp://*:2000");
+        mailbox = new Vector<>();
+    }
+
+    @Override
+    public void run() {
+        while(true)
+        {
+            byte[] notification = this.sub.recv();
+            mailbox.add(new String(notification));
+        }
+    }
+
+    public void subscricao(String tipo, String empresas){
+        String[] array = empresas.split(" ");
+        for (int i = 0; i < 10 && i < array.length ;i++)
+            sub.subscribe(tipo+"-"+array[i]);
+    }
 }
