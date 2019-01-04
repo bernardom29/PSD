@@ -38,7 +38,18 @@
       #{juro                    => integer(),       % = 2, 32 bits
         quantia                 => integer(),       % = 3, 32 bits
         empresa                 => iolist(),        % = 4
-        tipo                    := iolist()         % = 1
+        tipo                    := iolist(),        % = 1
+        investidor              => iolist()         % = 5
+       }.
+
+-type 'ExchangeRequest'() ::
+      #{mensagem                := 'Mensagem'(),    % = 1
+        pid                     := integer()        % = 2, 32 bits
+       }.
+
+-type 'ExchangeReply'() ::
+      #{sucesso                 := boolean() | 0 | 1, % = 1
+        pid                     := integer()        % = 2, 32 bits
        }.
 
 -type 'AuthReq'() ::
@@ -55,13 +66,13 @@
       #{sucesso                 := boolean() | 0 | 1 % = 1
        }.
 
--export_type(['Mensagem'/0, 'AuthReq'/0, 'AuthRep'/0, 'Reply'/0]).
+-export_type(['Mensagem'/0, 'ExchangeRequest'/0, 'ExchangeReply'/0, 'AuthReq'/0, 'AuthRep'/0, 'Reply'/0]).
 
--spec encode_msg('Mensagem'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom()) -> binary().
+-spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom()) -> binary().
 encode_msg(Msg, MsgName) when is_atom(MsgName) ->
     encode_msg(Msg, MsgName, []).
 
--spec encode_msg('Mensagem'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom(), list()) -> binary().
+-spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, MsgName, Opts);
@@ -71,6 +82,12 @@ encode_msg(Msg, MsgName, Opts) ->
     case MsgName of
       'Mensagem' ->
 	  encode_msg_Mensagem(id(Msg, TrUserData), TrUserData);
+      'ExchangeRequest' ->
+	  encode_msg_ExchangeRequest(id(Msg, TrUserData),
+				     TrUserData);
+      'ExchangeReply' ->
+	  encode_msg_ExchangeReply(id(Msg, TrUserData),
+				   TrUserData);
       'AuthReq' ->
 	  encode_msg_AuthReq(id(Msg, TrUserData), TrUserData);
       'AuthRep' ->
@@ -110,9 +127,48 @@ encode_msg_Mensagem(#{tipo := F4} = M, Bin,
 	       end;
 	   _ -> B2
 	 end,
+    B4 = begin
+	   TrF4 = id(F4, TrUserData),
+	   e_type_string(TrF4, <<B3/binary, 10>>, TrUserData)
+	 end,
+    case M of
+      #{investidor := F5} ->
+	  begin
+	    TrF5 = id(F5, TrUserData),
+	    e_type_string(TrF5, <<B4/binary, 42>>, TrUserData)
+	  end;
+      _ -> B4
+    end.
+
+encode_msg_ExchangeRequest(Msg, TrUserData) ->
+    encode_msg_ExchangeRequest(Msg, <<>>, TrUserData).
+
+
+encode_msg_ExchangeRequest(#{mensagem := F1, pid := F2},
+			   Bin, TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_mfield_ExchangeRequest_mensagem(TrF1,
+					     <<Bin/binary, 10>>, TrUserData)
+	 end,
     begin
-      TrF4 = id(F4, TrUserData),
-      e_type_string(TrF4, <<B3/binary, 10>>, TrUserData)
+      TrF2 = id(F2, TrUserData),
+      e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+    end.
+
+encode_msg_ExchangeReply(Msg, TrUserData) ->
+    encode_msg_ExchangeReply(Msg, <<>>, TrUserData).
+
+
+encode_msg_ExchangeReply(#{sucesso := F1, pid := F2},
+			 Bin, TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
+	 end,
+    begin
+      TrF2 = id(F2, TrUserData),
+      e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
     end.
 
 encode_msg_AuthReq(Msg, TrUserData) ->
@@ -158,6 +214,12 @@ encode_msg_Reply(#{sucesso := F1}, Bin, TrUserData) ->
       TrF1 = id(F1, TrUserData),
       e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
     end.
+
+e_mfield_ExchangeRequest_mensagem(Msg, Bin,
+				  TrUserData) ->
+    SubBin = encode_msg_Mensagem(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
 
 -compile({nowarn_unused_function,e_type_sint/3}).
 e_type_sint(Value, Bin, _TrUserData) when Value >= 0 ->
@@ -275,6 +337,12 @@ decode_msg_1_catch(Bin, MsgName, TrUserData) ->
 
 decode_msg_2_doit('Mensagem', Bin, TrUserData) ->
     id(decode_msg_Mensagem(Bin, TrUserData), TrUserData);
+decode_msg_2_doit('ExchangeRequest', Bin, TrUserData) ->
+    id(decode_msg_ExchangeRequest(Bin, TrUserData),
+       TrUserData);
+decode_msg_2_doit('ExchangeReply', Bin, TrUserData) ->
+    id(decode_msg_ExchangeReply(Bin, TrUserData),
+       TrUserData);
 decode_msg_2_doit('AuthReq', Bin, TrUserData) ->
     id(decode_msg_AuthReq(Bin, TrUserData), TrUserData);
 decode_msg_2_doit('AuthRep', Bin, TrUserData) ->
@@ -289,26 +357,31 @@ decode_msg_Mensagem(Bin, TrUserData) ->
 				id('$undef', TrUserData),
 				id('$undef', TrUserData),
 				id('$undef', TrUserData),
+				id('$undef', TrUserData),
 				id('$undef', TrUserData), TrUserData).
 
 dfp_read_field_def_Mensagem(<<16, Rest/binary>>, Z1, Z2,
-			    F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_juro(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			  F@_4, TrUserData);
+			  F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<24, Rest/binary>>, Z1, Z2,
-			    F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_quantia(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			     F@_4, TrUserData);
+			     F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<34, Rest/binary>>, Z1, Z2,
-			    F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_empresa(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			     F@_4, TrUserData);
+			     F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<10, Rest/binary>>, Z1, Z2,
-			    F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_tipo(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			  F@_4, TrUserData);
+			  F@_4, F@_5, TrUserData);
+dfp_read_field_def_Mensagem(<<42, Rest/binary>>, Z1, Z2,
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    d_field_Mensagem_investidor(Rest, Z1, Z2, F@_1, F@_2,
+				F@_3, F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2,
-			    F@_3, F@_4, _) ->
+			    F@_3, F@_4, F@_5, _) ->
     S1 = #{tipo => F@_4},
     S2 = if F@_1 == '$undef' -> S1;
 	    true -> S1#{juro => F@_1}
@@ -316,56 +389,62 @@ dfp_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2,
     S3 = if F@_2 == '$undef' -> S2;
 	    true -> S2#{quantia => F@_2}
 	 end,
-    if F@_3 == '$undef' -> S3;
-       true -> S3#{empresa => F@_3}
+    S4 = if F@_3 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_3}
+	 end,
+    if F@_5 == '$undef' -> S4;
+       true -> S4#{investidor => F@_5}
     end;
 dfp_read_field_def_Mensagem(Other, Z1, Z2, F@_1, F@_2,
-			    F@_3, F@_4, TrUserData) ->
+			    F@_3, F@_4, F@_5, TrUserData) ->
     dg_read_field_def_Mensagem(Other, Z1, Z2, F@_1, F@_2,
-			       F@_3, F@_4, TrUserData).
+			       F@_3, F@_4, F@_5, TrUserData).
 
 dg_read_field_def_Mensagem(<<1:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+			   Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 32 - 7 ->
     dg_read_field_def_Mensagem(Rest, N + 7, X bsl N + Acc,
-			       F@_1, F@_2, F@_3, F@_4, TrUserData);
+			       F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
 dg_read_field_def_Mensagem(<<0:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			   Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
       16 ->
 	  d_field_Mensagem_juro(Rest, 0, 0, F@_1, F@_2, F@_3,
-				F@_4, TrUserData);
+				F@_4, F@_5, TrUserData);
       24 ->
 	  d_field_Mensagem_quantia(Rest, 0, 0, F@_1, F@_2, F@_3,
-				   F@_4, TrUserData);
+				   F@_4, F@_5, TrUserData);
       34 ->
 	  d_field_Mensagem_empresa(Rest, 0, 0, F@_1, F@_2, F@_3,
-				   F@_4, TrUserData);
+				   F@_4, F@_5, TrUserData);
       10 ->
 	  d_field_Mensagem_tipo(Rest, 0, 0, F@_1, F@_2, F@_3,
-				F@_4, TrUserData);
+				F@_4, F@_5, TrUserData);
+      42 ->
+	  d_field_Mensagem_investidor(Rest, 0, 0, F@_1, F@_2,
+				      F@_3, F@_4, F@_5, TrUserData);
       _ ->
 	  case Key band 7 of
 	    0 ->
 		skip_varint_Mensagem(Rest, 0, 0, F@_1, F@_2, F@_3, F@_4,
-				     TrUserData);
+				     F@_5, TrUserData);
 	    1 ->
 		skip_64_Mensagem(Rest, 0, 0, F@_1, F@_2, F@_3, F@_4,
-				 TrUserData);
+				 F@_5, TrUserData);
 	    2 ->
 		skip_length_delimited_Mensagem(Rest, 0, 0, F@_1, F@_2,
-					       F@_3, F@_4, TrUserData);
+					       F@_3, F@_4, F@_5, TrUserData);
 	    3 ->
 		skip_group_Mensagem(Rest, Key bsr 3, 0, F@_1, F@_2,
-				    F@_3, F@_4, TrUserData);
+				    F@_3, F@_4, F@_5, TrUserData);
 	    5 ->
 		skip_32_Mensagem(Rest, 0, 0, F@_1, F@_2, F@_3, F@_4,
-				 TrUserData)
+				 F@_5, TrUserData)
 	  end
     end;
 dg_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2, F@_3,
-			   F@_4, _) ->
+			   F@_4, F@_5, _) ->
     S1 = #{tipo => F@_4},
     S2 = if F@_1 == '$undef' -> S1;
 	    true -> S1#{juro => F@_1}
@@ -373,17 +452,20 @@ dg_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2, F@_3,
     S3 = if F@_2 == '$undef' -> S2;
 	    true -> S2#{quantia => F@_2}
 	 end,
-    if F@_3 == '$undef' -> S3;
-       true -> S3#{empresa => F@_3}
+    S4 = if F@_3 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_3}
+	 end,
+    if F@_5 == '$undef' -> S4;
+       true -> S4#{investidor => F@_5}
     end.
 
 d_field_Mensagem_juro(<<1:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, F@_4, TrUserData)
+		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     d_field_Mensagem_juro(Rest, N + 7, X bsl N + Acc, F@_1,
-			  F@_2, F@_3, F@_4, TrUserData);
+			  F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_juro(<<0:1, X:7, Rest/binary>>, N, Acc,
-		      _, F@_2, F@_3, F@_4, TrUserData) ->
+		      _, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     {NewFValue, RestF} = {begin
 			    <<Res:32/signed-native>> = <<(X bsl N +
 							    Acc):32/unsigned-native>>,
@@ -391,15 +473,15 @@ d_field_Mensagem_juro(<<0:1, X:7, Rest/binary>>, N, Acc,
 			  end,
 			  Rest},
     dfp_read_field_def_Mensagem(RestF, 0, 0, NewFValue,
-				F@_2, F@_3, F@_4, TrUserData).
+				F@_2, F@_3, F@_4, F@_5, TrUserData).
 
 d_field_Mensagem_quantia(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     d_field_Mensagem_quantia(Rest, N + 7, X bsl N + Acc,
-			     F@_1, F@_2, F@_3, F@_4, TrUserData);
+			     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_quantia(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, _, F@_3, F@_4, TrUserData) ->
+			 Acc, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
     {NewFValue, RestF} = {begin
 			    <<Res:32/signed-native>> = <<(X bsl N +
 							    Acc):32/unsigned-native>>,
@@ -407,15 +489,15 @@ d_field_Mensagem_quantia(<<0:1, X:7, Rest/binary>>, N,
 			  end,
 			  Rest},
     dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1,
-				NewFValue, F@_3, F@_4, TrUserData).
+				NewFValue, F@_3, F@_4, F@_5, TrUserData).
 
 d_field_Mensagem_empresa(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     d_field_Mensagem_empresa(Rest, N + 7, X bsl N + Acc,
-			     F@_1, F@_2, F@_3, F@_4, TrUserData);
+			     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_empresa(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, _, F@_4, TrUserData) ->
+			 Acc, F@_1, F@_2, _, F@_4, F@_5, TrUserData) ->
     {NewFValue, RestF} = begin
 			   Len = X bsl N + Acc,
 			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
@@ -424,15 +506,15 @@ d_field_Mensagem_empresa(<<0:1, X:7, Rest/binary>>, N,
 			    Rest2}
 			 end,
     dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1, F@_2,
-				NewFValue, F@_4, TrUserData).
+				NewFValue, F@_4, F@_5, TrUserData).
 
 d_field_Mensagem_tipo(<<1:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, F@_4, TrUserData)
+		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     d_field_Mensagem_tipo(Rest, N + 7, X bsl N + Acc, F@_1,
-			  F@_2, F@_3, F@_4, TrUserData);
+			  F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_tipo(<<0:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, _, TrUserData) ->
+		      F@_1, F@_2, F@_3, _, F@_5, TrUserData) ->
     {NewFValue, RestF} = begin
 			   Len = X bsl N + Acc,
 			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
@@ -441,47 +523,341 @@ d_field_Mensagem_tipo(<<0:1, X:7, Rest/binary>>, N, Acc,
 			    Rest2}
 			 end,
     dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1, F@_2,
-				F@_3, NewFValue, TrUserData).
+				F@_3, NewFValue, F@_5, TrUserData).
+
+d_field_Mensagem_investidor(<<1:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
+    when N < 57 ->
+    d_field_Mensagem_investidor(Rest, N + 7, X bsl N + Acc,
+				F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
+d_field_Mensagem_investidor(<<0:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, F@_3, F@_4, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1, F@_2,
+				F@_3, F@_4, NewFValue, TrUserData).
 
 skip_varint_Mensagem(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		     F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+		     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     skip_varint_Mensagem(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			 F@_4, TrUserData);
+			 F@_4, F@_5, TrUserData);
 skip_varint_Mensagem(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		     F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+		     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1, F@_2,
-				F@_3, F@_4, TrUserData).
+				F@_3, F@_4, F@_5, TrUserData).
 
 skip_length_delimited_Mensagem(<<1:1, X:7,
 				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+			       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     skip_length_delimited_Mensagem(Rest, N + 7,
-				   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+				   X bsl N + Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
 				   TrUserData);
 skip_length_delimited_Mensagem(<<0:1, X:7,
 				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
+			       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+			       TrUserData) ->
     Length = X bsl N + Acc,
     <<_:Length/binary, Rest2/binary>> = Rest,
     dfp_read_field_def_Mensagem(Rest2, 0, 0, F@_1, F@_2,
-				F@_3, F@_4, TrUserData).
+				F@_3, F@_4, F@_5, TrUserData).
 
 skip_group_Mensagem(Bin, FNum, Z2, F@_1, F@_2, F@_3,
-		    F@_4, TrUserData) ->
+		    F@_4, F@_5, TrUserData) ->
     {_, Rest} = read_group(Bin, FNum),
     dfp_read_field_def_Mensagem(Rest, 0, Z2, F@_1, F@_2,
-				F@_3, F@_4, TrUserData).
+				F@_3, F@_4, F@_5, TrUserData).
 
 skip_32_Mensagem(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		 F@_2, F@_3, F@_4, TrUserData) ->
+		 F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1, F@_2,
-				F@_3, F@_4, TrUserData).
+				F@_3, F@_4, F@_5, TrUserData).
 
 skip_64_Mensagem(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		 F@_2, F@_3, F@_4, TrUserData) ->
+		 F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1, F@_2,
-				F@_3, F@_4, TrUserData).
+				F@_3, F@_4, F@_5, TrUserData).
+
+decode_msg_ExchangeRequest(Bin, TrUserData) ->
+    dfp_read_field_def_ExchangeRequest(Bin, 0, 0,
+				       id('$undef', TrUserData),
+				       id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_ExchangeRequest(<<10, Rest/binary>>,
+				   Z1, Z2, F@_1, F@_2, TrUserData) ->
+    d_field_ExchangeRequest_mensagem(Rest, Z1, Z2, F@_1,
+				     F@_2, TrUserData);
+dfp_read_field_def_ExchangeRequest(<<16, Rest/binary>>,
+				   Z1, Z2, F@_1, F@_2, TrUserData) ->
+    d_field_ExchangeRequest_pid(Rest, Z1, Z2, F@_1, F@_2,
+				TrUserData);
+dfp_read_field_def_ExchangeRequest(<<>>, 0, 0, F@_1,
+				   F@_2, _) ->
+    S1 = #{pid => F@_2},
+    if F@_1 == '$undef' -> S1;
+       true -> S1#{mensagem => F@_1}
+    end;
+dfp_read_field_def_ExchangeRequest(Other, Z1, Z2, F@_1,
+				   F@_2, TrUserData) ->
+    dg_read_field_def_ExchangeRequest(Other, Z1, Z2, F@_1,
+				      F@_2, TrUserData).
+
+dg_read_field_def_ExchangeRequest(<<1:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, F@_2, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_ExchangeRequest(Rest, N + 7,
+				      X bsl N + Acc, F@_1, F@_2, TrUserData);
+dg_read_field_def_ExchangeRequest(<<0:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, F@_2, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_ExchangeRequest_mensagem(Rest, 0, 0, F@_1, F@_2,
+					   TrUserData);
+      16 ->
+	  d_field_ExchangeRequest_pid(Rest, 0, 0, F@_1, F@_2,
+				      TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_ExchangeRequest(Rest, 0, 0, F@_1, F@_2,
+					    TrUserData);
+	    1 ->
+		skip_64_ExchangeRequest(Rest, 0, 0, F@_1, F@_2,
+					TrUserData);
+	    2 ->
+		skip_length_delimited_ExchangeRequest(Rest, 0, 0, F@_1,
+						      F@_2, TrUserData);
+	    3 ->
+		skip_group_ExchangeRequest(Rest, Key bsr 3, 0, F@_1,
+					   F@_2, TrUserData);
+	    5 ->
+		skip_32_ExchangeRequest(Rest, 0, 0, F@_1, F@_2,
+					TrUserData)
+	  end
+    end;
+dg_read_field_def_ExchangeRequest(<<>>, 0, 0, F@_1,
+				  F@_2, _) ->
+    S1 = #{pid => F@_2},
+    if F@_1 == '$undef' -> S1;
+       true -> S1#{mensagem => F@_1}
+    end.
+
+d_field_ExchangeRequest_mensagem(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_ExchangeRequest_mensagem(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, TrUserData);
+d_field_ExchangeRequest_mensagem(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, Prev, F@_2, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(decode_msg_Mensagem(Bs, TrUserData), TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_ExchangeRequest(RestF, 0, 0,
+				       if Prev == '$undef' -> NewFValue;
+					  true ->
+					      merge_msg_Mensagem(Prev,
+								 NewFValue,
+								 TrUserData)
+				       end,
+				       F@_2, TrUserData).
+
+d_field_ExchangeRequest_pid(<<1:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_ExchangeRequest_pid(Rest, N + 7, X bsl N + Acc,
+				F@_1, F@_2, TrUserData);
+d_field_ExchangeRequest_pid(<<0:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, _, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_ExchangeRequest(RestF, 0, 0, F@_1,
+				       NewFValue, TrUserData).
+
+skip_varint_ExchangeRequest(<<1:1, _:7, Rest/binary>>,
+			    Z1, Z2, F@_1, F@_2, TrUserData) ->
+    skip_varint_ExchangeRequest(Rest, Z1, Z2, F@_1, F@_2,
+				TrUserData);
+skip_varint_ExchangeRequest(<<0:1, _:7, Rest/binary>>,
+			    Z1, Z2, F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeRequest(Rest, Z1, Z2, F@_1,
+				       F@_2, TrUserData).
+
+skip_length_delimited_ExchangeRequest(<<1:1, X:7,
+					Rest/binary>>,
+				      N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_ExchangeRequest(Rest, N + 7,
+					  X bsl N + Acc, F@_1, F@_2,
+					  TrUserData);
+skip_length_delimited_ExchangeRequest(<<0:1, X:7,
+					Rest/binary>>,
+				      N, Acc, F@_1, F@_2, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_ExchangeRequest(Rest2, 0, 0, F@_1,
+				       F@_2, TrUserData).
+
+skip_group_ExchangeRequest(Bin, FNum, Z2, F@_1, F@_2,
+			   TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_ExchangeRequest(Rest, 0, Z2, F@_1,
+				       F@_2, TrUserData).
+
+skip_32_ExchangeRequest(<<_:32, Rest/binary>>, Z1, Z2,
+			F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeRequest(Rest, Z1, Z2, F@_1,
+				       F@_2, TrUserData).
+
+skip_64_ExchangeRequest(<<_:64, Rest/binary>>, Z1, Z2,
+			F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeRequest(Rest, Z1, Z2, F@_1,
+				       F@_2, TrUserData).
+
+decode_msg_ExchangeReply(Bin, TrUserData) ->
+    dfp_read_field_def_ExchangeReply(Bin, 0, 0,
+				     id('$undef', TrUserData),
+				     id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_ExchangeReply(<<8, Rest/binary>>, Z1,
+				 Z2, F@_1, F@_2, TrUserData) ->
+    d_field_ExchangeReply_sucesso(Rest, Z1, Z2, F@_1, F@_2,
+				  TrUserData);
+dfp_read_field_def_ExchangeReply(<<16, Rest/binary>>,
+				 Z1, Z2, F@_1, F@_2, TrUserData) ->
+    d_field_ExchangeReply_pid(Rest, Z1, Z2, F@_1, F@_2,
+			      TrUserData);
+dfp_read_field_def_ExchangeReply(<<>>, 0, 0, F@_1, F@_2,
+				 _) ->
+    #{sucesso => F@_1, pid => F@_2};
+dfp_read_field_def_ExchangeReply(Other, Z1, Z2, F@_1,
+				 F@_2, TrUserData) ->
+    dg_read_field_def_ExchangeReply(Other, Z1, Z2, F@_1,
+				    F@_2, TrUserData).
+
+dg_read_field_def_ExchangeReply(<<1:1, X:7,
+				  Rest/binary>>,
+				N, Acc, F@_1, F@_2, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_ExchangeReply(Rest, N + 7,
+				    X bsl N + Acc, F@_1, F@_2, TrUserData);
+dg_read_field_def_ExchangeReply(<<0:1, X:7,
+				  Rest/binary>>,
+				N, Acc, F@_1, F@_2, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      8 ->
+	  d_field_ExchangeReply_sucesso(Rest, 0, 0, F@_1, F@_2,
+					TrUserData);
+      16 ->
+	  d_field_ExchangeReply_pid(Rest, 0, 0, F@_1, F@_2,
+				    TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_ExchangeReply(Rest, 0, 0, F@_1, F@_2,
+					  TrUserData);
+	    1 ->
+		skip_64_ExchangeReply(Rest, 0, 0, F@_1, F@_2,
+				      TrUserData);
+	    2 ->
+		skip_length_delimited_ExchangeReply(Rest, 0, 0, F@_1,
+						    F@_2, TrUserData);
+	    3 ->
+		skip_group_ExchangeReply(Rest, Key bsr 3, 0, F@_1, F@_2,
+					 TrUserData);
+	    5 ->
+		skip_32_ExchangeReply(Rest, 0, 0, F@_1, F@_2,
+				      TrUserData)
+	  end
+    end;
+dg_read_field_def_ExchangeReply(<<>>, 0, 0, F@_1, F@_2,
+				_) ->
+    #{sucesso => F@_1, pid => F@_2}.
+
+d_field_ExchangeReply_sucesso(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_ExchangeReply_sucesso(Rest, N + 7,
+				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+d_field_ExchangeReply_sucesso(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, _, F@_2, TrUserData) ->
+    {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
+			     TrUserData),
+			  Rest},
+    dfp_read_field_def_ExchangeReply(RestF, 0, 0, NewFValue,
+				     F@_2, TrUserData).
+
+d_field_ExchangeReply_pid(<<1:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_ExchangeReply_pid(Rest, N + 7, X bsl N + Acc,
+			      F@_1, F@_2, TrUserData);
+d_field_ExchangeReply_pid(<<0:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, _, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_ExchangeReply(RestF, 0, 0, F@_1,
+				     NewFValue, TrUserData).
+
+skip_varint_ExchangeReply(<<1:1, _:7, Rest/binary>>, Z1,
+			  Z2, F@_1, F@_2, TrUserData) ->
+    skip_varint_ExchangeReply(Rest, Z1, Z2, F@_1, F@_2,
+			      TrUserData);
+skip_varint_ExchangeReply(<<0:1, _:7, Rest/binary>>, Z1,
+			  Z2, F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeReply(Rest, Z1, Z2, F@_1,
+				     F@_2, TrUserData).
+
+skip_length_delimited_ExchangeReply(<<1:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_ExchangeReply(Rest, N + 7,
+					X bsl N + Acc, F@_1, F@_2, TrUserData);
+skip_length_delimited_ExchangeReply(<<0:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_ExchangeReply(Rest2, 0, 0, F@_1,
+				     F@_2, TrUserData).
+
+skip_group_ExchangeReply(Bin, FNum, Z2, F@_1, F@_2,
+			 TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_ExchangeReply(Rest, 0, Z2, F@_1,
+				     F@_2, TrUserData).
+
+skip_32_ExchangeReply(<<_:32, Rest/binary>>, Z1, Z2,
+		      F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeReply(Rest, Z1, Z2, F@_1,
+				     F@_2, TrUserData).
+
+skip_64_ExchangeReply(<<_:64, Rest/binary>>, Z1, Z2,
+		      F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_ExchangeReply(Rest, Z1, Z2, F@_1,
+				     F@_2, TrUserData).
 
 decode_msg_AuthReq(Bin, TrUserData) ->
     dfp_read_field_def_AuthReq(Bin, 0, 0,
@@ -883,6 +1259,10 @@ merge_msgs(Prev, New, MsgName, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
       'Mensagem' -> merge_msg_Mensagem(Prev, New, TrUserData);
+      'ExchangeRequest' ->
+	  merge_msg_ExchangeRequest(Prev, New, TrUserData);
+      'ExchangeReply' ->
+	  merge_msg_ExchangeReply(Prev, New, TrUserData);
       'AuthReq' -> merge_msg_AuthReq(Prev, New, TrUserData);
       'AuthRep' -> merge_msg_AuthRep(Prev, New, TrUserData);
       'Reply' -> merge_msg_Reply(Prev, New, TrUserData)
@@ -904,13 +1284,33 @@ merge_msg_Mensagem(#{} = PMsg, #{tipo := NFtipo} = NMsg,
 	       S2#{quantia => PFquantia};
 	   _ -> S2
 	 end,
+    S4 = case {PMsg, NMsg} of
+	   {_, #{empresa := NFempresa}} ->
+	       S3#{empresa => NFempresa};
+	   {#{empresa := PFempresa}, _} ->
+	       S3#{empresa => PFempresa};
+	   _ -> S3
+	 end,
     case {PMsg, NMsg} of
-      {_, #{empresa := NFempresa}} ->
-	  S3#{empresa => NFempresa};
-      {#{empresa := PFempresa}, _} ->
-	  S3#{empresa => PFempresa};
-      _ -> S3
+      {_, #{investidor := NFinvestidor}} ->
+	  S4#{investidor => NFinvestidor};
+      {#{investidor := PFinvestidor}, _} ->
+	  S4#{investidor => PFinvestidor};
+      _ -> S4
     end.
+
+-compile({nowarn_unused_function,merge_msg_ExchangeRequest/3}).
+merge_msg_ExchangeRequest(#{mensagem := PFmensagem},
+			  #{mensagem := NFmensagem, pid := NFpid},
+			  TrUserData) ->
+    #{mensagem =>
+	  merge_msg_Mensagem(PFmensagem, NFmensagem, TrUserData),
+      pid => NFpid}.
+
+-compile({nowarn_unused_function,merge_msg_ExchangeReply/3}).
+merge_msg_ExchangeReply(#{},
+			#{sucesso := NFsucesso, pid := NFpid}, _) ->
+    #{sucesso => NFsucesso, pid => NFpid}.
 
 -compile({nowarn_unused_function,merge_msg_AuthReq/3}).
 merge_msg_AuthReq(#{},
@@ -940,6 +1340,10 @@ verify_msg(Msg, MsgName, Opts) ->
     case MsgName of
       'Mensagem' ->
 	  v_msg_Mensagem(Msg, [MsgName], TrUserData);
+      'ExchangeRequest' ->
+	  v_msg_ExchangeRequest(Msg, [MsgName], TrUserData);
+      'ExchangeReply' ->
+	  v_msg_ExchangeReply(Msg, [MsgName], TrUserData);
       'AuthReq' -> v_msg_AuthReq(Msg, [MsgName], TrUserData);
       'AuthRep' -> v_msg_AuthRep(Msg, [MsgName], TrUserData);
       'Reply' -> v_msg_Reply(Msg, [MsgName], TrUserData);
@@ -966,10 +1370,16 @@ v_msg_Mensagem(#{tipo := F4} = M, Path, TrUserData) ->
       _ -> ok
     end,
     v_type_string(F4, [tipo | Path], TrUserData),
+    case M of
+      #{investidor := F5} ->
+	  v_type_string(F5, [investidor | Path], TrUserData);
+      _ -> ok
+    end,
     lists:foreach(fun (juro) -> ok;
 		      (quantia) -> ok;
 		      (empresa) -> ok;
 		      (tipo) -> ok;
+		      (investidor) -> ok;
 		      (OtherKey) ->
 			  mk_type_error({extraneous_key, OtherKey}, M, Path)
 		  end,
@@ -981,6 +1391,49 @@ v_msg_Mensagem(M, Path, _TrUserData) when is_map(M) ->
 		  M, Path);
 v_msg_Mensagem(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'Mensagem'}, X, Path).
+
+-compile({nowarn_unused_function,v_msg_ExchangeRequest/3}).
+-dialyzer({nowarn_function,v_msg_ExchangeRequest/3}).
+v_msg_ExchangeRequest(#{mensagem := F1, pid := F2} = M,
+		      Path, TrUserData) ->
+    v_msg_Mensagem(F1, [mensagem | Path], TrUserData),
+    v_type_int32(F2, [pid | Path], TrUserData),
+    lists:foreach(fun (mensagem) -> ok;
+		      (pid) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_ExchangeRequest(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [mensagem, pid] -- maps:keys(M), 'ExchangeRequest'},
+		  M, Path);
+v_msg_ExchangeRequest(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'ExchangeRequest'}, X,
+		  Path).
+
+-compile({nowarn_unused_function,v_msg_ExchangeReply/3}).
+-dialyzer({nowarn_function,v_msg_ExchangeReply/3}).
+v_msg_ExchangeReply(#{sucesso := F1, pid := F2} = M,
+		    Path, TrUserData) ->
+    v_type_bool(F1, [sucesso | Path], TrUserData),
+    v_type_int32(F2, [pid | Path], TrUserData),
+    lists:foreach(fun (sucesso) -> ok;
+		      (pid) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_ExchangeReply(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [sucesso, pid] -- maps:keys(M), 'ExchangeReply'},
+		  M, Path);
+v_msg_ExchangeReply(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'ExchangeReply'}, X, Path).
 
 -compile({nowarn_unused_function,v_msg_AuthReq/3}).
 -dialyzer({nowarn_function,v_msg_AuthReq/3}).
@@ -1127,6 +1580,19 @@ get_msg_defs() ->
        #{name => empresa, fnum => 4, rnum => 4, type => string,
 	 occurrence => optional, opts => []},
        #{name => tipo, fnum => 1, rnum => 5, type => string,
+	 occurrence => required, opts => []},
+       #{name => investidor, fnum => 5, rnum => 6,
+	 type => string, occurrence => optional, opts => []}]},
+     {{msg, 'ExchangeRequest'},
+      [#{name => mensagem, fnum => 1, rnum => 2,
+	 type => {msg, 'Mensagem'}, occurrence => required,
+	 opts => []},
+       #{name => pid, fnum => 2, rnum => 3, type => int32,
+	 occurrence => required, opts => []}]},
+     {{msg, 'ExchangeReply'},
+      [#{name => sucesso, fnum => 1, rnum => 2, type => bool,
+	 occurrence => required, opts => []},
+       #{name => pid, fnum => 2, rnum => 3, type => int32,
 	 occurrence => required, opts => []}]},
      {{msg, 'AuthReq'},
       [#{name => username, fnum => 1, rnum => 2,
@@ -1144,14 +1610,16 @@ get_msg_defs() ->
 
 
 get_msg_names() ->
-    ['Mensagem', 'AuthReq', 'AuthRep', 'Reply'].
+    ['Mensagem', 'ExchangeRequest', 'ExchangeReply',
+     'AuthReq', 'AuthRep', 'Reply'].
 
 
 get_group_names() -> [].
 
 
 get_msg_or_group_names() ->
-    ['Mensagem', 'AuthReq', 'AuthRep', 'Reply'].
+    ['Mensagem', 'ExchangeRequest', 'ExchangeReply',
+     'AuthReq', 'AuthRep', 'Reply'].
 
 
 get_enum_names() -> [].
@@ -1177,6 +1645,19 @@ find_msg_def('Mensagem') ->
      #{name => empresa, fnum => 4, rnum => 4, type => string,
        occurrence => optional, opts => []},
      #{name => tipo, fnum => 1, rnum => 5, type => string,
+       occurrence => required, opts => []},
+     #{name => investidor, fnum => 5, rnum => 6,
+       type => string, occurrence => optional, opts => []}];
+find_msg_def('ExchangeRequest') ->
+    [#{name => mensagem, fnum => 1, rnum => 2,
+       type => {msg, 'Mensagem'}, occurrence => required,
+       opts => []},
+     #{name => pid, fnum => 2, rnum => 3, type => int32,
+       occurrence => required, opts => []}];
+find_msg_def('ExchangeReply') ->
+    [#{name => sucesso, fnum => 1, rnum => 2, type => bool,
+       occurrence => required, opts => []},
+     #{name => pid, fnum => 2, rnum => 3, type => int32,
        occurrence => required, opts => []}];
 find_msg_def('AuthReq') ->
     [#{name => username, fnum => 1, rnum => 2,

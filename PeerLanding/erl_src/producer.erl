@@ -24,6 +24,6 @@ run(Map, Msg, Pid) ->
   {ok, Context} = erlzmq:context(),
   {ok, Sock} = erlzmq:socket(Context, [push, {active, false}]),
   erlzmq:connect(Sock,Endereco),
-  Packet = protocolo:encode_msg(#{pid => Pid, mensagem => Msg}, ExchangeRequest),
+  Packet = protocolo:encode_msg(#{pid => Pid, mensagem => Msg}, 'ExchangeRequest'),
   erlzmq:send(Sock, Packet).
 
