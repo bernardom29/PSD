@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
-import Client.Protocolo.*;
+import Protos.Protocolo.*;
 
 public class Client {
     Notifier notifier;
@@ -99,7 +99,12 @@ public class Client {
                 .setTipo("leilao")
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        rep = getReply(rep, leilaoReq);
+        try {
+            os.write(leilaoReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso no leilão");
         }
@@ -114,7 +119,12 @@ public class Client {
         Mensagem emissaoReq = Mensagem.newBuilder()
                 .setTipo("emissao")
                 .setQuantia(Integer.parseInt(quantia)).build();
-        rep = getReply(rep, emissaoReq);
+        try {
+            os.write(emissaoReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso na emissao");
         }
@@ -163,7 +173,12 @@ public class Client {
                 .setEmpresa(empresa)
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        rep = getReply(rep, licitarReq);
+        try {
+            os.write(licitarReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso na licitação");
         }
@@ -179,7 +194,12 @@ public class Client {
                 .setTipo("emprestimo")
                 .setEmpresa(empresa)
                 .setQuantia(Integer.parseInt(quantia)).build();
-        rep = getReply(rep, emprestimoReq);
+        try {
+            os.write(emprestimoReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso no emprestimo");
         }
@@ -204,9 +224,9 @@ public class Client {
 
     }
 
-    private Reply getReply(Reply rep, Mensagem mensagem) {
+    private Reply getReply() {
+        Reply rep = null;
         try {
-            this.os.write(mensagem.toByteArray());
             byte[] response = this.recv();
             rep = Reply.parseFrom(response);
         } catch (IOException e) {

@@ -28,7 +28,7 @@ consumerLoop(Sock) ->
   case erlzmq:recv(Sock) of
     {ok, Packet} ->
       Msg = protocolo:decode_msg(Packet,'ExchangeReply'),
-      Pid = maps:get(pid, Msg),
+      Pid = maps:get(pid, binary_to_term(Msg)),
       Pid ! {consumer,maps:get(sucesso,Msg)},
       consumerLoop(Sock);
     _ ->

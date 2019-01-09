@@ -3,7 +3,7 @@
 
 
 accountService() ->
-    register(?MODULE, erlang:spawn(fun() -> loop(#{"rabeta" => {"mongo", 1, false} , "nabo" => {"mongo", 2, false}} ) end)).
+    register(?MODULE, erlang:spawn(fun() -> loop(#{"rabeta" => {"mongo", 1, false} , "IsqueiroLda" => {"mongo", 2, false}} ) end)).
 
 
 loop(Map) ->

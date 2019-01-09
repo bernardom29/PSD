@@ -35,21 +35,51 @@
 
 %% message types
 -type 'Mensagem'() ::
-      #{juro                    => integer(),       % = 2, 32 bits
+      #{tipo                    := iolist(),        % = 1
+        juro                    => integer(),       % = 2, 32 bits
         quantia                 => integer(),       % = 3, 32 bits
         empresa                 => iolist(),        % = 4
-        tipo                    := iolist(),        % = 1
         investidor              => iolist()         % = 5
        }.
 
 -type 'ExchangeRequest'() ::
       #{mensagem                := 'Mensagem'(),    % = 1
-        pid                     := integer()        % = 2, 32 bits
+        pid                     := iodata()         % = 2
        }.
 
 -type 'ExchangeReply'() ::
       #{sucesso                 := boolean() | 0 | 1, % = 1
-        pid                     := integer()        % = 2, 32 bits
+        pid                     := iodata()         % = 2
+       }.
+
+-type 'LeilaoReply'() ::
+      #{taxaMaximaAlocada       := integer(),       % = 1, 32 bits
+        taxaMaxima              := integer(),       % = 2, 32 bits
+        sucesso                 := boolean() | 0 | 1 % = 3
+       }.
+
+-type 'EmissaoReply'() ::
+      #{taxa                    := integer(),       % = 1, 32 bits
+        sucesso                 := boolean() | 0 | 1 % = 2
+       }.
+
+-type 'DirectoryReply'() ::
+      #{success                 := boolean() | 0 | 1, % = 1
+        leilao                  => 'LeilaoReply'(), % = 2
+        emissao                 => 'EmissaoReply'() % = 3
+       }.
+
+-type 'DirectoryRequest'() ::
+      #{tipo                    := iolist(),        % = 1
+        empresa                 := iolist()         % = 2
+       }.
+
+-type 'AddDirectoryRequest'() ::
+      #{tipo                    := iolist(),        % = 1
+        juro                    => integer(),       % = 2, 32 bits
+        quantia                 => integer(),       % = 3, 32 bits
+        empresa                 => iolist(),        % = 4
+        investidor              => iolist()         % = 5
        }.
 
 -type 'AuthReq'() ::
@@ -66,13 +96,13 @@
       #{sucesso                 := boolean() | 0 | 1 % = 1
        }.
 
--export_type(['Mensagem'/0, 'ExchangeRequest'/0, 'ExchangeReply'/0, 'AuthReq'/0, 'AuthRep'/0, 'Reply'/0]).
+-export_type(['Mensagem'/0, 'ExchangeRequest'/0, 'ExchangeReply'/0, 'LeilaoReply'/0, 'EmissaoReply'/0, 'DirectoryReply'/0, 'DirectoryRequest'/0, 'AddDirectoryRequest'/0, 'AuthReq'/0, 'AuthRep'/0, 'Reply'/0]).
 
--spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom()) -> binary().
+-spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'LeilaoReply'() | 'EmissaoReply'() | 'DirectoryReply'() | 'DirectoryRequest'() | 'AddDirectoryRequest'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom()) -> binary().
 encode_msg(Msg, MsgName) when is_atom(MsgName) ->
     encode_msg(Msg, MsgName, []).
 
--spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom(), list()) -> binary().
+-spec encode_msg('Mensagem'() | 'ExchangeRequest'() | 'ExchangeReply'() | 'LeilaoReply'() | 'EmissaoReply'() | 'DirectoryReply'() | 'DirectoryRequest'() | 'AddDirectoryRequest'() | 'AuthReq'() | 'AuthRep'() | 'Reply'(), atom(), list()) -> binary().
 encode_msg(Msg, MsgName, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, MsgName, Opts);
@@ -88,6 +118,20 @@ encode_msg(Msg, MsgName, Opts) ->
       'ExchangeReply' ->
 	  encode_msg_ExchangeReply(id(Msg, TrUserData),
 				   TrUserData);
+      'LeilaoReply' ->
+	  encode_msg_LeilaoReply(id(Msg, TrUserData), TrUserData);
+      'EmissaoReply' ->
+	  encode_msg_EmissaoReply(id(Msg, TrUserData),
+				  TrUserData);
+      'DirectoryReply' ->
+	  encode_msg_DirectoryReply(id(Msg, TrUserData),
+				    TrUserData);
+      'DirectoryRequest' ->
+	  encode_msg_DirectoryRequest(id(Msg, TrUserData),
+				      TrUserData);
+      'AddDirectoryRequest' ->
+	  encode_msg_AddDirectoryRequest(id(Msg, TrUserData),
+					 TrUserData);
       'AuthReq' ->
 	  encode_msg_AuthReq(id(Msg, TrUserData), TrUserData);
       'AuthRep' ->
@@ -101,35 +145,35 @@ encode_msg_Mensagem(Msg, TrUserData) ->
     encode_msg_Mensagem(Msg, <<>>, TrUserData).
 
 
-encode_msg_Mensagem(#{tipo := F4} = M, Bin,
+encode_msg_Mensagem(#{tipo := F1} = M, Bin,
 		    TrUserData) ->
-    B1 = case M of
-	   #{juro := F1} ->
-	       begin
-		 TrF1 = id(F1, TrUserData),
-		 e_type_int32(TrF1, <<Bin/binary, 16>>, TrUserData)
-	       end;
-	   _ -> Bin
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
 	 end,
     B2 = case M of
-	   #{quantia := F2} ->
+	   #{juro := F2} ->
 	       begin
 		 TrF2 = id(F2, TrUserData),
-		 e_type_int32(TrF2, <<B1/binary, 24>>, TrUserData)
+		 e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
 	       end;
 	   _ -> B1
 	 end,
     B3 = case M of
-	   #{empresa := F3} ->
+	   #{quantia := F3} ->
 	       begin
 		 TrF3 = id(F3, TrUserData),
-		 e_type_string(TrF3, <<B2/binary, 34>>, TrUserData)
+		 e_type_int32(TrF3, <<B2/binary, 24>>, TrUserData)
 	       end;
 	   _ -> B2
 	 end,
-    B4 = begin
-	   TrF4 = id(F4, TrUserData),
-	   e_type_string(TrF4, <<B3/binary, 10>>, TrUserData)
+    B4 = case M of
+	   #{empresa := F4} ->
+	       begin
+		 TrF4 = id(F4, TrUserData),
+		 e_type_string(TrF4, <<B3/binary, 34>>, TrUserData)
+	       end;
+	   _ -> B3
 	 end,
     case M of
       #{investidor := F5} ->
@@ -153,7 +197,7 @@ encode_msg_ExchangeRequest(#{mensagem := F1, pid := F2},
 	 end,
     begin
       TrF2 = id(F2, TrUserData),
-      e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+      e_type_bytes(TrF2, <<B1/binary, 18>>, TrUserData)
     end.
 
 encode_msg_ExchangeReply(Msg, TrUserData) ->
@@ -168,7 +212,130 @@ encode_msg_ExchangeReply(#{sucesso := F1, pid := F2},
 	 end,
     begin
       TrF2 = id(F2, TrUserData),
-      e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+      e_type_bytes(TrF2, <<B1/binary, 18>>, TrUserData)
+    end.
+
+encode_msg_LeilaoReply(Msg, TrUserData) ->
+    encode_msg_LeilaoReply(Msg, <<>>, TrUserData).
+
+
+encode_msg_LeilaoReply(#{taxaMaximaAlocada := F1,
+			 taxaMaxima := F2, sucesso := F3},
+		       Bin, TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+	 end,
+    B2 = begin
+	   TrF2 = id(F2, TrUserData),
+	   e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+	 end,
+    begin
+      TrF3 = id(F3, TrUserData),
+      e_type_bool(TrF3, <<B2/binary, 24>>, TrUserData)
+    end.
+
+encode_msg_EmissaoReply(Msg, TrUserData) ->
+    encode_msg_EmissaoReply(Msg, <<>>, TrUserData).
+
+
+encode_msg_EmissaoReply(#{taxa := F1, sucesso := F2},
+			Bin, TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+	 end,
+    begin
+      TrF2 = id(F2, TrUserData),
+      e_type_bool(TrF2, <<B1/binary, 16>>, TrUserData)
+    end.
+
+encode_msg_DirectoryReply(Msg, TrUserData) ->
+    encode_msg_DirectoryReply(Msg, <<>>, TrUserData).
+
+
+encode_msg_DirectoryReply(#{success := F1} = M, Bin,
+			  TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_bool(TrF1, <<Bin/binary, 8>>, TrUserData)
+	 end,
+    B2 = case M of
+	   #{leilao := F2} ->
+	       begin
+		 TrF2 = id(F2, TrUserData),
+		 e_mfield_DirectoryReply_leilao(TrF2, <<B1/binary, 18>>,
+						TrUserData)
+	       end;
+	   _ -> B1
+	 end,
+    case M of
+      #{emissao := F3} ->
+	  begin
+	    TrF3 = id(F3, TrUserData),
+	    e_mfield_DirectoryReply_emissao(TrF3, <<B2/binary, 26>>,
+					    TrUserData)
+	  end;
+      _ -> B2
+    end.
+
+encode_msg_DirectoryRequest(Msg, TrUserData) ->
+    encode_msg_DirectoryRequest(Msg, <<>>, TrUserData).
+
+
+encode_msg_DirectoryRequest(#{tipo := F1,
+			      empresa := F2},
+			    Bin, TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
+	 end,
+    begin
+      TrF2 = id(F2, TrUserData),
+      e_type_string(TrF2, <<B1/binary, 18>>, TrUserData)
+    end.
+
+encode_msg_AddDirectoryRequest(Msg, TrUserData) ->
+    encode_msg_AddDirectoryRequest(Msg, <<>>, TrUserData).
+
+
+encode_msg_AddDirectoryRequest(#{tipo := F1} = M, Bin,
+			       TrUserData) ->
+    B1 = begin
+	   TrF1 = id(F1, TrUserData),
+	   e_type_string(TrF1, <<Bin/binary, 10>>, TrUserData)
+	 end,
+    B2 = case M of
+	   #{juro := F2} ->
+	       begin
+		 TrF2 = id(F2, TrUserData),
+		 e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+	       end;
+	   _ -> B1
+	 end,
+    B3 = case M of
+	   #{quantia := F3} ->
+	       begin
+		 TrF3 = id(F3, TrUserData),
+		 e_type_int32(TrF3, <<B2/binary, 24>>, TrUserData)
+	       end;
+	   _ -> B2
+	 end,
+    B4 = case M of
+	   #{empresa := F4} ->
+	       begin
+		 TrF4 = id(F4, TrUserData),
+		 e_type_string(TrF4, <<B3/binary, 34>>, TrUserData)
+	       end;
+	   _ -> B3
+	 end,
+    case M of
+      #{investidor := F5} ->
+	  begin
+	    TrF5 = id(F5, TrUserData),
+	    e_type_string(TrF5, <<B4/binary, 42>>, TrUserData)
+	  end;
+      _ -> B4
     end.
 
 encode_msg_AuthReq(Msg, TrUserData) ->
@@ -218,6 +385,16 @@ encode_msg_Reply(#{sucesso := F1}, Bin, TrUserData) ->
 e_mfield_ExchangeRequest_mensagem(Msg, Bin,
 				  TrUserData) ->
     SubBin = encode_msg_Mensagem(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
+
+e_mfield_DirectoryReply_leilao(Msg, Bin, TrUserData) ->
+    SubBin = encode_msg_LeilaoReply(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
+
+e_mfield_DirectoryReply_emissao(Msg, Bin, TrUserData) ->
+    SubBin = encode_msg_EmissaoReply(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
@@ -343,6 +520,22 @@ decode_msg_2_doit('ExchangeRequest', Bin, TrUserData) ->
 decode_msg_2_doit('ExchangeReply', Bin, TrUserData) ->
     id(decode_msg_ExchangeReply(Bin, TrUserData),
        TrUserData);
+decode_msg_2_doit('LeilaoReply', Bin, TrUserData) ->
+    id(decode_msg_LeilaoReply(Bin, TrUserData), TrUserData);
+decode_msg_2_doit('EmissaoReply', Bin, TrUserData) ->
+    id(decode_msg_EmissaoReply(Bin, TrUserData),
+       TrUserData);
+decode_msg_2_doit('DirectoryReply', Bin, TrUserData) ->
+    id(decode_msg_DirectoryReply(Bin, TrUserData),
+       TrUserData);
+decode_msg_2_doit('DirectoryRequest', Bin,
+		  TrUserData) ->
+    id(decode_msg_DirectoryRequest(Bin, TrUserData),
+       TrUserData);
+decode_msg_2_doit('AddDirectoryRequest', Bin,
+		  TrUserData) ->
+    id(decode_msg_AddDirectoryRequest(Bin, TrUserData),
+       TrUserData);
 decode_msg_2_doit('AuthReq', Bin, TrUserData) ->
     id(decode_msg_AuthReq(Bin, TrUserData), TrUserData);
 decode_msg_2_doit('AuthRep', Bin, TrUserData) ->
@@ -360,6 +553,10 @@ decode_msg_Mensagem(Bin, TrUserData) ->
 				id('$undef', TrUserData),
 				id('$undef', TrUserData), TrUserData).
 
+dfp_read_field_def_Mensagem(<<10, Rest/binary>>, Z1, Z2,
+			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    d_field_Mensagem_tipo(Rest, Z1, Z2, F@_1, F@_2, F@_3,
+			  F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<16, Rest/binary>>, Z1, Z2,
 			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_juro(Rest, Z1, Z2, F@_1, F@_2, F@_3,
@@ -372,25 +569,21 @@ dfp_read_field_def_Mensagem(<<34, Rest/binary>>, Z1, Z2,
 			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_empresa(Rest, Z1, Z2, F@_1, F@_2, F@_3,
 			     F@_4, F@_5, TrUserData);
-dfp_read_field_def_Mensagem(<<10, Rest/binary>>, Z1, Z2,
-			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
-    d_field_Mensagem_tipo(Rest, Z1, Z2, F@_1, F@_2, F@_3,
-			  F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<42, Rest/binary>>, Z1, Z2,
 			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_investidor(Rest, Z1, Z2, F@_1, F@_2,
 				F@_3, F@_4, F@_5, TrUserData);
 dfp_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2,
 			    F@_3, F@_4, F@_5, _) ->
-    S1 = #{tipo => F@_4},
-    S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{juro => F@_1}
+    S1 = #{tipo => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{juro => F@_2}
 	 end,
-    S3 = if F@_2 == '$undef' -> S2;
-	    true -> S2#{quantia => F@_2}
+    S3 = if F@_3 == '$undef' -> S2;
+	    true -> S2#{quantia => F@_3}
 	 end,
-    S4 = if F@_3 == '$undef' -> S3;
-	    true -> S3#{empresa => F@_3}
+    S4 = if F@_4 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_4}
 	 end,
     if F@_5 == '$undef' -> S4;
        true -> S4#{investidor => F@_5}
@@ -409,6 +602,9 @@ dg_read_field_def_Mensagem(<<0:1, X:7, Rest/binary>>, N,
 			   Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
+      10 ->
+	  d_field_Mensagem_tipo(Rest, 0, 0, F@_1, F@_2, F@_3,
+				F@_4, F@_5, TrUserData);
       16 ->
 	  d_field_Mensagem_juro(Rest, 0, 0, F@_1, F@_2, F@_3,
 				F@_4, F@_5, TrUserData);
@@ -418,9 +614,6 @@ dg_read_field_def_Mensagem(<<0:1, X:7, Rest/binary>>, N,
       34 ->
 	  d_field_Mensagem_empresa(Rest, 0, 0, F@_1, F@_2, F@_3,
 				   F@_4, F@_5, TrUserData);
-      10 ->
-	  d_field_Mensagem_tipo(Rest, 0, 0, F@_1, F@_2, F@_3,
-				F@_4, F@_5, TrUserData);
       42 ->
 	  d_field_Mensagem_investidor(Rest, 0, 0, F@_1, F@_2,
 				      F@_3, F@_4, F@_5, TrUserData);
@@ -445,19 +638,36 @@ dg_read_field_def_Mensagem(<<0:1, X:7, Rest/binary>>, N,
     end;
 dg_read_field_def_Mensagem(<<>>, 0, 0, F@_1, F@_2, F@_3,
 			   F@_4, F@_5, _) ->
-    S1 = #{tipo => F@_4},
-    S2 = if F@_1 == '$undef' -> S1;
-	    true -> S1#{juro => F@_1}
+    S1 = #{tipo => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{juro => F@_2}
 	 end,
-    S3 = if F@_2 == '$undef' -> S2;
-	    true -> S2#{quantia => F@_2}
+    S3 = if F@_3 == '$undef' -> S2;
+	    true -> S2#{quantia => F@_3}
 	 end,
-    S4 = if F@_3 == '$undef' -> S3;
-	    true -> S3#{empresa => F@_3}
+    S4 = if F@_4 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_4}
 	 end,
     if F@_5 == '$undef' -> S4;
        true -> S4#{investidor => F@_5}
     end.
+
+d_field_Mensagem_tipo(<<1:1, X:7, Rest/binary>>, N, Acc,
+		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
+    when N < 57 ->
+    d_field_Mensagem_tipo(Rest, N + 7, X bsl N + Acc, F@_1,
+			  F@_2, F@_3, F@_4, F@_5, TrUserData);
+d_field_Mensagem_tipo(<<0:1, X:7, Rest/binary>>, N, Acc,
+		      _, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_Mensagem(RestF, 0, 0, NewFValue,
+				F@_2, F@_3, F@_4, F@_5, TrUserData).
 
 d_field_Mensagem_juro(<<1:1, X:7, Rest/binary>>, N, Acc,
 		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
@@ -465,23 +675,7 @@ d_field_Mensagem_juro(<<1:1, X:7, Rest/binary>>, N, Acc,
     d_field_Mensagem_juro(Rest, N + 7, X bsl N + Acc, F@_1,
 			  F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_juro(<<0:1, X:7, Rest/binary>>, N, Acc,
-		      _, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_Mensagem(RestF, 0, 0, NewFValue,
-				F@_2, F@_3, F@_4, F@_5, TrUserData).
-
-d_field_Mensagem_quantia(<<1:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
-    when N < 57 ->
-    d_field_Mensagem_quantia(Rest, N + 7, X bsl N + Acc,
-			     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
-d_field_Mensagem_quantia(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
+		      F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
     {NewFValue, RestF} = {begin
 			    <<Res:32/signed-native>> = <<(X bsl N +
 							    Acc):32/unsigned-native>>,
@@ -491,30 +685,29 @@ d_field_Mensagem_quantia(<<0:1, X:7, Rest/binary>>, N,
     dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1,
 				NewFValue, F@_3, F@_4, F@_5, TrUserData).
 
+d_field_Mensagem_quantia(<<1:1, X:7, Rest/binary>>, N,
+			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
+    when N < 57 ->
+    d_field_Mensagem_quantia(Rest, N + 7, X bsl N + Acc,
+			     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
+d_field_Mensagem_quantia(<<0:1, X:7, Rest/binary>>, N,
+			 Acc, F@_1, F@_2, _, F@_4, F@_5, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1, F@_2,
+				NewFValue, F@_4, F@_5, TrUserData).
+
 d_field_Mensagem_empresa(<<1:1, X:7, Rest/binary>>, N,
 			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
     when N < 57 ->
     d_field_Mensagem_empresa(Rest, N + 7, X bsl N + Acc,
 			     F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData);
 d_field_Mensagem_empresa(<<0:1, X:7, Rest/binary>>, N,
-			 Acc, F@_1, F@_2, _, F@_4, F@_5, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
-			   {id(unicode:characters_to_list(Utf8, unicode),
-			       TrUserData),
-			    Rest2}
-			 end,
-    dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1, F@_2,
-				NewFValue, F@_4, F@_5, TrUserData).
-
-d_field_Mensagem_tipo(<<1:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
-    when N < 57 ->
-    d_field_Mensagem_tipo(Rest, N + 7, X bsl N + Acc, F@_1,
-			  F@_2, F@_3, F@_4, F@_5, TrUserData);
-d_field_Mensagem_tipo(<<0:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, _, F@_5, TrUserData) ->
+			 Acc, F@_1, F@_2, F@_3, _, F@_5, TrUserData) ->
     {NewFValue, RestF} = begin
 			   Len = X bsl N + Acc,
 			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
@@ -592,7 +785,7 @@ dfp_read_field_def_ExchangeRequest(<<10, Rest/binary>>,
 				   Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_field_ExchangeRequest_mensagem(Rest, Z1, Z2, F@_1,
 				     F@_2, TrUserData);
-dfp_read_field_def_ExchangeRequest(<<16, Rest/binary>>,
+dfp_read_field_def_ExchangeRequest(<<18, Rest/binary>>,
 				   Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_field_ExchangeRequest_pid(Rest, Z1, Z2, F@_1, F@_2,
 				TrUserData);
@@ -621,7 +814,7 @@ dg_read_field_def_ExchangeRequest(<<0:1, X:7,
       10 ->
 	  d_field_ExchangeRequest_mensagem(Rest, 0, 0, F@_1, F@_2,
 					   TrUserData);
-      16 ->
+      18 ->
 	  d_field_ExchangeRequest_pid(Rest, 0, 0, F@_1, F@_2,
 				      TrUserData);
       _ ->
@@ -681,12 +874,11 @@ d_field_ExchangeRequest_pid(<<1:1, X:7, Rest/binary>>,
 				F@_1, F@_2, TrUserData);
 d_field_ExchangeRequest_pid(<<0:1, X:7, Rest/binary>>,
 			    N, Acc, F@_1, _, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {id(binary:copy(Bytes), TrUserData), Rest2}
+			 end,
     dfp_read_field_def_ExchangeRequest(RestF, 0, 0, F@_1,
 				       NewFValue, TrUserData).
 
@@ -739,7 +931,7 @@ dfp_read_field_def_ExchangeReply(<<8, Rest/binary>>, Z1,
 				 Z2, F@_1, F@_2, TrUserData) ->
     d_field_ExchangeReply_sucesso(Rest, Z1, Z2, F@_1, F@_2,
 				  TrUserData);
-dfp_read_field_def_ExchangeReply(<<16, Rest/binary>>,
+dfp_read_field_def_ExchangeReply(<<18, Rest/binary>>,
 				 Z1, Z2, F@_1, F@_2, TrUserData) ->
     d_field_ExchangeReply_pid(Rest, Z1, Z2, F@_1, F@_2,
 			      TrUserData);
@@ -765,7 +957,7 @@ dg_read_field_def_ExchangeReply(<<0:1, X:7,
       8 ->
 	  d_field_ExchangeReply_sucesso(Rest, 0, 0, F@_1, F@_2,
 					TrUserData);
-      16 ->
+      18 ->
 	  d_field_ExchangeReply_pid(Rest, 0, 0, F@_1, F@_2,
 				    TrUserData);
       _ ->
@@ -811,12 +1003,11 @@ d_field_ExchangeReply_pid(<<1:1, X:7, Rest/binary>>, N,
 			      F@_1, F@_2, TrUserData);
 d_field_ExchangeReply_pid(<<0:1, X:7, Rest/binary>>, N,
 			  Acc, F@_1, _, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {id(binary:copy(Bytes), TrUserData), Rest2}
+			 end,
     dfp_read_field_def_ExchangeReply(RestF, 0, 0, F@_1,
 				     NewFValue, TrUserData).
 
@@ -858,6 +1049,912 @@ skip_64_ExchangeReply(<<_:64, Rest/binary>>, Z1, Z2,
 		      F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_ExchangeReply(Rest, Z1, Z2, F@_1,
 				     F@_2, TrUserData).
+
+decode_msg_LeilaoReply(Bin, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Bin, 0, 0,
+				   id('$undef', TrUserData),
+				   id('$undef', TrUserData),
+				   id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_LeilaoReply(<<8, Rest/binary>>, Z1,
+			       Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_LeilaoReply_taxaMaximaAlocada(Rest, Z1, Z2,
+					  F@_1, F@_2, F@_3, TrUserData);
+dfp_read_field_def_LeilaoReply(<<16, Rest/binary>>, Z1,
+			       Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_LeilaoReply_taxaMaxima(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData);
+dfp_read_field_def_LeilaoReply(<<24, Rest/binary>>, Z1,
+			       Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_LeilaoReply_sucesso(Rest, Z1, Z2, F@_1, F@_2,
+				F@_3, TrUserData);
+dfp_read_field_def_LeilaoReply(<<>>, 0, 0, F@_1, F@_2,
+			       F@_3, _) ->
+    #{taxaMaximaAlocada => F@_1, taxaMaxima => F@_2,
+      sucesso => F@_3};
+dfp_read_field_def_LeilaoReply(Other, Z1, Z2, F@_1,
+			       F@_2, F@_3, TrUserData) ->
+    dg_read_field_def_LeilaoReply(Other, Z1, Z2, F@_1, F@_2,
+				  F@_3, TrUserData).
+
+dg_read_field_def_LeilaoReply(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_LeilaoReply(Rest, N + 7,
+				  X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+dg_read_field_def_LeilaoReply(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      8 ->
+	  d_field_LeilaoReply_taxaMaximaAlocada(Rest, 0, 0, F@_1,
+						F@_2, F@_3, TrUserData);
+      16 ->
+	  d_field_LeilaoReply_taxaMaxima(Rest, 0, 0, F@_1, F@_2,
+					 F@_3, TrUserData);
+      24 ->
+	  d_field_LeilaoReply_sucesso(Rest, 0, 0, F@_1, F@_2,
+				      F@_3, TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_LeilaoReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+					TrUserData);
+	    1 ->
+		skip_64_LeilaoReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+				    TrUserData);
+	    2 ->
+		skip_length_delimited_LeilaoReply(Rest, 0, 0, F@_1,
+						  F@_2, F@_3, TrUserData);
+	    3 ->
+		skip_group_LeilaoReply(Rest, Key bsr 3, 0, F@_1, F@_2,
+				       F@_3, TrUserData);
+	    5 ->
+		skip_32_LeilaoReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+				    TrUserData)
+	  end
+    end;
+dg_read_field_def_LeilaoReply(<<>>, 0, 0, F@_1, F@_2,
+			      F@_3, _) ->
+    #{taxaMaximaAlocada => F@_1, taxaMaxima => F@_2,
+      sucesso => F@_3}.
+
+d_field_LeilaoReply_taxaMaximaAlocada(<<1:1, X:7,
+					Rest/binary>>,
+				      N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_LeilaoReply_taxaMaximaAlocada(Rest, N + 7,
+					  X bsl N + Acc, F@_1, F@_2, F@_3,
+					  TrUserData);
+d_field_LeilaoReply_taxaMaximaAlocada(<<0:1, X:7,
+					Rest/binary>>,
+				      N, Acc, _, F@_2, F@_3, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_LeilaoReply(RestF, 0, 0, NewFValue,
+				   F@_2, F@_3, TrUserData).
+
+d_field_LeilaoReply_taxaMaxima(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_LeilaoReply_taxaMaxima(Rest, N + 7,
+				   X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+d_field_LeilaoReply_taxaMaxima(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, _, F@_3, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_LeilaoReply(RestF, 0, 0, F@_1,
+				   NewFValue, F@_3, TrUserData).
+
+d_field_LeilaoReply_sucesso(<<1:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_LeilaoReply_sucesso(Rest, N + 7, X bsl N + Acc,
+				F@_1, F@_2, F@_3, TrUserData);
+d_field_LeilaoReply_sucesso(<<0:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, _, TrUserData) ->
+    {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
+			     TrUserData),
+			  Rest},
+    dfp_read_field_def_LeilaoReply(RestF, 0, 0, F@_1, F@_2,
+				   NewFValue, TrUserData).
+
+skip_varint_LeilaoReply(<<1:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    skip_varint_LeilaoReply(Rest, Z1, Z2, F@_1, F@_2, F@_3,
+			    TrUserData);
+skip_varint_LeilaoReply(<<0:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData).
+
+skip_length_delimited_LeilaoReply(<<1:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_LeilaoReply(Rest, N + 7,
+				      X bsl N + Acc, F@_1, F@_2, F@_3,
+				      TrUserData);
+skip_length_delimited_LeilaoReply(<<0:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_LeilaoReply(Rest2, 0, 0, F@_1, F@_2,
+				   F@_3, TrUserData).
+
+skip_group_LeilaoReply(Bin, FNum, Z2, F@_1, F@_2, F@_3,
+		       TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_LeilaoReply(Rest, 0, Z2, F@_1, F@_2,
+				   F@_3, TrUserData).
+
+skip_32_LeilaoReply(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
+		    F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData).
+
+skip_64_LeilaoReply(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
+		    F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData).
+
+decode_msg_EmissaoReply(Bin, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Bin, 0, 0,
+				    id('$undef', TrUserData),
+				    id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_EmissaoReply(<<8, Rest/binary>>, Z1,
+				Z2, F@_1, F@_2, TrUserData) ->
+    d_field_EmissaoReply_taxa(Rest, Z1, Z2, F@_1, F@_2,
+			      TrUserData);
+dfp_read_field_def_EmissaoReply(<<16, Rest/binary>>, Z1,
+				Z2, F@_1, F@_2, TrUserData) ->
+    d_field_EmissaoReply_sucesso(Rest, Z1, Z2, F@_1, F@_2,
+				 TrUserData);
+dfp_read_field_def_EmissaoReply(<<>>, 0, 0, F@_1, F@_2,
+				_) ->
+    #{taxa => F@_1, sucesso => F@_2};
+dfp_read_field_def_EmissaoReply(Other, Z1, Z2, F@_1,
+				F@_2, TrUserData) ->
+    dg_read_field_def_EmissaoReply(Other, Z1, Z2, F@_1,
+				   F@_2, TrUserData).
+
+dg_read_field_def_EmissaoReply(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_EmissaoReply(Rest, N + 7,
+				   X bsl N + Acc, F@_1, F@_2, TrUserData);
+dg_read_field_def_EmissaoReply(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      8 ->
+	  d_field_EmissaoReply_taxa(Rest, 0, 0, F@_1, F@_2,
+				    TrUserData);
+      16 ->
+	  d_field_EmissaoReply_sucesso(Rest, 0, 0, F@_1, F@_2,
+				       TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_EmissaoReply(Rest, 0, 0, F@_1, F@_2,
+					 TrUserData);
+	    1 ->
+		skip_64_EmissaoReply(Rest, 0, 0, F@_1, F@_2,
+				     TrUserData);
+	    2 ->
+		skip_length_delimited_EmissaoReply(Rest, 0, 0, F@_1,
+						   F@_2, TrUserData);
+	    3 ->
+		skip_group_EmissaoReply(Rest, Key bsr 3, 0, F@_1, F@_2,
+					TrUserData);
+	    5 ->
+		skip_32_EmissaoReply(Rest, 0, 0, F@_1, F@_2, TrUserData)
+	  end
+    end;
+dg_read_field_def_EmissaoReply(<<>>, 0, 0, F@_1, F@_2,
+			       _) ->
+    #{taxa => F@_1, sucesso => F@_2}.
+
+d_field_EmissaoReply_taxa(<<1:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_EmissaoReply_taxa(Rest, N + 7, X bsl N + Acc,
+			      F@_1, F@_2, TrUserData);
+d_field_EmissaoReply_taxa(<<0:1, X:7, Rest/binary>>, N,
+			  Acc, _, F@_2, TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_EmissaoReply(RestF, 0, 0, NewFValue,
+				    F@_2, TrUserData).
+
+d_field_EmissaoReply_sucesso(<<1:1, X:7, Rest/binary>>,
+			     N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_EmissaoReply_sucesso(Rest, N + 7, X bsl N + Acc,
+				 F@_1, F@_2, TrUserData);
+d_field_EmissaoReply_sucesso(<<0:1, X:7, Rest/binary>>,
+			     N, Acc, F@_1, _, TrUserData) ->
+    {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
+			     TrUserData),
+			  Rest},
+    dfp_read_field_def_EmissaoReply(RestF, 0, 0, F@_1,
+				    NewFValue, TrUserData).
+
+skip_varint_EmissaoReply(<<1:1, _:7, Rest/binary>>, Z1,
+			 Z2, F@_1, F@_2, TrUserData) ->
+    skip_varint_EmissaoReply(Rest, Z1, Z2, F@_1, F@_2,
+			     TrUserData);
+skip_varint_EmissaoReply(<<0:1, _:7, Rest/binary>>, Z1,
+			 Z2, F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2, F@_1,
+				    F@_2, TrUserData).
+
+skip_length_delimited_EmissaoReply(<<1:1, X:7,
+				     Rest/binary>>,
+				   N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_EmissaoReply(Rest, N + 7,
+				       X bsl N + Acc, F@_1, F@_2, TrUserData);
+skip_length_delimited_EmissaoReply(<<0:1, X:7,
+				     Rest/binary>>,
+				   N, Acc, F@_1, F@_2, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_EmissaoReply(Rest2, 0, 0, F@_1, F@_2,
+				    TrUserData).
+
+skip_group_EmissaoReply(Bin, FNum, Z2, F@_1, F@_2,
+			TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_EmissaoReply(Rest, 0, Z2, F@_1, F@_2,
+				    TrUserData).
+
+skip_32_EmissaoReply(<<_:32, Rest/binary>>, Z1, Z2,
+		     F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2, F@_1,
+				    F@_2, TrUserData).
+
+skip_64_EmissaoReply(<<_:64, Rest/binary>>, Z1, Z2,
+		     F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2, F@_1,
+				    F@_2, TrUserData).
+
+decode_msg_DirectoryReply(Bin, TrUserData) ->
+    dfp_read_field_def_DirectoryReply(Bin, 0, 0,
+				      id('$undef', TrUserData),
+				      id('$undef', TrUserData),
+				      id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_DirectoryReply(<<8, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_DirectoryReply_success(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData);
+dfp_read_field_def_DirectoryReply(<<18, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_DirectoryReply_leilao(Rest, Z1, Z2, F@_1, F@_2,
+				  F@_3, TrUserData);
+dfp_read_field_def_DirectoryReply(<<26, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_DirectoryReply_emissao(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData);
+dfp_read_field_def_DirectoryReply(<<>>, 0, 0, F@_1,
+				  F@_2, F@_3, _) ->
+    S1 = #{success => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{leilao => F@_2}
+	 end,
+    if F@_3 == '$undef' -> S2;
+       true -> S2#{emissao => F@_3}
+    end;
+dfp_read_field_def_DirectoryReply(Other, Z1, Z2, F@_1,
+				  F@_2, F@_3, TrUserData) ->
+    dg_read_field_def_DirectoryReply(Other, Z1, Z2, F@_1,
+				     F@_2, F@_3, TrUserData).
+
+dg_read_field_def_DirectoryReply(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_DirectoryReply(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, F@_3,
+				     TrUserData);
+dg_read_field_def_DirectoryReply(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      8 ->
+	  d_field_DirectoryReply_success(Rest, 0, 0, F@_1, F@_2,
+					 F@_3, TrUserData);
+      18 ->
+	  d_field_DirectoryReply_leilao(Rest, 0, 0, F@_1, F@_2,
+					F@_3, TrUserData);
+      26 ->
+	  d_field_DirectoryReply_emissao(Rest, 0, 0, F@_1, F@_2,
+					 F@_3, TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_DirectoryReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+					   TrUserData);
+	    1 ->
+		skip_64_DirectoryReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+				       TrUserData);
+	    2 ->
+		skip_length_delimited_DirectoryReply(Rest, 0, 0, F@_1,
+						     F@_2, F@_3, TrUserData);
+	    3 ->
+		skip_group_DirectoryReply(Rest, Key bsr 3, 0, F@_1,
+					  F@_2, F@_3, TrUserData);
+	    5 ->
+		skip_32_DirectoryReply(Rest, 0, 0, F@_1, F@_2, F@_3,
+				       TrUserData)
+	  end
+    end;
+dg_read_field_def_DirectoryReply(<<>>, 0, 0, F@_1, F@_2,
+				 F@_3, _) ->
+    S1 = #{success => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{leilao => F@_2}
+	 end,
+    if F@_3 == '$undef' -> S2;
+       true -> S2#{emissao => F@_3}
+    end.
+
+d_field_DirectoryReply_success(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_DirectoryReply_success(Rest, N + 7,
+				   X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+d_field_DirectoryReply_success(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, _, F@_2, F@_3, TrUserData) ->
+    {NewFValue, RestF} = {id(X bsl N + Acc =/= 0,
+			     TrUserData),
+			  Rest},
+    dfp_read_field_def_DirectoryReply(RestF, 0, 0,
+				      NewFValue, F@_2, F@_3, TrUserData).
+
+d_field_DirectoryReply_leilao(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_DirectoryReply_leilao(Rest, N + 7,
+				  X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+d_field_DirectoryReply_leilao(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, Prev, F@_3, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(decode_msg_LeilaoReply(Bs, TrUserData),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_DirectoryReply(RestF, 0, 0, F@_1,
+				      if Prev == '$undef' -> NewFValue;
+					 true ->
+					     merge_msg_LeilaoReply(Prev,
+								   NewFValue,
+								   TrUserData)
+				      end,
+				      F@_3, TrUserData).
+
+d_field_DirectoryReply_emissao(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_DirectoryReply_emissao(Rest, N + 7,
+				   X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+d_field_DirectoryReply_emissao(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, Prev, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(decode_msg_EmissaoReply(Bs, TrUserData),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_DirectoryReply(RestF, 0, 0, F@_1,
+				      F@_2,
+				      if Prev == '$undef' -> NewFValue;
+					 true ->
+					     merge_msg_EmissaoReply(Prev,
+								    NewFValue,
+								    TrUserData)
+				      end,
+				      TrUserData).
+
+skip_varint_DirectoryReply(<<1:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    skip_varint_DirectoryReply(Rest, Z1, Z2, F@_1, F@_2,
+			       F@_3, TrUserData);
+skip_varint_DirectoryReply(<<0:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_DirectoryReply(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_length_delimited_DirectoryReply(<<1:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_DirectoryReply(Rest, N + 7,
+					 X bsl N + Acc, F@_1, F@_2, F@_3,
+					 TrUserData);
+skip_length_delimited_DirectoryReply(<<0:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_DirectoryReply(Rest2, 0, 0, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_group_DirectoryReply(Bin, FNum, Z2, F@_1, F@_2,
+			  F@_3, TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_DirectoryReply(Rest, 0, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_32_DirectoryReply(<<_:32, Rest/binary>>, Z1, Z2,
+		       F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_DirectoryReply(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_64_DirectoryReply(<<_:64, Rest/binary>>, Z1, Z2,
+		       F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_DirectoryReply(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+decode_msg_DirectoryRequest(Bin, TrUserData) ->
+    dfp_read_field_def_DirectoryRequest(Bin, 0, 0,
+					id('$undef', TrUserData),
+					id('$undef', TrUserData), TrUserData).
+
+dfp_read_field_def_DirectoryRequest(<<10, Rest/binary>>,
+				    Z1, Z2, F@_1, F@_2, TrUserData) ->
+    d_field_DirectoryRequest_tipo(Rest, Z1, Z2, F@_1, F@_2,
+				  TrUserData);
+dfp_read_field_def_DirectoryRequest(<<18, Rest/binary>>,
+				    Z1, Z2, F@_1, F@_2, TrUserData) ->
+    d_field_DirectoryRequest_empresa(Rest, Z1, Z2, F@_1,
+				     F@_2, TrUserData);
+dfp_read_field_def_DirectoryRequest(<<>>, 0, 0, F@_1,
+				    F@_2, _) ->
+    #{tipo => F@_1, empresa => F@_2};
+dfp_read_field_def_DirectoryRequest(Other, Z1, Z2, F@_1,
+				    F@_2, TrUserData) ->
+    dg_read_field_def_DirectoryRequest(Other, Z1, Z2, F@_1,
+				       F@_2, TrUserData).
+
+dg_read_field_def_DirectoryRequest(<<1:1, X:7,
+				     Rest/binary>>,
+				   N, Acc, F@_1, F@_2, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_DirectoryRequest(Rest, N + 7,
+				       X bsl N + Acc, F@_1, F@_2, TrUserData);
+dg_read_field_def_DirectoryRequest(<<0:1, X:7,
+				     Rest/binary>>,
+				   N, Acc, F@_1, F@_2, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_DirectoryRequest_tipo(Rest, 0, 0, F@_1, F@_2,
+					TrUserData);
+      18 ->
+	  d_field_DirectoryRequest_empresa(Rest, 0, 0, F@_1, F@_2,
+					   TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_DirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+					     TrUserData);
+	    1 ->
+		skip_64_DirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+					 TrUserData);
+	    2 ->
+		skip_length_delimited_DirectoryRequest(Rest, 0, 0, F@_1,
+						       F@_2, TrUserData);
+	    3 ->
+		skip_group_DirectoryRequest(Rest, Key bsr 3, 0, F@_1,
+					    F@_2, TrUserData);
+	    5 ->
+		skip_32_DirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+					 TrUserData)
+	  end
+    end;
+dg_read_field_def_DirectoryRequest(<<>>, 0, 0, F@_1,
+				   F@_2, _) ->
+    #{tipo => F@_1, empresa => F@_2}.
+
+d_field_DirectoryRequest_tipo(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_DirectoryRequest_tipo(Rest, N + 7,
+				  X bsl N + Acc, F@_1, F@_2, TrUserData);
+d_field_DirectoryRequest_tipo(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, _, F@_2, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_DirectoryRequest(RestF, 0, 0,
+					NewFValue, F@_2, TrUserData).
+
+d_field_DirectoryRequest_empresa(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_DirectoryRequest_empresa(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, TrUserData);
+d_field_DirectoryRequest_empresa(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_DirectoryRequest(RestF, 0, 0, F@_1,
+					NewFValue, TrUserData).
+
+skip_varint_DirectoryRequest(<<1:1, _:7, Rest/binary>>,
+			     Z1, Z2, F@_1, F@_2, TrUserData) ->
+    skip_varint_DirectoryRequest(Rest, Z1, Z2, F@_1, F@_2,
+				 TrUserData);
+skip_varint_DirectoryRequest(<<0:1, _:7, Rest/binary>>,
+			     Z1, Z2, F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_DirectoryRequest(Rest, Z1, Z2, F@_1,
+					F@_2, TrUserData).
+
+skip_length_delimited_DirectoryRequest(<<1:1, X:7,
+					 Rest/binary>>,
+				       N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_DirectoryRequest(Rest, N + 7,
+					   X bsl N + Acc, F@_1, F@_2,
+					   TrUserData);
+skip_length_delimited_DirectoryRequest(<<0:1, X:7,
+					 Rest/binary>>,
+				       N, Acc, F@_1, F@_2, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_DirectoryRequest(Rest2, 0, 0, F@_1,
+					F@_2, TrUserData).
+
+skip_group_DirectoryRequest(Bin, FNum, Z2, F@_1, F@_2,
+			    TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_DirectoryRequest(Rest, 0, Z2, F@_1,
+					F@_2, TrUserData).
+
+skip_32_DirectoryRequest(<<_:32, Rest/binary>>, Z1, Z2,
+			 F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_DirectoryRequest(Rest, Z1, Z2, F@_1,
+					F@_2, TrUserData).
+
+skip_64_DirectoryRequest(<<_:64, Rest/binary>>, Z1, Z2,
+			 F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_DirectoryRequest(Rest, Z1, Z2, F@_1,
+					F@_2, TrUserData).
+
+decode_msg_AddDirectoryRequest(Bin, TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Bin, 0, 0,
+					   id('$undef', TrUserData),
+					   id('$undef', TrUserData),
+					   id('$undef', TrUserData),
+					   id('$undef', TrUserData),
+					   id('$undef', TrUserData),
+					   TrUserData).
+
+dfp_read_field_def_AddDirectoryRequest(<<10,
+					 Rest/binary>>,
+				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    d_field_AddDirectoryRequest_tipo(Rest, Z1, Z2, F@_1,
+				     F@_2, F@_3, F@_4, F@_5, TrUserData);
+dfp_read_field_def_AddDirectoryRequest(<<16,
+					 Rest/binary>>,
+				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    d_field_AddDirectoryRequest_juro(Rest, Z1, Z2, F@_1,
+				     F@_2, F@_3, F@_4, F@_5, TrUserData);
+dfp_read_field_def_AddDirectoryRequest(<<24,
+					 Rest/binary>>,
+				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    d_field_AddDirectoryRequest_quantia(Rest, Z1, Z2, F@_1,
+					F@_2, F@_3, F@_4, F@_5, TrUserData);
+dfp_read_field_def_AddDirectoryRequest(<<34,
+					 Rest/binary>>,
+				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    d_field_AddDirectoryRequest_empresa(Rest, Z1, Z2, F@_1,
+					F@_2, F@_3, F@_4, F@_5, TrUserData);
+dfp_read_field_def_AddDirectoryRequest(<<42,
+					 Rest/binary>>,
+				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    d_field_AddDirectoryRequest_investidor(Rest, Z1, Z2,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData);
+dfp_read_field_def_AddDirectoryRequest(<<>>, 0, 0, F@_1,
+				       F@_2, F@_3, F@_4, F@_5, _) ->
+    S1 = #{tipo => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{juro => F@_2}
+	 end,
+    S3 = if F@_3 == '$undef' -> S2;
+	    true -> S2#{quantia => F@_3}
+	 end,
+    S4 = if F@_4 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_4}
+	 end,
+    if F@_5 == '$undef' -> S4;
+       true -> S4#{investidor => F@_5}
+    end;
+dfp_read_field_def_AddDirectoryRequest(Other, Z1, Z2,
+				       F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData) ->
+    dg_read_field_def_AddDirectoryRequest(Other, Z1, Z2,
+					  F@_1, F@_2, F@_3, F@_4, F@_5,
+					  TrUserData).
+
+dg_read_field_def_AddDirectoryRequest(<<1:1, X:7,
+					Rest/binary>>,
+				      N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				      TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_AddDirectoryRequest(Rest, N + 7,
+					  X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+					  F@_5, TrUserData);
+dg_read_field_def_AddDirectoryRequest(<<0:1, X:7,
+					Rest/binary>>,
+				      N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				      TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_AddDirectoryRequest_tipo(Rest, 0, 0, F@_1, F@_2,
+					   F@_3, F@_4, F@_5, TrUserData);
+      16 ->
+	  d_field_AddDirectoryRequest_juro(Rest, 0, 0, F@_1, F@_2,
+					   F@_3, F@_4, F@_5, TrUserData);
+      24 ->
+	  d_field_AddDirectoryRequest_quantia(Rest, 0, 0, F@_1,
+					      F@_2, F@_3, F@_4, F@_5,
+					      TrUserData);
+      34 ->
+	  d_field_AddDirectoryRequest_empresa(Rest, 0, 0, F@_1,
+					      F@_2, F@_3, F@_4, F@_5,
+					      TrUserData);
+      42 ->
+	  d_field_AddDirectoryRequest_investidor(Rest, 0, 0, F@_1,
+						 F@_2, F@_3, F@_4, F@_5,
+						 TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_AddDirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+						F@_3, F@_4, F@_5, TrUserData);
+	    1 ->
+		skip_64_AddDirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+					    F@_3, F@_4, F@_5, TrUserData);
+	    2 ->
+		skip_length_delimited_AddDirectoryRequest(Rest, 0, 0,
+							  F@_1, F@_2, F@_3,
+							  F@_4, F@_5,
+							  TrUserData);
+	    3 ->
+		skip_group_AddDirectoryRequest(Rest, Key bsr 3, 0, F@_1,
+					       F@_2, F@_3, F@_4, F@_5,
+					       TrUserData);
+	    5 ->
+		skip_32_AddDirectoryRequest(Rest, 0, 0, F@_1, F@_2,
+					    F@_3, F@_4, F@_5, TrUserData)
+	  end
+    end;
+dg_read_field_def_AddDirectoryRequest(<<>>, 0, 0, F@_1,
+				      F@_2, F@_3, F@_4, F@_5, _) ->
+    S1 = #{tipo => F@_1},
+    S2 = if F@_2 == '$undef' -> S1;
+	    true -> S1#{juro => F@_2}
+	 end,
+    S3 = if F@_3 == '$undef' -> S2;
+	    true -> S2#{quantia => F@_3}
+	 end,
+    S4 = if F@_4 == '$undef' -> S3;
+	    true -> S3#{empresa => F@_4}
+	 end,
+    if F@_5 == '$undef' -> S4;
+       true -> S4#{investidor => F@_5}
+    end.
+
+d_field_AddDirectoryRequest_tipo(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				 TrUserData)
+    when N < 57 ->
+    d_field_AddDirectoryRequest_tipo(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+				     F@_5, TrUserData);
+d_field_AddDirectoryRequest_tipo(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, _, F@_2, F@_3, F@_4, F@_5,
+				 TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
+					   NewFValue, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+d_field_AddDirectoryRequest_juro(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				 TrUserData)
+    when N < 57 ->
+    d_field_AddDirectoryRequest_juro(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+				     F@_5, TrUserData);
+d_field_AddDirectoryRequest_juro(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, _, F@_3, F@_4, F@_5,
+				 TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
+					   F@_1, NewFValue, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+d_field_AddDirectoryRequest_quantia(<<1:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				    TrUserData)
+    when N < 57 ->
+    d_field_AddDirectoryRequest_quantia(Rest, N + 7,
+					X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+					F@_5, TrUserData);
+d_field_AddDirectoryRequest_quantia(<<0:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, _, F@_4, F@_5,
+				    TrUserData) ->
+    {NewFValue, RestF} = {begin
+			    <<Res:32/signed-native>> = <<(X bsl N +
+							    Acc):32/unsigned-native>>,
+			    id(Res, TrUserData)
+			  end,
+			  Rest},
+    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
+					   F@_1, F@_2, NewFValue, F@_4, F@_5,
+					   TrUserData).
+
+d_field_AddDirectoryRequest_empresa(<<1:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				    TrUserData)
+    when N < 57 ->
+    d_field_AddDirectoryRequest_empresa(Rest, N + 7,
+					X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
+					F@_5, TrUserData);
+d_field_AddDirectoryRequest_empresa(<<0:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, F@_2, F@_3, _, F@_5,
+				    TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
+					   F@_1, F@_2, F@_3, NewFValue, F@_5,
+					   TrUserData).
+
+d_field_AddDirectoryRequest_investidor(<<1:1, X:7,
+					 Rest/binary>>,
+				       N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+				       TrUserData)
+    when N < 57 ->
+    d_field_AddDirectoryRequest_investidor(Rest, N + 7,
+					   X bsl N + Acc, F@_1, F@_2, F@_3,
+					   F@_4, F@_5, TrUserData);
+d_field_AddDirectoryRequest_investidor(<<0:1, X:7,
+					 Rest/binary>>,
+				       N, Acc, F@_1, F@_2, F@_3, F@_4, _,
+				       TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Utf8:Len/binary, Rest2/binary>> = Rest,
+			   {id(unicode:characters_to_list(Utf8, unicode),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
+					   F@_1, F@_2, F@_3, F@_4, NewFValue,
+					   TrUserData).
+
+skip_varint_AddDirectoryRequest(<<1:1, _:7,
+				  Rest/binary>>,
+				Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				TrUserData) ->
+    skip_varint_AddDirectoryRequest(Rest, Z1, Z2, F@_1,
+				    F@_2, F@_3, F@_4, F@_5, TrUserData);
+skip_varint_AddDirectoryRequest(<<0:1, _:7,
+				  Rest/binary>>,
+				Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
+				TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+skip_length_delimited_AddDirectoryRequest(<<1:1, X:7,
+					    Rest/binary>>,
+					  N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+					  TrUserData)
+    when N < 57 ->
+    skip_length_delimited_AddDirectoryRequest(Rest, N + 7,
+					      X bsl N + Acc, F@_1, F@_2, F@_3,
+					      F@_4, F@_5, TrUserData);
+skip_length_delimited_AddDirectoryRequest(<<0:1, X:7,
+					    Rest/binary>>,
+					  N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
+					  TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_AddDirectoryRequest(Rest2, 0, 0,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+skip_group_AddDirectoryRequest(Bin, FNum, Z2, F@_1,
+			       F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_AddDirectoryRequest(Rest, 0, Z2,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+skip_32_AddDirectoryRequest(<<_:32, Rest/binary>>, Z1,
+			    Z2, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
+
+skip_64_AddDirectoryRequest(<<_:64, Rest/binary>>, Z1,
+			    Z2, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, F@_2, F@_3, F@_4, F@_5,
+					   TrUserData).
 
 decode_msg_AuthReq(Bin, TrUserData) ->
     dfp_read_field_def_AuthReq(Bin, 0, 0,
@@ -1263,6 +2360,16 @@ merge_msgs(Prev, New, MsgName, Opts) ->
 	  merge_msg_ExchangeRequest(Prev, New, TrUserData);
       'ExchangeReply' ->
 	  merge_msg_ExchangeReply(Prev, New, TrUserData);
+      'LeilaoReply' ->
+	  merge_msg_LeilaoReply(Prev, New, TrUserData);
+      'EmissaoReply' ->
+	  merge_msg_EmissaoReply(Prev, New, TrUserData);
+      'DirectoryReply' ->
+	  merge_msg_DirectoryReply(Prev, New, TrUserData);
+      'DirectoryRequest' ->
+	  merge_msg_DirectoryRequest(Prev, New, TrUserData);
+      'AddDirectoryRequest' ->
+	  merge_msg_AddDirectoryRequest(Prev, New, TrUserData);
       'AuthReq' -> merge_msg_AuthReq(Prev, New, TrUserData);
       'AuthRep' -> merge_msg_AuthRep(Prev, New, TrUserData);
       'Reply' -> merge_msg_Reply(Prev, New, TrUserData)
@@ -1312,6 +2419,79 @@ merge_msg_ExchangeReply(#{},
 			#{sucesso := NFsucesso, pid := NFpid}, _) ->
     #{sucesso => NFsucesso, pid => NFpid}.
 
+-compile({nowarn_unused_function,merge_msg_LeilaoReply/3}).
+merge_msg_LeilaoReply(#{},
+		      #{taxaMaximaAlocada := NFtaxaMaximaAlocada,
+			taxaMaxima := NFtaxaMaxima, sucesso := NFsucesso},
+		      _) ->
+    #{taxaMaximaAlocada => NFtaxaMaximaAlocada,
+      taxaMaxima => NFtaxaMaxima, sucesso => NFsucesso}.
+
+-compile({nowarn_unused_function,merge_msg_EmissaoReply/3}).
+merge_msg_EmissaoReply(#{},
+		       #{taxa := NFtaxa, sucesso := NFsucesso}, _) ->
+    #{taxa => NFtaxa, sucesso => NFsucesso}.
+
+-compile({nowarn_unused_function,merge_msg_DirectoryReply/3}).
+merge_msg_DirectoryReply(#{} = PMsg,
+			 #{success := NFsuccess} = NMsg, TrUserData) ->
+    S1 = #{success => NFsuccess},
+    S2 = case {PMsg, NMsg} of
+	   {#{leilao := PFleilao}, #{leilao := NFleilao}} ->
+	       S1#{leilao =>
+		       merge_msg_LeilaoReply(PFleilao, NFleilao, TrUserData)};
+	   {_, #{leilao := NFleilao}} -> S1#{leilao => NFleilao};
+	   {#{leilao := PFleilao}, _} -> S1#{leilao => PFleilao};
+	   {_, _} -> S1
+	 end,
+    case {PMsg, NMsg} of
+      {#{emissao := PFemissao}, #{emissao := NFemissao}} ->
+	  S2#{emissao =>
+		  merge_msg_EmissaoReply(PFemissao, NFemissao,
+					 TrUserData)};
+      {_, #{emissao := NFemissao}} ->
+	  S2#{emissao => NFemissao};
+      {#{emissao := PFemissao}, _} ->
+	  S2#{emissao => PFemissao};
+      {_, _} -> S2
+    end.
+
+-compile({nowarn_unused_function,merge_msg_DirectoryRequest/3}).
+merge_msg_DirectoryRequest(#{},
+			   #{tipo := NFtipo, empresa := NFempresa}, _) ->
+    #{tipo => NFtipo, empresa => NFempresa}.
+
+-compile({nowarn_unused_function,merge_msg_AddDirectoryRequest/3}).
+merge_msg_AddDirectoryRequest(#{} = PMsg,
+			      #{tipo := NFtipo} = NMsg, _) ->
+    S1 = #{tipo => NFtipo},
+    S2 = case {PMsg, NMsg} of
+	   {_, #{juro := NFjuro}} -> S1#{juro => NFjuro};
+	   {#{juro := PFjuro}, _} -> S1#{juro => PFjuro};
+	   _ -> S1
+	 end,
+    S3 = case {PMsg, NMsg} of
+	   {_, #{quantia := NFquantia}} ->
+	       S2#{quantia => NFquantia};
+	   {#{quantia := PFquantia}, _} ->
+	       S2#{quantia => PFquantia};
+	   _ -> S2
+	 end,
+    S4 = case {PMsg, NMsg} of
+	   {_, #{empresa := NFempresa}} ->
+	       S3#{empresa => NFempresa};
+	   {#{empresa := PFempresa}, _} ->
+	       S3#{empresa => PFempresa};
+	   _ -> S3
+	 end,
+    case {PMsg, NMsg} of
+      {_, #{investidor := NFinvestidor}} ->
+	  S4#{investidor => NFinvestidor};
+      {#{investidor := PFinvestidor}, _} ->
+	  S4#{investidor => PFinvestidor};
+      _ -> S4
+    end.
+
 -compile({nowarn_unused_function,merge_msg_AuthReq/3}).
 merge_msg_AuthReq(#{},
 		  #{username := NFusername, password := NFpassword}, _) ->
@@ -1344,6 +2524,16 @@ verify_msg(Msg, MsgName, Opts) ->
 	  v_msg_ExchangeRequest(Msg, [MsgName], TrUserData);
       'ExchangeReply' ->
 	  v_msg_ExchangeReply(Msg, [MsgName], TrUserData);
+      'LeilaoReply' ->
+	  v_msg_LeilaoReply(Msg, [MsgName], TrUserData);
+      'EmissaoReply' ->
+	  v_msg_EmissaoReply(Msg, [MsgName], TrUserData);
+      'DirectoryReply' ->
+	  v_msg_DirectoryReply(Msg, [MsgName], TrUserData);
+      'DirectoryRequest' ->
+	  v_msg_DirectoryRequest(Msg, [MsgName], TrUserData);
+      'AddDirectoryRequest' ->
+	  v_msg_AddDirectoryRequest(Msg, [MsgName], TrUserData);
       'AuthReq' -> v_msg_AuthReq(Msg, [MsgName], TrUserData);
       'AuthRep' -> v_msg_AuthRep(Msg, [MsgName], TrUserData);
       'Reply' -> v_msg_Reply(Msg, [MsgName], TrUserData);
@@ -1353,32 +2543,32 @@ verify_msg(Msg, MsgName, Opts) ->
 
 -compile({nowarn_unused_function,v_msg_Mensagem/3}).
 -dialyzer({nowarn_function,v_msg_Mensagem/3}).
-v_msg_Mensagem(#{tipo := F4} = M, Path, TrUserData) ->
+v_msg_Mensagem(#{tipo := F1} = M, Path, TrUserData) ->
+    v_type_string(F1, [tipo | Path], TrUserData),
     case M of
-      #{juro := F1} ->
-	  v_type_int32(F1, [juro | Path], TrUserData);
+      #{juro := F2} ->
+	  v_type_int32(F2, [juro | Path], TrUserData);
       _ -> ok
     end,
     case M of
-      #{quantia := F2} ->
-	  v_type_int32(F2, [quantia | Path], TrUserData);
+      #{quantia := F3} ->
+	  v_type_int32(F3, [quantia | Path], TrUserData);
       _ -> ok
     end,
     case M of
-      #{empresa := F3} ->
-	  v_type_string(F3, [empresa | Path], TrUserData);
+      #{empresa := F4} ->
+	  v_type_string(F4, [empresa | Path], TrUserData);
       _ -> ok
     end,
-    v_type_string(F4, [tipo | Path], TrUserData),
     case M of
       #{investidor := F5} ->
 	  v_type_string(F5, [investidor | Path], TrUserData);
       _ -> ok
     end,
-    lists:foreach(fun (juro) -> ok;
+    lists:foreach(fun (tipo) -> ok;
+		      (juro) -> ok;
 		      (quantia) -> ok;
 		      (empresa) -> ok;
-		      (tipo) -> ok;
 		      (investidor) -> ok;
 		      (OtherKey) ->
 			  mk_type_error({extraneous_key, OtherKey}, M, Path)
@@ -1397,7 +2587,7 @@ v_msg_Mensagem(X, Path, _TrUserData) ->
 v_msg_ExchangeRequest(#{mensagem := F1, pid := F2} = M,
 		      Path, TrUserData) ->
     v_msg_Mensagem(F1, [mensagem | Path], TrUserData),
-    v_type_int32(F2, [pid | Path], TrUserData),
+    v_type_bytes(F2, [pid | Path], TrUserData),
     lists:foreach(fun (mensagem) -> ok;
 		      (pid) -> ok;
 		      (OtherKey) ->
@@ -1419,7 +2609,7 @@ v_msg_ExchangeRequest(X, Path, _TrUserData) ->
 v_msg_ExchangeReply(#{sucesso := F1, pid := F2} = M,
 		    Path, TrUserData) ->
     v_type_bool(F1, [sucesso | Path], TrUserData),
-    v_type_int32(F2, [pid | Path], TrUserData),
+    v_type_bytes(F2, [pid | Path], TrUserData),
     lists:foreach(fun (sucesso) -> ok;
 		      (pid) -> ok;
 		      (OtherKey) ->
@@ -1434,6 +2624,153 @@ v_msg_ExchangeReply(M, Path, _TrUserData)
 		  M, Path);
 v_msg_ExchangeReply(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'ExchangeReply'}, X, Path).
+
+-compile({nowarn_unused_function,v_msg_LeilaoReply/3}).
+-dialyzer({nowarn_function,v_msg_LeilaoReply/3}).
+v_msg_LeilaoReply(#{taxaMaximaAlocada := F1,
+		    taxaMaxima := F2, sucesso := F3} =
+		      M,
+		  Path, TrUserData) ->
+    v_type_int32(F1, [taxaMaximaAlocada | Path],
+		 TrUserData),
+    v_type_int32(F2, [taxaMaxima | Path], TrUserData),
+    v_type_bool(F3, [sucesso | Path], TrUserData),
+    lists:foreach(fun (taxaMaximaAlocada) -> ok;
+		      (taxaMaxima) -> ok;
+		      (sucesso) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_LeilaoReply(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [taxaMaximaAlocada, taxaMaxima, sucesso] --
+		     maps:keys(M),
+		   'LeilaoReply'},
+		  M, Path);
+v_msg_LeilaoReply(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'LeilaoReply'}, X, Path).
+
+-compile({nowarn_unused_function,v_msg_EmissaoReply/3}).
+-dialyzer({nowarn_function,v_msg_EmissaoReply/3}).
+v_msg_EmissaoReply(#{taxa := F1, sucesso := F2} = M,
+		   Path, TrUserData) ->
+    v_type_int32(F1, [taxa | Path], TrUserData),
+    v_type_bool(F2, [sucesso | Path], TrUserData),
+    lists:foreach(fun (taxa) -> ok;
+		      (sucesso) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_EmissaoReply(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [taxa, sucesso] -- maps:keys(M), 'EmissaoReply'},
+		  M, Path);
+v_msg_EmissaoReply(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'EmissaoReply'}, X, Path).
+
+-compile({nowarn_unused_function,v_msg_DirectoryReply/3}).
+-dialyzer({nowarn_function,v_msg_DirectoryReply/3}).
+v_msg_DirectoryReply(#{success := F1} = M, Path,
+		     TrUserData) ->
+    v_type_bool(F1, [success | Path], TrUserData),
+    case M of
+      #{leilao := F2} ->
+	  v_msg_LeilaoReply(F2, [leilao | Path], TrUserData);
+      _ -> ok
+    end,
+    case M of
+      #{emissao := F3} ->
+	  v_msg_EmissaoReply(F3, [emissao | Path], TrUserData);
+      _ -> ok
+    end,
+    lists:foreach(fun (success) -> ok;
+		      (leilao) -> ok;
+		      (emissao) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_DirectoryReply(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [success] -- maps:keys(M), 'DirectoryReply'},
+		  M, Path);
+v_msg_DirectoryReply(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'DirectoryReply'}, X,
+		  Path).
+
+-compile({nowarn_unused_function,v_msg_DirectoryRequest/3}).
+-dialyzer({nowarn_function,v_msg_DirectoryRequest/3}).
+v_msg_DirectoryRequest(#{tipo := F1, empresa := F2} = M,
+		       Path, TrUserData) ->
+    v_type_string(F1, [tipo | Path], TrUserData),
+    v_type_string(F2, [empresa | Path], TrUserData),
+    lists:foreach(fun (tipo) -> ok;
+		      (empresa) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_DirectoryRequest(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields,
+		   [tipo, empresa] -- maps:keys(M), 'DirectoryRequest'},
+		  M, Path);
+v_msg_DirectoryRequest(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'DirectoryRequest'}, X,
+		  Path).
+
+-compile({nowarn_unused_function,v_msg_AddDirectoryRequest/3}).
+-dialyzer({nowarn_function,v_msg_AddDirectoryRequest/3}).
+v_msg_AddDirectoryRequest(#{tipo := F1} = M, Path,
+			  TrUserData) ->
+    v_type_string(F1, [tipo | Path], TrUserData),
+    case M of
+      #{juro := F2} ->
+	  v_type_int32(F2, [juro | Path], TrUserData);
+      _ -> ok
+    end,
+    case M of
+      #{quantia := F3} ->
+	  v_type_int32(F3, [quantia | Path], TrUserData);
+      _ -> ok
+    end,
+    case M of
+      #{empresa := F4} ->
+	  v_type_string(F4, [empresa | Path], TrUserData);
+      _ -> ok
+    end,
+    case M of
+      #{investidor := F5} ->
+	  v_type_string(F5, [investidor | Path], TrUserData);
+      _ -> ok
+    end,
+    lists:foreach(fun (tipo) -> ok;
+		      (juro) -> ok;
+		      (quantia) -> ok;
+		      (empresa) -> ok;
+		      (investidor) -> ok;
+		      (OtherKey) ->
+			  mk_type_error({extraneous_key, OtherKey}, M, Path)
+		  end,
+		  maps:keys(M)),
+    ok;
+v_msg_AddDirectoryRequest(M, Path, _TrUserData)
+    when is_map(M) ->
+    mk_type_error({missing_fields, [tipo] -- maps:keys(M),
+		   'AddDirectoryRequest'},
+		  M, Path);
+v_msg_AddDirectoryRequest(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'AddDirectoryRequest'}, X,
+		  Path).
 
 -compile({nowarn_unused_function,v_msg_AuthReq/3}).
 -dialyzer({nowarn_function,v_msg_AuthReq/3}).
@@ -1531,6 +2868,15 @@ v_type_string(S, Path, _TrUserData)
 v_type_string(X, Path, _TrUserData) ->
     mk_type_error(bad_unicode_string, X, Path).
 
+-compile({nowarn_unused_function,v_type_bytes/3}).
+-dialyzer({nowarn_function,v_type_bytes/3}).
+v_type_bytes(B, _Path, _TrUserData) when is_binary(B) ->
+    ok;
+v_type_bytes(B, _Path, _TrUserData) when is_list(B) ->
+    ok;
+v_type_bytes(X, Path, _TrUserData) ->
+    mk_type_error(bad_binary_value, X, Path).
+
 -compile({nowarn_unused_function,mk_type_error/3}).
 -spec mk_type_error(_, _, list()) -> no_return().
 mk_type_error(Error, ValueSeen, Path) ->
@@ -1573,27 +2919,64 @@ cons(Elem, Acc, _TrUserData) -> [Elem | Acc].
 
 get_msg_defs() ->
     [{{msg, 'Mensagem'},
-      [#{name => juro, fnum => 2, rnum => 2, type => int32,
-	 occurrence => optional, opts => []},
-       #{name => quantia, fnum => 3, rnum => 3, type => int32,
-	 occurrence => optional, opts => []},
-       #{name => empresa, fnum => 4, rnum => 4, type => string,
-	 occurrence => optional, opts => []},
-       #{name => tipo, fnum => 1, rnum => 5, type => string,
+      [#{name => tipo, fnum => 1, rnum => 2, type => string,
 	 occurrence => required, opts => []},
+       #{name => juro, fnum => 2, rnum => 3, type => int32,
+	 occurrence => optional, opts => []},
+       #{name => quantia, fnum => 3, rnum => 4, type => int32,
+	 occurrence => optional, opts => []},
+       #{name => empresa, fnum => 4, rnum => 5, type => string,
+	 occurrence => optional, opts => []},
        #{name => investidor, fnum => 5, rnum => 6,
 	 type => string, occurrence => optional, opts => []}]},
      {{msg, 'ExchangeRequest'},
       [#{name => mensagem, fnum => 1, rnum => 2,
 	 type => {msg, 'Mensagem'}, occurrence => required,
 	 opts => []},
-       #{name => pid, fnum => 2, rnum => 3, type => int32,
+       #{name => pid, fnum => 2, rnum => 3, type => bytes,
 	 occurrence => required, opts => []}]},
      {{msg, 'ExchangeReply'},
       [#{name => sucesso, fnum => 1, rnum => 2, type => bool,
 	 occurrence => required, opts => []},
-       #{name => pid, fnum => 2, rnum => 3, type => int32,
+       #{name => pid, fnum => 2, rnum => 3, type => bytes,
 	 occurrence => required, opts => []}]},
+     {{msg, 'LeilaoReply'},
+      [#{name => taxaMaximaAlocada, fnum => 1, rnum => 2,
+	 type => int32, occurrence => required, opts => []},
+       #{name => taxaMaxima, fnum => 2, rnum => 3,
+	 type => int32, occurrence => required, opts => []},
+       #{name => sucesso, fnum => 3, rnum => 4, type => bool,
+	 occurrence => required, opts => []}]},
+     {{msg, 'EmissaoReply'},
+      [#{name => taxa, fnum => 1, rnum => 2, type => int32,
+	 occurrence => required, opts => []},
+       #{name => sucesso, fnum => 2, rnum => 3, type => bool,
+	 occurrence => required, opts => []}]},
+     {{msg, 'DirectoryReply'},
+      [#{name => success, fnum => 1, rnum => 2, type => bool,
+	 occurrence => required, opts => []},
+       #{name => leilao, fnum => 2, rnum => 3,
+	 type => {msg, 'LeilaoReply'}, occurrence => optional,
+	 opts => []},
+       #{name => emissao, fnum => 3, rnum => 4,
+	 type => {msg, 'EmissaoReply'}, occurrence => optional,
+	 opts => []}]},
+     {{msg, 'DirectoryRequest'},
+      [#{name => tipo, fnum => 1, rnum => 2, type => string,
+	 occurrence => required, opts => []},
+       #{name => empresa, fnum => 2, rnum => 3, type => string,
+	 occurrence => required, opts => []}]},
+     {{msg, 'AddDirectoryRequest'},
+      [#{name => tipo, fnum => 1, rnum => 2, type => string,
+	 occurrence => required, opts => []},
+       #{name => juro, fnum => 2, rnum => 3, type => int32,
+	 occurrence => optional, opts => []},
+       #{name => quantia, fnum => 3, rnum => 4, type => int32,
+	 occurrence => optional, opts => []},
+       #{name => empresa, fnum => 4, rnum => 5, type => string,
+	 occurrence => optional, opts => []},
+       #{name => investidor, fnum => 5, rnum => 6,
+	 type => string, occurrence => optional, opts => []}]},
      {{msg, 'AuthReq'},
       [#{name => username, fnum => 1, rnum => 2,
 	 type => string, occurrence => required, opts => []},
@@ -1611,7 +2994,9 @@ get_msg_defs() ->
 
 get_msg_names() ->
     ['Mensagem', 'ExchangeRequest', 'ExchangeReply',
-     'AuthReq', 'AuthRep', 'Reply'].
+     'LeilaoReply', 'EmissaoReply', 'DirectoryReply',
+     'DirectoryRequest', 'AddDirectoryRequest', 'AuthReq',
+     'AuthRep', 'Reply'].
 
 
 get_group_names() -> [].
@@ -1619,7 +3004,9 @@ get_group_names() -> [].
 
 get_msg_or_group_names() ->
     ['Mensagem', 'ExchangeRequest', 'ExchangeReply',
-     'AuthReq', 'AuthRep', 'Reply'].
+     'LeilaoReply', 'EmissaoReply', 'DirectoryReply',
+     'DirectoryRequest', 'AddDirectoryRequest', 'AuthReq',
+     'AuthRep', 'Reply'].
 
 
 get_enum_names() -> [].
@@ -1638,27 +3025,64 @@ fetch_enum_def(EnumName) ->
 
 
 find_msg_def('Mensagem') ->
-    [#{name => juro, fnum => 2, rnum => 2, type => int32,
-       occurrence => optional, opts => []},
-     #{name => quantia, fnum => 3, rnum => 3, type => int32,
-       occurrence => optional, opts => []},
-     #{name => empresa, fnum => 4, rnum => 4, type => string,
-       occurrence => optional, opts => []},
-     #{name => tipo, fnum => 1, rnum => 5, type => string,
+    [#{name => tipo, fnum => 1, rnum => 2, type => string,
        occurrence => required, opts => []},
+     #{name => juro, fnum => 2, rnum => 3, type => int32,
+       occurrence => optional, opts => []},
+     #{name => quantia, fnum => 3, rnum => 4, type => int32,
+       occurrence => optional, opts => []},
+     #{name => empresa, fnum => 4, rnum => 5, type => string,
+       occurrence => optional, opts => []},
      #{name => investidor, fnum => 5, rnum => 6,
        type => string, occurrence => optional, opts => []}];
 find_msg_def('ExchangeRequest') ->
     [#{name => mensagem, fnum => 1, rnum => 2,
        type => {msg, 'Mensagem'}, occurrence => required,
        opts => []},
-     #{name => pid, fnum => 2, rnum => 3, type => int32,
+     #{name => pid, fnum => 2, rnum => 3, type => bytes,
        occurrence => required, opts => []}];
 find_msg_def('ExchangeReply') ->
     [#{name => sucesso, fnum => 1, rnum => 2, type => bool,
        occurrence => required, opts => []},
-     #{name => pid, fnum => 2, rnum => 3, type => int32,
+     #{name => pid, fnum => 2, rnum => 3, type => bytes,
        occurrence => required, opts => []}];
+find_msg_def('LeilaoReply') ->
+    [#{name => taxaMaximaAlocada, fnum => 1, rnum => 2,
+       type => int32, occurrence => required, opts => []},
+     #{name => taxaMaxima, fnum => 2, rnum => 3,
+       type => int32, occurrence => required, opts => []},
+     #{name => sucesso, fnum => 3, rnum => 4, type => bool,
+       occurrence => required, opts => []}];
+find_msg_def('EmissaoReply') ->
+    [#{name => taxa, fnum => 1, rnum => 2, type => int32,
+       occurrence => required, opts => []},
+     #{name => sucesso, fnum => 2, rnum => 3, type => bool,
+       occurrence => required, opts => []}];
+find_msg_def('DirectoryReply') ->
+    [#{name => success, fnum => 1, rnum => 2, type => bool,
+       occurrence => required, opts => []},
+     #{name => leilao, fnum => 2, rnum => 3,
+       type => {msg, 'LeilaoReply'}, occurrence => optional,
+       opts => []},
+     #{name => emissao, fnum => 3, rnum => 4,
+       type => {msg, 'EmissaoReply'}, occurrence => optional,
+       opts => []}];
+find_msg_def('DirectoryRequest') ->
+    [#{name => tipo, fnum => 1, rnum => 2, type => string,
+       occurrence => required, opts => []},
+     #{name => empresa, fnum => 2, rnum => 3, type => string,
+       occurrence => required, opts => []}];
+find_msg_def('AddDirectoryRequest') ->
+    [#{name => tipo, fnum => 1, rnum => 2, type => string,
+       occurrence => required, opts => []},
+     #{name => juro, fnum => 2, rnum => 3, type => int32,
+       occurrence => optional, opts => []},
+     #{name => quantia, fnum => 3, rnum => 4, type => int32,
+       occurrence => optional, opts => []},
+     #{name => empresa, fnum => 4, rnum => 5, type => string,
+       occurrence => optional, opts => []},
+     #{name => investidor, fnum => 5, rnum => 6,
+       type => string, occurrence => optional, opts => []}];
 find_msg_def('AuthReq') ->
     [#{name => username, fnum => 1, rnum => 2,
        type => string, occurrence => required, opts => []},
@@ -1734,7 +3158,7 @@ service_and_rpc_name_to_fqbins(S, R) ->
     error({gpb_error, {badservice_or_rpc, {S, R}}}).
 
 
-get_package_name() -> undefined.
+get_package_name() -> 'Protos'.
 
 
 %% Whether or not the message names

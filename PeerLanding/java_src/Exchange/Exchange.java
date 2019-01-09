@@ -1,43 +1,110 @@
 package Exchange;
-import Client.Protocolo.*;
+import Protos.Protocolo.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
 
-public class Exchange {
+public class Exchange implements Runnable{
 
+    ZMQ.Socket req;
     ZMQ.Socket pull;
     ZMQ.Socket push;
     ZMQ.Socket pub;
     ZMQ.Context context;
 
+
     public Exchange(int port) {
         this.context = ZMQ.context(1);
-        this.pub = context.socket(ZMQ.PUB);
+        this.req  = context.socket(ZMQ.REQ);
+        this.pub  = context.socket(ZMQ.PUB);
         this.push = context.socket(ZMQ.PUSH);
         this.pull = context.socket(ZMQ.PULL);
-        this.pub.bind("tcp://*:2001");
+        this.req.connect("tcp://*:3000");
+        this.pub .connect("tcp://*:2001");
         this.push.connect("tcp://*:"+(port+1000));
         this.pull.bind("tcp://*:"+port);
-
     }
 
-    public boolean licitar(String empresa, String investidor, int quantia, int juro){}
-    public boolean emprestimo(String empresa, String investidor, int quantia){}
-    public boolean emissao(String empresa, int quantia){}
-    public boolean leilao(String empresa, int quantia, int juro){}
-    public boolean notificacao(Mensagem mensagem){}
+
+
+
+
+
+
+    public boolean licitar(String empresa, String investidor, int quantia, int juro){
+        DirectoryRequest dreq = DirectoryRequest.newBuilder()
+                .setTipo("TaxaMaxLeilao")
+                .setEmpresa(empresa)
+                .build();
+        req.send(dreq.toByteArray());
+        DirectoryReply drep = this.getDirectoryReply();
+        if (drep.hasLeilao()) {
+            if (juro <= drep.getLeilao().getTaxaMaxima()) {
+                AddDirectoryRequest adreq = AddDirectoryRequest.newBuilder()
+                        .setTipo("licitar")
+                        .setEmpresa(empresa)
+                        .setJuro(juro)
+                        .setQuantia(quantia).build();
+                req.send(adreq.toByteArray());
+                //FIXME ver se é preciso receber cenas do diretorio
+                return true;
+            }
+        }
+        else{
+            return false;
+        }
+        //Verificar se o juro <= taxa maxima do leilao
+        //se sim
+        // atualizar dir
+        // notificar subs
+        System.out.println("licitar");
+        return true;
+    }
+    public boolean emprestimo(String empresa, String investidor, int quantia){
+        // atualizar dir
+        // notificar subs
+        System.out.println("emprestimo");
+        return true;
+    }
+    public boolean emissao(String empresa, int quantia){
+        //Verificar se a ultima acao foi leilao ou emissao
+        //se leilao && se terminou leilao com sucesso
+            //obter taxa max alocada nesse leilao
+        //se emissao && se emissao completa
+            //obter taxa da emissao
+        //se emissao && emissao incompleta
+            //taxa da emissao * 1.1
+        //executors para timeout da emissao
+        //atualizar diretorio
+        //Notificar subs
+        System.out.println("emissao");
+        return true;
+    }
+    public boolean leilao(String empresa, int quantia, int juro){
+        //verificar se emp tem leilao em curso
+        //quantia multiplo de 1000
+        //executors para timeout do leilao
+        //atualizar diretorio
+        //Notificar subs
+        System.out.println("leilao");
+        return true;
+    }
+    public boolean notificacao(Mensagem mensagem){
+        System.out.println("notifica");
+        return true;
+    };
 
 
     public void run(){
         while(true)
         {
-            byte[] packet = this.recv();
+            byte[] packet = this.recv(this.pull);
             try {
                 ExchangeRequest pedido = ExchangeRequest.parseFrom(packet);
                 Mensagem mensagem = pedido.getMensagem();
                 String tipo = mensagem.getTipo();
+                System.out.println(mensagem);
                 boolean sucesso;
                 switch (tipo){
                     case "licitar":
@@ -86,10 +153,11 @@ public class Exchange {
     }
 
 
-    public byte[] recv(){
+    public byte[] recv(ZMQ.Socket socket){
         byte[] tmp;
         int len = 0;
-        tmp = this.pull.recv();
+        tmp = socket.recv();
+        System.out.println("Exchange: Pedido recebido");
         len = tmp.length;
         byte[] response = new byte[len];
         for(int i = 0; i < len; i++)
@@ -99,10 +167,21 @@ public class Exchange {
     }
 
 
+    private DirectoryReply getDirectoryReply() {
+        DirectoryReply rep = null;
+        try {
+            byte[] response = this.recv(this.req);
+            rep = DirectoryReply.parseFrom(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rep;
+    }
+
 
     public static void main(String[] args){
         for (int i = 0; i < 5; i++) {
-            new Exchange(4000+i);
+            new Thread(new Exchange(4000+i)).start();
         }
     }
     /*

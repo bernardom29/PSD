@@ -12,7 +12,7 @@ public class Notifier implements Runnable{
     {
         this.context = ZMQ.context(1);
         this.sub = context.socket(ZMQ.SUB);
-        this.sub.connect("tcp://*:2000");
+        this.sub.connect("tcp://*:2200");
         mailbox = new Vector<>();
     }
 

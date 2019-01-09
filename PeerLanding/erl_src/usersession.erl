@@ -49,23 +49,24 @@ usersession(Sock, Username, Empresas) ->
         "licitar" ->
           Pedido = maps:put(investidor, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Licitar");
+          io:format("Usersession: Licitar\n");
         "emprestimo"->
           Pedido = maps:put(investidor, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Emprestimo");
+          io:format("Usersession: Emprestimo\n");
         "leilao"->
           Pedido = maps:put(empresa, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Criar leilao");
+          io:format("Usersession: Criar leilao\n");
         "emissao"->
           Pedido = maps:put(empresa, Username, Msg),
           producer:run(Empresas, Pedido, self()),
-          io:format("Emissao")
+          io:format("Usersession: Emissao\n")
       end,
       usersession(Sock,Username, Empresas);
     {consumer, Msg} ->
       Packet = protocolo:encode_msg(Msg,'Reply'),
+      io:format("o consumer respondeu\n"),
       gen_tcp:send(Sock,Packet),
       usersession(Sock,Username, Empresas)
 
