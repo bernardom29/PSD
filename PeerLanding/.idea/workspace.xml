@@ -2,166 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b5b8e20-3dd5-445f-9565-00102c254eb5" name="Default Changelist" comment="makefile">
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/UPGRADING3.1.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/c_src/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/c_src/erlzmq_nif.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/c_src/vector.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/c_src/vector.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/doc/overview.edoc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/include/erlzmq.hrl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/erlzmq_perf.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/local_lat.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/local_lat_active.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/local_thr.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/local_thr_active.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/perfgraphs.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/remote_lat.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/remote_lat_active.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/perf/remote_thr.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/src/erlzmq.app.src" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/src/erlzmq.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/src/erlzmq_nif.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/erlzmq2/test/erlzmq_test.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/.dir-locals.el" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/.travis.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/COPYING.LIB" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/README.nif-cc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/README.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-all-concatenated.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n01.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n02.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n03.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n04.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n05.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n06.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n07.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n08.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n09.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n10.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n11.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n12.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n13.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n14.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n15.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n16.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n17.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n18.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n19.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n20.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n21.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n22.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n23.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n24.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n25.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n26.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n27.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n28.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n29.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n30.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n31.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n32.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n33.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n34.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n35.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n36.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n37.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n38.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n39.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n40.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n41.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n42.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n43.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n44.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n45.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n46.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n47.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n48.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n49.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n50.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n51.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n52.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n53.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n54.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n55.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n56.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n57.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n58.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n59.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n60.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n61.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n62.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n63.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n64.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n65.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n66.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n67.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n68.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n69.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n70.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n71.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n72.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n73.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n74.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n75.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n76.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d-msgs/d-msg-n77.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/d.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/google_message1.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/google_message2.dat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/msg.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/benchmarks/proto-bench" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/bin/protoc-erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/build/compile_descriptor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/build/mk_version_hrl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/build/prepend_edoc_autogenerated" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/descr_src/gpb_compile_descr.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/export-from-git" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/git-hooks/pre-push" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/import-protobuf-protos" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/install-git-hooks" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/package-for-hex.pm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/send-pr-to-rebar3-gpb-plugin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/tag-next-minor-vsn" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/upload-hexdoc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/helpers/xsillyed" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/include/gpb.hrl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/include/gpb_version.hrl.in" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/any.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/api.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/descriptor.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/duration.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/empty.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/field_mask.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/source_context.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/struct.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/timestamp.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/type.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/priv/proto3/google/protobuf/wrappers.proto" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/rebar.config.script" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb.app.src" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_codegen.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_codemorpher.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_gen_nif.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_gen_translators.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_gen_types.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_lib.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_parse.yrl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/src/gpb_scan.xrl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_codegen_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_codemorpher_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_lib_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_names_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_parse_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_scan_tests.erl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependencies/gpb/test/gpb_tests.erl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -175,7 +16,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/java_src/Client/Client.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-95">
@@ -183,6 +24,42 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="340">
+              <caret line="23" column="98" selection-start-line="23" selection-start-column="98" selection-end-line="23" selection-end-column="98" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/erl_src/frontend.erl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="509">
+              <caret line="46" column="29" selection-start-line="46" selection-start-column="29" selection-end-line="46" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/erl_src/producer.erl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="151">
+              <caret line="13" selection-start-line="13" selection-end-line="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/erl_src/usersession.erl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="43" column="9" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -273,7 +150,7 @@
             <path>
               <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
               <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name=".idea" type="462c0819:PsiDirectoryNode" />
+              <item name="erl_src" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -283,6 +160,10 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1547156833397" />
@@ -396,7 +277,7 @@
       <workItem from="1546664179757" duration="23000" />
       <workItem from="1546958836945" duration="8956000" />
       <workItem from="1546970636010" duration="10279000" />
-      <workItem from="1547139642417" duration="5909000" />
+      <workItem from="1547139642417" duration="7710000" />
     </task>
     <task id="LOCAL-00001" summary="producer + consumer">
       <created>1546620813965</created>
@@ -405,14 +286,22 @@
       <option name="project" value="LOCAL" />
       <updated>1546620813966</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="dropwizard deps">
+      <created>1547160180675</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1547160180675</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="62174000" />
+    <option name="totallyTimeSpent" value="63975000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="48" y="22" width="1232" height="778" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49708456" visible="true" weight="0.27478993" />
       <window_info id="Structure" order="1" sideWeight="0.5030181" side_tool="true" weight="0.25605816" />
@@ -421,6 +310,7 @@
       <window_info id="UI Designer" order="4" />
       <window_info id="Capture Tool" order="5" />
       <window_info id="Favorites" order="6" sideWeight="0.50291544" side_tool="true" weight="0.27478993" />
+      <window_info anchor="bottom" id="Java Enterprise" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32876712" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.31778425" />
@@ -435,6 +325,7 @@
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50084037" side_tool="true" weight="0.32944608" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.3260274" />
       <window_info anchor="bottom" id="Duplicate detector" order="13" weight="0.32876712" />
+      <window_info anchor="right" id="Bean Validation" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -487,10 +378,10 @@
     <MESSAGE value="producer + consumer" />
     <MESSAGE value="makefile com runs e coisas" />
     <MESSAGE value="makefile" />
-    <option name="LAST_COMMIT_MESSAGE" value="makefile" />
+    <MESSAGE value="dropwizard deps" />
+    <option name="LAST_COMMIT_MESSAGE" value="dropwizard deps" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/Downloads/zeromq/push_pull/Sink.java" />
     <entry file="file://$USER_HOME$/Downloads/zeromq/pub_sub/Subscriber.java" />
     <entry file="file://$USER_HOME$/Downloads/zeromq/pub_sub/Publisher.java" />
     <entry file="file://$USER_HOME$/Downloads/zeromq/pub_sub/MultipleConnectSub.java" />
@@ -740,27 +631,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/erl_src/frontend.erl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="509">
-          <caret line="46" column="29" selection-start-line="46" selection-start-column="29" selection-end-line="46" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/erl_src/usersession.erl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="43" column="9" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/erl_src/producer.erl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Client/Client.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-95">
@@ -768,6 +638,34 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="23" column="98" selection-start-line="23" selection-start-column="98" selection-end-line="23" selection-end-column="98" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/erl_src/frontend.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="509">
+          <caret line="46" column="29" selection-start-line="46" selection-start-column="29" selection-end-line="46" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/erl_src/producer.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="151">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/erl_src/usersession.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="43" column="9" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -837,7 +735,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>dropwizard-core-1.3.7</last-edited>
+          <last-edited>javax.xml.bind:jaxb-api:2.3.0</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

@@ -30,14 +30,14 @@ Kernel configured for up to 4 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3
 Primary memory available: 8.00 gigabytes
-Default processor set: 304 tasks, 1238 threads, 4 processors
-Load average: 3.38, Mach factor: 2.25
+Default processor set: 297 tasks, 1275 threads, 4 processors
+Load average: 2.71, Mach factor: 1.69
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH: /usr/local/Cellar/erlang/21.2.1/lib/erlang/erts-10.2.1/bin
-PATH: /usr/local/Cellar/erlang/21.2.1/lib/erlang/bin
+PATH: /usr/local/Cellar/erlang/21.2.2/lib/erlang/erts-10.2.1/bin
+PATH: /usr/local/Cellar/erlang/21.2.2/lib/erlang/bin
 PATH: /usr/local/opt/llvm/bin
 PATH: /usr/local/bin
 PATH: /usr/bin
@@ -88,13 +88,13 @@ configure:3662: cc --version >&5
 Apple LLVM version 9.0.0 (clang-900.0.39.2)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:3673: $? = 0
 configure:3662: cc -v >&5
 Apple LLVM version 9.0.0 (clang-900.0.39.2)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:3673: $? = 0
 configure:3662: cc -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
@@ -149,13 +149,13 @@ configure:4628: c++ --version >&5
 Apple LLVM version 9.0.0 (clang-900.0.39.2)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:4639: $? = 0
 configure:4628: c++ -v >&5
 Apple LLVM version 9.0.0 (clang-900.0.39.2)
 Target: x86_64-apple-darwin16.7.0
 Thread model: posix
-InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
 configure:4639: $? = 0
 configure:4628: c++ -V >&5
 clang: error: argument to '-V' is missing (expected 1 value)
