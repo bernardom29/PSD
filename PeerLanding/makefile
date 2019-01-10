@@ -57,7 +57,9 @@ run_client: Client
 run_frontend:
 	erl -pa bin/frontend/ -run frontend 
 
-
+clean:
+	rm -rf bin/*
+	
 
 DirInstall:
 	@mkdir -p $(BIN)
