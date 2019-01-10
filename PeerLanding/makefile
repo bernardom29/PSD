@@ -1,7 +1,7 @@
 JAVA_DEPS = dependencies/protobuf-java-3.6.1.jar:dependencies/jeromq-0.4.3.jar:bin:. 
 BIN = bin/
 ERLANG_ZMQ = dependencies/erlzmq2/include
-ERLANG_GPB = dependencies/gpb/include
+ERLANG_GPB = dependencies/gpb/include/
 JAVA_SRC = java_src/
 SERIAL = $(JAVA_SRC)Protos/*.java
 PROTO_DIR = java_src/Protos/protocolo.proto
@@ -42,7 +42,7 @@ Directory: Protos $(JAVA_SRC)Directory/*.java
 
 Frontend: erl_src/*.erl 
 	@dependencies/gpb/bin/protoc-erl -maps -o erl_src/ $(PROTO_DIR)
-	@erlc -I $(ERLANG_GBP) -o $(BIN)/frontend erl_src/protocolo.erl 
+	@erlc -I $(ERLANG_GPB) -o $(BIN)/frontend erl_src/protocolo.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq_nif.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/producer.erl 
