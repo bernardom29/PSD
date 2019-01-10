@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PeerLanding.iml" filepath="$PROJECT_DIR$/PeerLanding.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java_src/java_src.iml" filepath="$PROJECT_DIR$/java_src/java_src.iml" />
     </modules>
   </component>
 </project>
