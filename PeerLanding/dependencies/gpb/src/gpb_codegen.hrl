@@ -4,10 +4,10 @@
 -compile({parse_transform,gpb_codegen}).
 
 -define(case_clause(Clause),
-        gpb_codegen:case_clause(case dummy of Clause, end)).
+        gpb_codegen:case_clause(case dummy of Clause end)).
 
 -define(case_clause(Clause, Transforms), % FIXME; Transforms gets misindented
-        gpb_codegen:case_clause(case dummy of Clause, end,
+        gpb_codegen:case_clause(case dummy of Clause end,
                                 Transforms)).
 
 -define(fn_clause(FunExpr),
@@ -17,16 +17,16 @@
         gpb_codegen:fn_clause(FunExpr, Transforms)).
 
 -define(if_clause(Clause),
-        gpb_codegen:if_clause(if Clause. end)).
+        gpb_codegen:if_clause(if Clause end)).
 
 -define(if_clause(Clause, Transforms), % FIXME; Transforms gets misindented
-        gpb_codegen:if_clause(if Clause. end, Transforms)).
+        gpb_codegen:if_clause(if Clause end, Transforms)).
 
 -define(receive_clause(Clause),
-        gpb_codegen:receive_clause(receive Clause, end)).
+        gpb_codegen:receive_clause(receive Clause end)).
 
 -define(receive_clause(Clause, Transforms), % FIXME; Transforms gets misindented
-        gpb_codegen:receive_clause(receive Clause, end, Transforms)).
+        gpb_codegen:receive_clause(receive Clause end, Transforms)).
 
 -define(expr(X),
         gpb_codegen:expr(X)).

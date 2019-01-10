@@ -1,0 +1,66 @@
+syntax="proto2";
+
+package Protos;
+
+message Mensagem{
+    required string tipo = 1;
+    optional int32 juro = 2;
+    optional int32 quantia = 3;
+    optional string empresa = 4;
+    optional string investidor = 5;
+}
+
+
+message ExchangeRequest{
+    required Mensagem mensagem = 1;
+    required bytes pid = 2;
+}
+
+message ExchangeReply {
+    required bool sucesso = 1;
+    required bytes pid = 2;
+}
+
+message LeilaoReply {
+    required int32 taxaMaximaAlocada = 1;
+    required int32 taxaMaxima = 2;
+    required bool sucesso = 3;
+}
+
+message EmissaoReply{
+    required int32 taxa = 1;
+    required bool sucesso = 2;
+}
+
+message DirectoryReply{
+    required bool success = 1;
+    optional LeilaoReply leilao = 2;
+    optional EmissaoReply emissao = 3;
+}
+
+message DirectoryRequest{
+    required string tipo = 1;
+    required string empresa = 2;
+}
+
+message AddDirectoryRequest{
+    required string tipo = 1;
+    optional int32 juro = 2;
+    optional int32 quantia = 3;
+    optional string empresa = 4;
+    optional string investidor = 5;
+}
+
+message AuthReq {
+    required string username = 1;
+    required string password = 2;
+};
+
+message AuthRep {
+    required bool sucesso = 1;
+    optional int32 tipo = 2;
+}
+
+message Reply{
+    required bool sucesso = 1;
+}

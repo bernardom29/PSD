@@ -1,10 +1,10 @@
 [
 { "file"      : "c_src/erlzmq_nif.c"
-, "directory" : "/Users/trident/Documents/PeerLanding/dependencies/erlzmq2"
-, "command"   : "cc -c -g -Wall -fPIC -MMD -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/lib/erl_interface-3.10.4/include\" -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/erts-10.2.1/include\" c_src/erlzmq_nif.c -o c_src/erlzmq_nif.o"
+, "directory" : "/Users/trident/Documents/PSD/PeerLanding/dependencies/erlzmq2"
+, "command"   : "cc -c -Ic_src -Ideps/zeromq3/include -g -Wall -fPIC -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/lib/erl_interface-3.10.4/include\" -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/erts-10.2.1/include\" c_src/erlzmq_nif.c -o c_src/erlzmq_nif.o"
 },
 { "file"      : "c_src/vector.c"
-, "directory" : "/Users/trident/Documents/PeerLanding/dependencies/erlzmq2"
-, "command"   : "cc -c -g -Wall -fPIC -MMD -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/lib/erl_interface-3.10.4/include\" -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/erts-10.2.1/include\" c_src/vector.c -o c_src/vector.o"
+, "directory" : "/Users/trident/Documents/PSD/PeerLanding/dependencies/erlzmq2"
+, "command"   : "cc -c -Ic_src -Ideps/zeromq3/include -g -Wall -fPIC -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/lib/erl_interface-3.10.4/include\" -I\"/usr/local/Cellar/erlang/21.2.1/lib/erlang/erts-10.2.1/include\" c_src/vector.c -o c_src/vector.o"
 }
 ]
