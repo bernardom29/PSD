@@ -4,6 +4,8 @@ ERLANG_ZMQ = dependencies/erlzmq2/include
 ERLANG_GPB = dependencies/gpb/include
 JAVA_SRC = java_src/
 SERIAL = $(JAVA_SRC)Protos/*.java
+PROTO_DIR = java_src/Protos/protocolo.proto
+
 
 
 all: DirInstall Compile
@@ -11,7 +13,7 @@ all: DirInstall Compile
 Compile: Client Exchange Directory Frontend
 
 Protos: $(SERIAL)
-	@protoc -I=. --java_out=$(JAVA_SRC) $(JAVA_SRC)Protos/protocolo.proto
+	@protoc -I=. --java_out=$(JAVA_SRC) $(PROTO_DIR) 
 	@javac -d $(BIN) \
 		-classpath $(JAVA_DEPS) \
 	 	$(JAVA_SRC)Protos/Protocolo.java 
@@ -39,17 +41,15 @@ Directory: Protos $(JAVA_SRC)Directory/*.java
 
 
 Frontend: erl_src/*.erl 
-	@dependencies/gpb/bin/protoc-erl -I. -maps -o erl_src/ $(SERIAL)
+	@dependencies/gpb/bin/protoc-erl -maps -o erl_src/ $(PROTO_DIR)
 	@erlc -I $(ERLANG_GBP) -o $(BIN)/frontend erl_src/protocolo.erl 
-	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq_nif.erl 
+	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/producer.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/consumer.erl
 	@erlc -o $(BIN)/frontend/ erl_src/accountManager.erl erl_src/usersession.erl erl_src/frontend.erl
 	@echo Erlang Components Compiled
 	@echo Compilation done
-
-
 
 run_client: Client
 	java -cp bin Client.Client

@@ -4,56 +4,28 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Exchange implements Runnable{
-
-    ZMQ.Socket req;
-    ZMQ.Socket pull;
-    ZMQ.Socket push;
+    HashMap<String, Empresa> empresas;
+    HashMap<String, Leilao> leiloes;
+    HashMap<String, Emissao> emissoes;
+    ZMQ.Socket rep;
     ZMQ.Socket pub;
     ZMQ.Context context;
 
 
     public Exchange(int port) {
         this.context = ZMQ.context(1);
-        this.req  = context.socket(ZMQ.REQ);
+        this.rep  = context.socket(ZMQ.REP);
         this.pub  = context.socket(ZMQ.PUB);
-        this.push = context.socket(ZMQ.PUSH);
-        this.pull = context.socket(ZMQ.PULL);
-        this.req.connect("tcp://*:3000");
-        this.pub .connect("tcp://*:2001");
-        this.push.connect("tcp://*:"+(port+1000));
-        this.pull.bind("tcp://*:"+port);
+        this.rep.bind("tcp://*:"+port);
+        this.pub.connect("tcp://*:2000");
     }
 
 
 
-
-
-
-
     public boolean licitar(String empresa, String investidor, int quantia, int juro){
-        DirectoryRequest dreq = DirectoryRequest.newBuilder()
-                .setTipo("TaxaMaxLeilao")
-                .setEmpresa(empresa)
-                .build();
-        req.send(dreq.toByteArray());
-        DirectoryReply drep = this.getDirectoryReply();
-        if (drep.hasLeilao()) {
-            if (juro <= drep.getLeilao().getTaxaMaxima()) {
-                AddDirectoryRequest adreq = AddDirectoryRequest.newBuilder()
-                        .setTipo("licitar")
-                        .setEmpresa(empresa)
-                        .setJuro(juro)
-                        .setQuantia(quantia).build();
-                req.send(adreq.toByteArray());
-                //FIXME ver se é preciso receber cenas do diretorio
-                return true;
-            }
-        }
-        else{
-            return false;
-        }
         //Verificar se o juro <= taxa maxima do leilao
         //se sim
         // atualizar dir
@@ -99,7 +71,7 @@ public class Exchange implements Runnable{
     public void run(){
         while(true)
         {
-            byte[] packet = this.recv(this.pull);
+            byte[] packet = this.recv(this.rep);
             try {
                 ExchangeRequest pedido = ExchangeRequest.parseFrom(packet);
                 Mensagem mensagem = pedido.getMensagem();
@@ -143,7 +115,7 @@ public class Exchange implements Runnable{
                         .setPid(pedido.getPid())
                         .setSucesso(sucesso)
                         .build();
-                this.push.send(resposta.toByteArray());
+                this.rep.send(resposta.toByteArray());
                 if (sucesso)
                     notificacao(mensagem);
             } catch (InvalidProtocolBufferException e) {
@@ -165,19 +137,6 @@ public class Exchange implements Runnable{
         return response;
 
     }
-
-
-    private DirectoryReply getDirectoryReply() {
-        DirectoryReply rep = null;
-        try {
-            byte[] response = this.recv(this.req);
-            rep = DirectoryReply.parseFrom(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return rep;
-    }
-
 
     public static void main(String[] args){
         for (int i = 0; i < 5; i++) {

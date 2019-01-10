@@ -1,13 +1,12 @@
-package Directory;
+package Exchange;
 
-import java.util.Date;
 import java.util.List;
 
-public class Leilao {
-    int taxaMaxima;
+public class Emissao {
+    int id;
+    int taxa;
     int montanteTotal;
     String empresa;
-    Date data;
     boolean sucesso;
     List<Licitacao> licitacoes;
 

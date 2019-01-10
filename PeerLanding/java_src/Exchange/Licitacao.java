@@ -1,4 +1,4 @@
-package Directory;
+package Exchange;
 
 public class Licitacao {
     String investidor;
