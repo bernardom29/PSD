@@ -18,7 +18,6 @@ message ExchangeRequest{
 
 message ExchangeReply {
     required bool sucesso = 1;
-    required bytes pid = 2;
 }
 
 message LeilaoReply {

@@ -73,8 +73,7 @@ public class Exchange implements Runnable{
         {
             byte[] packet = this.recv(this.rep);
             try {
-                ExchangeRequest pedido = ExchangeRequest.parseFrom(packet);
-                Mensagem mensagem = pedido.getMensagem();
+                Mensagem mensagem = Mensagem.parseFrom(packet);
                 String tipo = mensagem.getTipo();
                 System.out.println(mensagem);
                 boolean sucesso;
@@ -112,7 +111,6 @@ public class Exchange implements Runnable{
                         break;
                 }
                 ExchangeReply resposta = ExchangeReply.newBuilder()
-                        .setPid(pedido.getPid())
                         .setSucesso(sucesso)
                         .build();
                 this.rep.send(resposta.toByteArray());

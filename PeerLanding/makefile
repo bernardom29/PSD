@@ -8,9 +8,9 @@ PROTO_DIR = java_src/Protos/protocolo.proto
 
 
 
-all: DirInstall Compile
+all: compile
 
-Compile: Client Exchange Directory Frontend
+compile: Client Exchange Frontend
 
 Protos: $(SERIAL)
 	@protoc -I=. --java_out=$(JAVA_SRC) $(PROTO_DIR) 
@@ -33,12 +33,6 @@ Exchange: Protos $(JAVA_SRC)Exchange/*.java
 	@echo Exchange Compiled
 		
 
-Directory: Protos $(JAVA_SRC)Directory/*.java
-	@javac -d  $(BIN) \
-		-classpath $(JAVA_DEPS) \
-		$(JAVA_SRC)Directory/*.java 
-	@echo Directory Compiled
-
 
 Frontend: erl_src/*.erl 
 	@dependencies/gpb/bin/protoc-erl -maps -o erl_src/ $(PROTO_DIR)
@@ -58,15 +52,16 @@ run_frontend:
 	erl -pa bin/frontend/ -run frontend 
 
 clean:
-	rm -rf bin/*
+	@rm -rf bin/*/*
 	
 
-DirInstall:
+install:
 	@mkdir -p $(BIN)
 	@mkdir -p $(BIN)Exchange
 	@mkdir -p $(BIN)frontend
 	@mkdir -p $(BIN)Client
 	@mkdir -p $(BIN)Directory
+	@cp -r dependencies/erlzmq2/priv $(BIN)
 	@echo Creating dirs
 
 

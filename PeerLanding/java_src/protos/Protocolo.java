@@ -1848,15 +1848,6 @@ public final class Protocolo {
      * <code>required bool sucesso = 1;</code>
      */
     boolean getSucesso();
-
-    /**
-     * <code>required bytes pid = 2;</code>
-     */
-    boolean hasPid();
-    /**
-     * <code>required bytes pid = 2;</code>
-     */
-    com.google.protobuf.ByteString getPid();
   }
   /**
    * Protobuf type {@code Protos.ExchangeReply}
@@ -1872,7 +1863,6 @@ public final class Protocolo {
     }
     private ExchangeReply() {
       sucesso_ = false;
-      pid_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -1902,11 +1892,6 @@ public final class Protocolo {
             case 8: {
               bitField0_ |= 0x00000001;
               sucesso_ = input.readBool();
-              break;
-            }
-            case 18: {
-              bitField0_ |= 0x00000002;
-              pid_ = input.readBytes();
               break;
             }
             default: {
@@ -1957,21 +1942,6 @@ public final class Protocolo {
       return sucesso_;
     }
 
-    public static final int PID_FIELD_NUMBER = 2;
-    private com.google.protobuf.ByteString pid_;
-    /**
-     * <code>required bytes pid = 2;</code>
-     */
-    public boolean hasPid() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required bytes pid = 2;</code>
-     */
-    public com.google.protobuf.ByteString getPid() {
-      return pid_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1980,10 +1950,6 @@ public final class Protocolo {
       if (isInitialized == 0) return false;
 
       if (!hasSucesso()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasPid()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1997,9 +1963,6 @@ public final class Protocolo {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBool(1, sucesso_);
       }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(2, pid_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -2012,10 +1975,6 @@ public final class Protocolo {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(1, sucesso_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(2, pid_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2038,11 +1997,6 @@ public final class Protocolo {
         result = result && (getSucesso()
             == other.getSucesso());
       }
-      result = result && (hasPid() == other.hasPid());
-      if (hasPid()) {
-        result = result && getPid()
-            .equals(other.getPid());
-      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2058,10 +2012,6 @@ public final class Protocolo {
         hash = (37 * hash) + SUCESSO_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getSucesso());
-      }
-      if (hasPid()) {
-        hash = (37 * hash) + PID_FIELD_NUMBER;
-        hash = (53 * hash) + getPid().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2198,8 +2148,6 @@ public final class Protocolo {
         super.clear();
         sucesso_ = false;
         bitField0_ = (bitField0_ & ~0x00000001);
-        pid_ = com.google.protobuf.ByteString.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -2232,10 +2180,6 @@ public final class Protocolo {
           to_bitField0_ |= 0x00000001;
         }
         result.sucesso_ = sucesso_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.pid_ = pid_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2288,9 +2232,6 @@ public final class Protocolo {
         if (other.hasSucesso()) {
           setSucesso(other.getSucesso());
         }
-        if (other.hasPid()) {
-          setPid(other.getPid());
-        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -2299,9 +2240,6 @@ public final class Protocolo {
       @java.lang.Override
       public final boolean isInitialized() {
         if (!hasSucesso()) {
-          return false;
-        }
-        if (!hasPid()) {
           return false;
         }
         return true;
@@ -2355,41 +2293,6 @@ public final class Protocolo {
       public Builder clearSucesso() {
         bitField0_ = (bitField0_ & ~0x00000001);
         sucesso_ = false;
-        onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.ByteString pid_ = com.google.protobuf.ByteString.EMPTY;
-      /**
-       * <code>required bytes pid = 2;</code>
-       */
-      public boolean hasPid() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required bytes pid = 2;</code>
-       */
-      public com.google.protobuf.ByteString getPid() {
-        return pid_;
-      }
-      /**
-       * <code>required bytes pid = 2;</code>
-       */
-      public Builder setPid(com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000002;
-        pid_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>required bytes pid = 2;</code>
-       */
-      public Builder clearPid() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        pid_ = getDefaultInstance().getPid();
         onChanged();
         return this;
       }
@@ -8487,20 +8390,20 @@ public final class Protocolo {
       "\005\022\017\n\007quantia\030\003 \001(\005\022\017\n\007empresa\030\004 \001(\t\022\022\n\ni" +
       "nvestidor\030\005 \001(\t\"B\n\017ExchangeRequest\022\"\n\010me" +
       "nsagem\030\001 \002(\0132\020.Protos.Mensagem\022\013\n\003pid\030\002 " +
-      "\002(\014\"-\n\rExchangeReply\022\017\n\007sucesso\030\001 \002(\010\022\013\n" +
-      "\003pid\030\002 \002(\014\"M\n\013LeilaoReply\022\031\n\021taxaMaximaA" +
-      "locada\030\001 \002(\005\022\022\n\ntaxaMaxima\030\002 \002(\005\022\017\n\007suce" +
-      "sso\030\003 \002(\010\"-\n\014EmissaoReply\022\014\n\004taxa\030\001 \002(\005\022" +
-      "\017\n\007sucesso\030\002 \002(\010\"m\n\016DirectoryReply\022\017\n\007su" +
-      "ccess\030\001 \002(\010\022#\n\006leilao\030\002 \001(\0132\023.Protos.Lei" +
-      "laoReply\022%\n\007emissao\030\003 \001(\0132\024.Protos.Emiss" +
-      "aoReply\"1\n\020DirectoryRequest\022\014\n\004tipo\030\001 \002(" +
-      "\t\022\017\n\007empresa\030\002 \002(\t\"g\n\023AddDirectoryReques" +
-      "t\022\014\n\004tipo\030\001 \002(\t\022\014\n\004juro\030\002 \001(\005\022\017\n\007quantia" +
-      "\030\003 \001(\005\022\017\n\007empresa\030\004 \001(\t\022\022\n\ninvestidor\030\005 " +
-      "\001(\t\"-\n\007AuthReq\022\020\n\010username\030\001 \002(\t\022\020\n\010pass" +
-      "word\030\002 \002(\t\"(\n\007AuthRep\022\017\n\007sucesso\030\001 \002(\010\022\014" +
-      "\n\004tipo\030\002 \001(\005\"\030\n\005Reply\022\017\n\007sucesso\030\001 \002(\010"
+      "\002(\014\" \n\rExchangeReply\022\017\n\007sucesso\030\001 \002(\010\"M\n" +
+      "\013LeilaoReply\022\031\n\021taxaMaximaAlocada\030\001 \002(\005\022" +
+      "\022\n\ntaxaMaxima\030\002 \002(\005\022\017\n\007sucesso\030\003 \002(\010\"-\n\014" +
+      "EmissaoReply\022\014\n\004taxa\030\001 \002(\005\022\017\n\007sucesso\030\002 " +
+      "\002(\010\"m\n\016DirectoryReply\022\017\n\007success\030\001 \002(\010\022#" +
+      "\n\006leilao\030\002 \001(\0132\023.Protos.LeilaoReply\022%\n\007e" +
+      "missao\030\003 \001(\0132\024.Protos.EmissaoReply\"1\n\020Di" +
+      "rectoryRequest\022\014\n\004tipo\030\001 \002(\t\022\017\n\007empresa\030" +
+      "\002 \002(\t\"g\n\023AddDirectoryRequest\022\014\n\004tipo\030\001 \002" +
+      "(\t\022\014\n\004juro\030\002 \001(\005\022\017\n\007quantia\030\003 \001(\005\022\017\n\007emp" +
+      "resa\030\004 \001(\t\022\022\n\ninvestidor\030\005 \001(\t\"-\n\007AuthRe" +
+      "q\022\020\n\010username\030\001 \002(\t\022\020\n\010password\030\002 \002(\t\"(\n" +
+      "\007AuthRep\022\017\n\007sucesso\030\001 \002(\010\022\014\n\004tipo\030\002 \001(\005\"" +
+      "\030\n\005Reply\022\017\n\007sucesso\030\001 \002(\010"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8531,7 +8434,7 @@ public final class Protocolo {
     internal_static_Protos_ExchangeReply_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Protos_ExchangeReply_descriptor,
-        new java.lang.String[] { "Sucesso", "Pid", });
+        new java.lang.String[] { "Sucesso", });
     internal_static_Protos_LeilaoReply_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_Protos_LeilaoReply_fieldAccessorTable = new

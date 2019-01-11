@@ -17,18 +17,12 @@ loop(Map) ->
             end;
         {{User,logout}, From} ->
             case maps:find(User,Map) of
-                {ok, {Password, Tipo,false}} ->
+                {ok, {Password, Tipo,true}} ->
                     From ! ok,
+                    io:format("logo\n"),
                     loop(maps:update(User, {Password, Tipo, false}, Map));
                 _ -> From ! invalid, loop(Map)
             end
-    end.
-
-
-rpc(M) ->
-    ?MODULE ! {M, self()},
-    receive
-        Msg -> Msg
     end.
 
 

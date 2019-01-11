@@ -10,7 +10,7 @@
 -author("trident").
 
 %% API
--export([start/0, createConsumers/0, createConsumers/3]).
+-export([start/0]).
 %%% aceitar coneções
 %%% spawn actor com user session e do exchange manager
 %%%spawn( fun() -> accountManager:accountService() end),
@@ -19,33 +19,23 @@
 start() ->
   case gen_tcp:listen(3000, [binary,{packet, 0}, {reuseaddr, true}, {active, true}]) of
     {ok, LSock} ->
-      io:format("server iniciado"),
-      createConsumers(),
+      io:format("Frontend: iniciado"),
       spawn( fun() -> accountManager:accountService() end),
       spawn( fun() -> acceptorService(LSock) end);
-    _ -> io:format("Erro")
+    _ ->
+      io:format("Frontend: erro")
   end.
 
-
-createConsumers()->
-  createConsumers(0,5,5000).
-createConsumers(Start, End, Port) ->
-  if
-    Start < End ->
-      spawn( fun() -> consumer:run(string:concat("tcp://*:",integer_to_list(Port+Start))) end ),
-      createConsumers(Start+1, End, Port);
-    true -> true
-  end.
 
 
 acceptorService(LSock) ->
   {ok, Sock} = gen_tcp:accept(LSock),
   spawn(fun () -> acceptorService(LSock) end),
-  io:format("conexão recebida\n"),
+  io:format("Frontend: conexão recebida\n"),
   usersession:usersession(Sock, #{
-    "CanecaLda" => "tcp://*:4000","SapatoLda" => "tcp://*:4000",
-    "IsqueiroLda" => "tcp://*:4001", "MesasLda" => "tcp://*:4001",
-    "AguaLda" => "tcp://*:4002", "VinhoLda" => "tcp://*:4002",
-    "SandesLda" => "tcp://*:4003", "OreoLda" => "tcp://*:4003",
-    "MongoLda" => "tcp://*:4004", "RelogioLda" => "tcp://*:4004"
+    "CanecaLda" => "tcp://localhost:4000","SapatoLda" => "tcp://localhost:4000",
+    "IsqueiroLda" => "tcp://localhost:4001", "MesasLda" => "tcp://localhost:4001",
+    "AguaLda" => "tcp://localhost:4002", "VinhoLda" => "tcp://localhost:4002",
+    "SandesLda" => "tcp://localhost:4003", "OreoLda" => "tcp://localhost:4003",
+    "MongoLda" => "tcp://localhost:4004", "RelogioLda" => "tcp://localhost:4004"
     }).

@@ -35,14 +35,12 @@ public class Client {
             AuthRep authRep = null;
             try {
                 os.write(authReq.toByteArray());
-                System.out.println("auth req enviado");
                 os.flush();
                 byte [] response = this.recv();
                 authRep = AuthRep.parseFrom(response);
                 if (authRep.getSucesso()) {
                     this.auth = true;
                     this.type = authRep.getTipo();
-                    System.out.println("login");
                     break;
                 }
                 else
@@ -152,11 +150,13 @@ public class Client {
                     this.notificacoes();
                     break;
                 case "0":
+                    this.logout();
                     flag = false;
                     break;
                 default:
                     break;
             }
+            System.out.println(flag);
         }
     }
 
@@ -205,6 +205,19 @@ public class Client {
         }
     }
 
+    public void logout()
+    {
+        Mensagem logoutReq = Mensagem.newBuilder()
+                .setTipo("logout")
+                .build();
+        System.out.println("logout");
+        try {
+            os.write(logoutReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void notificacoes(){
     }
 
@@ -220,6 +233,13 @@ public class Client {
         }
         else if (this.type == 2){
             empresa();
+        }
+        try {
+            this.is.close();
+            this.os.close();
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

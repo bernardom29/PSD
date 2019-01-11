@@ -16,28 +16,23 @@
 usersession(Sock, Empresas) ->
   receive
     {tcp, Sock, Packet} ->
-      io:format("Auth req ~w\n",[Packet]),
       AuthReq = protocolo:decode_msg(Packet, 'AuthReq'),
       Username = maps:get(username, AuthReq),
-      Password = maps:get(password, AuthReq),
       Tipo = accountManager:login(Username, maps:get(password, AuthReq)),
-      io:format("Auth req ~w\n",[Tipo]),
-      io:format("user ~s\n",[Username]),
-      io:format("pass ~s\n",[Password]),
       case Tipo of
         invalid ->
-          io:format("Login insucesso\n"),
+          io:format("UserSession~p: login insucesso\n",[self()]),
           OutPacket = protocolo:encode_msg(#{sucesso => false, tipo => 0 },'AuthRep'),
           gen_tcp:send(Sock,OutPacket),
           usersession(Sock,Empresas);
         _ ->
-          io:format("Login sucesso\n"),
+          io:format("UserSession~p: login sucesso\n",[self()]),
           OutPacket = protocolo:encode_msg(#{sucesso => true, tipo=>Tipo},'AuthRep'),
           gen_tcp:send(Sock, OutPacket),
           usersession(Sock,Username,Empresas)
       end;
     _ ->
-      io:format("erro")
+      io:format("UserSession~p: erro",[self()])
   end.
 
 usersession(Sock, Username, Empresas) ->
@@ -48,28 +43,37 @@ usersession(Sock, Username, Empresas) ->
       case Tipo of
         "licitar" ->
           Pedido = maps:put(investidor, Username, Msg),
-          producer:run(Empresas, Pedido, self()),
-          io:format("Usersession: Licitar\n");
+          Pid = self(),
+          spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
+          io:format("UserSession~p: licitar\n",[self()]),
+          usersession(Sock,Username, Empresas);
         "emprestimo"->
           Pedido = maps:put(investidor, Username, Msg),
-          producer:run(Empresas, Pedido, self()),
-          io:format("Usersession: Emprestimo\n");
+          Pid = self(),
+          spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
+          io:format("UserSession~p: emprestimo\n",[self()]),
+          usersession(Sock,Username, Empresas);
         "leilao"->
-          Pedido = maps:put(empresa, Username, Msg),
-          producer:run(Empresas, Pedido, self()),
-          io:format("Usersession: Criar leilao\n");
+          Pedido = maps:put(investidor, Username, Msg),
+          Pid = self(),
+          spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
+          io:format("UserSession~p: criar leilao\n",[self()]),
+          usersession(Sock,Username, Empresas);
         "emissao"->
-          Pedido = maps:put(empresa, Username, Msg),
-          producer:run(Empresas, Pedido, self()),
-          io:format("Usersession: Emissao\n")
-      end,
-      usersession(Sock,Username, Empresas);
-    {consumer, Msg} ->
-      Packet = protocolo:encode_msg(Msg,'Reply'),
-      io:format("o consumer respondeu\n"),
-      gen_tcp:send(Sock,Packet),
+          Pedido = maps:put(investidor, Username, Msg),
+          Pid = self(),
+          spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
+          io:format("UserSession~p: emissao\n",[self()]),
+          usersession(Sock,Username, Empresas);
+        "logout"->
+          accountManager:logout(Username),
+          io:format("UserSession~p: logout ~s\n",[self(),Username]),
+          exit(ok)
+      end;
+    {producer, Msg} ->
+      io:format("UserSession~p: receber resposta\n",[self()]),
+      gen_tcp:send(Sock,Msg),
       usersession(Sock,Username, Empresas)
-
   end.
 
 

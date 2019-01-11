@@ -23,16 +23,27 @@ run(Map, Msg, Pid) ->
   case maps:find(Empresa, Map) of
     {ok, Endereco} ->
       {ok, Context} = erlzmq:context(),
-      {ok, Sock} = erlzmq:socket(Context, [push, {active, false}]),
+      {ok, Sock} = erlzmq:socket(Context, [req, {active, false}]),
       erlzmq:connect(Sock,Endereco),
       io:format("~s\n",[Endereco]),
-      Packet = protocolo:encode_msg(#{pid => term_to_binary(Pid), mensagem => Msg}, 'ExchangeRequest'),
-      %TODO erro na passagem de erlang para java
-      case erlzmq:send(Sock, Packet, [dontwait]) of
-        ok -> io:format("Producer: enviar pedido\n");
+      Packet = protocolo:encode_msg(Msg, 'Mensagem'),
+      case erlzmq:send(Sock, Packet) of
+        ok ->
+          io:format("Producer: enviar pedido\n"),
+          case erlzmq:recv(Sock) of
+            {ok, PacketRecv} ->
+              io:format("Producer: receber resposta\n"),
+              PacketRecvDecode = protocolo:decode_msg(PacketRecv,'ExchangeReply'),
+              Sucesso =  maps:get(sucesso,PacketRecvDecode),
+              Reply = protocolo:encode_msg(#{sucesso => Sucesso},'Reply'),
+              Pid ! {producer, Reply};
+              _ -> io:format("Erro a receber\n")
+          end;
         _ -> io:format("Tenta outra vez")
       end;
     _ ->
+      Reply = protocolo:encode_msg(#{sucesso => false},'Reply'),
+      Pid ! {producer, Reply},
       io:format("Producer: Empresa nao encontrada\n")
   end.
 
