@@ -6,10 +6,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class EmpresasRep{
-    private List<String> nomes = null;
+    public List<String> empresas;
 
     @JsonCreator
-    public EmpresasRep (@JsonProperty("nomes") List<String> nomes) {
-        this.nomes = nomes;
+    public EmpresasRep (@JsonProperty("empresas") List<String> empresas) {
+        this.empresas = empresas;
+    }
+
+    public List<String> getEmpresas() {
+        return empresas;
+    }
+
+    public void setEmpresas(List<String> empresas) {
+        this.empresas = empresas;
     }
 }

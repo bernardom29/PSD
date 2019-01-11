@@ -15,8 +15,9 @@ public class DirectoryApp extends Application<DirectoryConf>{
     public void initialize(Bootstrap<DirectoryConf> bootstrap) { }
 
     public void run (DirectoryConf configuration, Environment environment) throws Exception {
-        environment.jersey().register(
-                new Historico());
+        Historico hist = new Historico();
+
+        environment.jersey().register(hist);
         //environment.healthChecks().register("empresas",
         //        new HealthCheck(configuration.empresas));
     }

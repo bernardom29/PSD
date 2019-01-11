@@ -1,16 +1,15 @@
 package Directory.Resources;
 
 import Directory.Representations.*;
+import com.codahale.metrics.annotation.Timed;
+import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-@Produces(MediaType.APPLICATION_JSON)
+@Path("/")
 public class Historico {
     private HashMap<String, Empresa> empresas;
 
@@ -23,18 +22,31 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresas")
+    @Path("empresas")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public EmpresasRep getEmps() {
-        List<String> nomes = new ArrayList<>();
+        List<String> emp = new ArrayList<>();
 
-        if(!(nomes.addAll(empresas.keySet())))
+        if(this.empresas == null)
             throw new WebApplicationException(404);
 
-        return new EmpresasRep(nomes);
+        emp.addAll(this.empresas.keySet());
+
+        EmpresasRep nomes = new EmpresasRep(emp);
+
+        return nomes;
+    }
+
+    @POST
+    @Path("empresa/{nome}")
+    public Response put(@PathParam("nome") String nome){
+        empresas.put(nome, null);
+        return Response.status(201).build();
     }
 
     @GET
-    @Path("/empresa/{nome}")
+    @Path("empresa/{nome}")
     public EmpresaRep getEmp(@PathParam("nome") String nomeEmp) {
         String nome = null;
 
@@ -52,7 +64,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/leiloes")
+    @Path("empresa/{nome}/leiloes")
     public LeiloesRep getLeiloes(@PathParam("nome") String nome) {
         String nomeEmp = null;
 
@@ -71,7 +83,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/leilao/{id}")
+    @Path("empresa/{nome}/leilao/{id}")
     public LeilaoRep getLeilao(@PathParam("nome") String nome, @PathParam("id") int id) {
         String nomeEmp = null;
         int idL = 0;
@@ -98,9 +110,9 @@ public class Historico {
 
         return new LeilaoRep(empresas.get(nomeEmp).getLeilao(id));
     }
-
+/*
     @POST
-    @Path("/empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
+    @Path("empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
     public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxaMaxima") int taxaMaxima,
                         @PathParam("montanteTotal") int montanteTotal, @PathParam("data") Date data, @PathParam("sucesso") boolean sucesso,
                         @PathParam("licitacoes") List<Licitacao> licitacoes) {
@@ -109,9 +121,9 @@ public class Historico {
 
         return Response.status(201).build();
     }
-
+*/
     @GET
-    @Path("/empresa/{nome}/emissoes")
+    @Path("empresa/{nome}/emissoes")
     public EmissoesRep getEmissoes(@PathParam("nome") String nome) {
         String nomeEmp = null;
 
@@ -130,7 +142,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/emissao/{id}")
+    @Path("empresa/{nome}/emissao/{id}")
     public EmissaoRep getEmissao(@PathParam("nome") String nome, @PathParam("id") int id) {
         String nomeEmp = null;
         int idE = 0;
@@ -157,9 +169,9 @@ public class Historico {
 
         return new EmissaoRep(empresas.get(nomeEmp).getEmissao(id));
     }
-
+/*
     @POST
-    @Path("/empresa/{nome}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/{licitacoes}")
+    @Path("empresa/{nome}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/{licitacoes}")
     public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxa") int taxa,
                         @PathParam("montanteTotal") int montanteTotal, @PathParam("sucesso") boolean sucesso,
                         @PathParam("licitacoes") List<Licitacao> licitacoes) {
@@ -168,9 +180,9 @@ public class Historico {
 
         return Response.status(201).build();
     }
-
+*/
     @GET
-    @Path("/empresa/{nome}/leilao/{id}/licitacoes")
+    @Path("empresa/{nome}/leilao/{id}/licitacoes")
     public LicitacoesRep getLicitacoesLeilao(@PathParam("nome") String nome, @PathParam("id") int id) {
         String nomeEmp = null;
         int idL = 0;
@@ -199,7 +211,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/emissao/{id}/licitacoes")
+    @Path("empresa/{nome}/emissao/{id}/licitacoes")
     public LicitacoesRep getLicitacoesEmissao(@PathParam("nome") String nome, @PathParam("id") int id) {
         String nomeEmp = null;
         int idE = 0;
@@ -228,7 +240,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/leilao/{idL}/licitacao/{id}")
+    @Path("empresa/{nome}/leilao/{idL}/licitacao/{id}")
     public LicitacaoRep getLicitacaoLeilao(@PathParam("nome") String nome, @PathParam("idL") int idL, @PathParam("id") int id) {
         String nomeEmp = null;
         int idLeilao = 0;
@@ -267,7 +279,7 @@ public class Historico {
     }
 
     @GET
-    @Path("/empresa/{nome}/emissao/{idE}/licitacao/{id}")
+    @Path("empresa/{nome}/emissao/{idE}/licitacao/{id}")
     public LicitacaoRep getLicitacaoEmissao(@PathParam("nome") String nome, @PathParam("idE") int idE, @PathParam("id") int id) {
         String nomeEmp = null;
         int idEmissao = 0;
