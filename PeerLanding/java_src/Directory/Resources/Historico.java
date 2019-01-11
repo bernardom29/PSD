@@ -10,16 +10,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-@Path("/empresas")
 @Produces(MediaType.APPLICATION_JSON)
 public class Historico {
     private HashMap<String, Empresa> empresas;
+
+    public Historico() {
+        this.empresas = null;
+    }
 
     public Historico(HashMap<String, Empresa> empresas) {
         this.empresas = empresas;
     }
 
     @GET
+    @Path("/empresas")
     public EmpresasRep getEmps() {
         List<String> nomes = new ArrayList<>();
 
