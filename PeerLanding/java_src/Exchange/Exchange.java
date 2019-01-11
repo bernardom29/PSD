@@ -19,8 +19,8 @@ public class Exchange implements Runnable{
         this.context = ZMQ.context(1);
         this.rep  = context.socket(ZMQ.REP);
         this.pub  = context.socket(ZMQ.PUB);
-        this.rep.bind("tcp://*:"+port);
-        this.pub.connect("tcp://*:2000");
+        this.rep.bind("tcp://localhost:"+port);
+        this.pub.connect("tcp://localhost:2000");
     }
 
 

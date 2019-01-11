@@ -1,3 +1,4 @@
-PeerLanding/.idea/
-PeerLanding/bin
-PeerLanding/out
+PeerLanding/.idea/workspace.xml
+PeerLanding/.idea/libraries/
+PeerLanding/bin/*
+PeerLanding/out/*
