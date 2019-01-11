@@ -6,12 +6,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 public class Emissao{
-    int id;
-    int taxa;
-    int montanteTotal;
-    String empresa;
-    boolean sucesso;
-    List<Licitacao> licitacoes;
+    public int id;
+    public int taxa;
+    public int montanteTotal;
+    public String empresa;
+    public boolean sucesso;
+    public List<Licitacao> licitacoes;
 
     public Emissao(){
         this.id = 0;
@@ -37,5 +37,23 @@ public class Emissao{
 
     public Licitacao getLicitacao(int id){
         return this.licitacoes.get(id);
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("id: ")
+                .append(this.id).append("\n")
+                .append("taxa: ")
+                .append(this.taxa).append("\n")
+                .append("montanteTotal: ")
+                .append(this.montanteTotal).append("\n")
+                .append("empresa: ")
+                .append(this.empresa).append("\n")
+                .append("sucesso: ")
+                .append(this.sucesso).append("\n");
+        for(Licitacao licitacao : this.licitacoes){
+            sb.append(licitacao.toString());
+        }
+        return sb.toString();
     }
 }
