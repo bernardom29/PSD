@@ -2,12 +2,15 @@ package Directory;
 
 import Directory.Representations.*;
 import Directory.Resources.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,57 +39,109 @@ public class Directory {
 
         return new EmpresasRep(nomes);
     }
-/*
-    @GET
-    @Path("/empresa/{name}")
-    public EmpresaRep getEmp(@PathParam("name") String nameEmp){
-        return new EmpresaRep(nameEmp);
-    }
-
 
     @GET
-    @Path("/empresa/{name}/leiloes")
-    public LeiloesRep getLeiloes(@PathParam("name") String name){
-        return new LeiloesRep(empresas.get(name).getLeiloes());
+    @Path("/empresa/{nome}")
+    public EmpresaRep getEmp(@PathParam("nome") String nomeEmp){
+        return new EmpresaRep(nomeEmp);
     }
 
     @GET
-    @Path("/empresa/{name}/leilao/{id}")
-    public LeilaoRep getLeilao(@PathParam("name") String name, @PathParam("id") int id){
-        return new LeilaoRep(empresas.get(name).getLeilao(id));
-    }*/
+    @Path("/empresa/{nome}/leiloes")
+    public LeiloesRep getLeiloes(@PathParam("nome") String nome){
+        return new LeiloesRep(empresas.get(nome).getLeiloes());
+    }
+
+    @GET
+    @Path("/empresa/{nome}/leilao/{id}")
+    public LeilaoRep getLeilao(@PathParam("nome") String nome, @PathParam("id") int id){
+        return new LeilaoRep(empresas.get(nome).getLeilao(id));
+    }
 
     @POST
-    @Path("/empresa/{name}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
-    public Response put(@PathParam("name") String name, @PathParam("id") int id, @PathParam("taxaMaxima") int taxaMaxima,
+    @Path("/empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
+    public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxaMaxima") int taxaMaxima,
                         @PathParam("montanteTotal") int montanteTotal, @PathParam("data") Date data, @PathParam("sucesso") boolean sucesso,
                         @PathParam("licitacoes") List<Licitacao> licitacoes){
 
-        empresas.get(name).addLeilao(id,taxaMaxima,montanteTotal,name,data,sucesso,licitacoes);
+        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome,data,sucesso,licitacoes);
 
         return Response.status(201).build();
-    }/*
-
-    @GET
-    @Path("/empresa/{name}/emissoes")
-    public LeiloesRep getEmissoes(@PathParam("name") String name){
-        return new LeiloesRep(empresas.get(name).getEmissoes());
     }
 
     @GET
-    @Path("/empresa/{name}/emissao/{id}")
-    public EmissaoRep getEmissao(@PathParam("name") String name, @PathParam("id") int id){
-        return new EmissaoRep(empresas.get(name).getEmissao(id));
-    }*/
+    @Path("/empresa/{nome}/emissoes")
+    public EmissoesRep getEmissoes(@PathParam("nome") String nome){
+        return new EmissoesRep(empresas.get(nome).getEmissoes());
+    }
+
+    @GET
+    @Path("/empresa/{nome}/emissao/{id}")
+    public EmissaoRep getEmissao(@PathParam("nome") String nome, @PathParam("id") int id){
+        return new EmissaoRep(empresas.get(nome).getEmissao(id));
+    }
 
     @POST
-    @Path("/empresa/{name}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/{licitacoes}")
-    public Response put(@PathParam("name") String name, @PathParam("id") int id, @PathParam("taxa") int taxa,
+    @Path("/empresa/{nome}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/{licitacoes}")
+    public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxa") int taxa,
                         @PathParam("montanteTotal") int montanteTotal, @PathParam("sucesso") boolean sucesso,
                         @PathParam("licitacoes") List<Licitacao> licitacoes){
 
-        empresas.get(name).addEmissao(id,taxa,montanteTotal,name,sucesso,licitacoes);
+        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,sucesso,licitacoes);
 
         return Response.status(201).build();
     }
+
+    @GET
+    @Path("/empresa/{nome}/leilao/{id}/licitacoes")
+    public LicitacoesRep getLicitacoesLeilao(@PathParam("nome") String nome, @PathParam("id") int id){
+        return new LicitacoesRep(empresas.get(nome).getLeilao(id).getLicitacoes());
+    }
+
+    @GET
+    @Path("/empresa/{nome}/emissao/{id}/licitacoes")
+    public LicitacoesRep getLicitacoesEmissao(@PathParam("nome") String nome, @PathParam("id") int id){
+        return new LicitacoesRep(empresas.get(nome).getEmissao(id).getLicitacoes());
+    }
+
+    @GET
+    @Path("/empresa/{nome}/leilao/{idL}/licitacao/{id}")
+    public LicitacaoRep getLicitacaoLeilao(@PathParam("nome") String nome, @PathParam("idL") int idL, @PathParam("id") int id){
+        return new LicitacaoRep(empresas.get(nome).getLeilao(idL).getLicitacao(id));
+    }
+
+    @GET
+    @Path("/empresa/{nome}/emissao/{idE}/licitacao/{id}")
+    public LicitacaoRep getLicitacaoEmissao(@PathParam("nome") String nome, @PathParam("idE") int idE, @PathParam("id") int id){
+        return new LicitacaoRep(empresas.get(nome).getEmissao(idE).getLicitacao(id));
+    }
+    /*
+    public static void main(String[] args) throws JsonProcessingException {
+        Licitacao lic1 = new Licitacao(1,"psa",20,500);
+        Licitacao lic2 = new Licitacao(2,"juan",30,100);
+        List<Licitacao> lics = new ArrayList<>();
+        Licitacao lic3 = new Licitacao(1,"m",30,200);
+        List<Licitacao> lics2 = new ArrayList<>();
+        lics.add(lic1);
+        lics.add(lic2);
+        lics2.add(lic3);
+        Emissao em1 = new Emissao(1,30,540,"naosei",true,lics);
+        Emissao em2 = new Emissao(2,43,520,"naosei",true,lics2);
+        List<Emissao> ems = new ArrayList<>();
+        ems.add(em1);
+        ems.add(em2);
+        List<Leilao> lls = new ArrayList<>();
+
+        Empresa emp = new Empresa("naosei",lls,ems);
+
+        HashMap<String, Empresa> empresas = new HashMap<>();
+
+        empresas.put("naosei", emp);
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String value = objectMapper.writeValueAsString(empresas);
+
+        System.out.print(value);
+    }*/
 }

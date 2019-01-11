@@ -16,14 +16,14 @@ public class Empresa {
 
     public Empresa(){
         String nome = null;
-        this.historicoLeiloes = new ArrayList<Leilao>();
-        this.historicoEmissoes = new ArrayList<Emissao>();
+        this.historicoLeiloes = new ArrayList<>();
+        this.historicoEmissoes = new ArrayList<>();
     }
 
-    public Empresa(String nome){
+    public Empresa(String nome, List<Leilao> leiloes, List<Emissao> emissoes){
         this.nome = nome;
-        this.historicoLeiloes = new ArrayList<Leilao>();
-        this.historicoEmissoes = new ArrayList<Emissao>();
+        this.historicoLeiloes = leiloes;
+        this.historicoEmissoes = emissoes;
     }
 
     public List<Leilao> getLeiloes(){
