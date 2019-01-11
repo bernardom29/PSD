@@ -30,4 +30,12 @@ public class Emissao{
         this.sucesso = sucesso;
         this.licitacoes = licitacoes;
     }
+
+    public List<Licitacao> getLicitacoes(){
+        return this.licitacoes;
+    }
+
+    public Licitacao getLicitacao(int id){
+        return this.licitacoes.get(id);
+    }
 }
