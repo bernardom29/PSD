@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6b5b8e20-3dd5-445f-9565-00102c254eb5" name="Default Changelist" comment="makefile">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/erl_src/accountManager.erl" beforeDir="false" afterPath="$PROJECT_DIR$/erl_src/accountManager.erl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/erl_src/frontend.erl" beforeDir="false" afterPath="$PROJECT_DIR$/erl_src/frontend.erl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Client/Notifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Client/Notifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Emissao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Emissao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Empresa.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Empresa.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Exchange.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Exchange.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Leilao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Leilao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java_src/Directory/Representations/EmpresaRep.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Directory/Representations/EmpresaRep.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java_src/Directory/Resources/Historico.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Directory/Resources/Historico.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -50,11 +41,29 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="24" column="26" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
+            <state relative-caret-position="254">
+              <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/java_src/Directory/Representations/EmpresaRep.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="24" selection-start-line="24" selection-end-line="24" />
             </state>
           </provider>
         </entry>
@@ -133,6 +142,7 @@
         <option value="$PROJECT_DIR$/java_src/Exchange/Exchange.java" />
         <option value="$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java" />
         <option value="$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java" />
+        <option value="$PROJECT_DIR$/java_src/Directory/Representations/EmpresaRep.java" />
       </list>
     </option>
   </component>
@@ -196,7 +206,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1547262670640" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1547262717421" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -321,7 +331,7 @@
       <workItem from="1547217113687" duration="4730000" />
       <workItem from="1547227284425" duration="868000" />
       <workItem from="1547228203288" duration="2553000" />
-      <workItem from="1547254213648" duration="5546000" />
+      <workItem from="1547254213648" duration="5725000" />
     </task>
     <task id="LOCAL-00001" summary="producer + consumer">
       <created>1546620813965</created>
@@ -341,7 +351,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="87613000" />
+    <option name="totallyTimeSpent" value="87792000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="48" y="22" width="1232" height="778" extended-state="0" />
@@ -356,13 +366,13 @@
       <window_info id="Favorites" order="6" sideWeight="0.50291544" side_tool="true" weight="0.27478993" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32876712" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.31632653" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.31632653" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39941692" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.49915966" weight="0.32944608" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="8" sideWeight="0.49915966" visible="true" weight="0.32944608" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50084037" side_tool="true" weight="0.32944608" />
@@ -440,7 +450,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/java_src/Client/ProtoClient.java" />
     <entry file="file://$PROJECT_DIR$/java_src/protos/protocolo.erl" />
     <entry file="file:///usr/local/Cellar/erlang/21.2.1/lib/erlang/lib/kernel-6.2/src/gen_tcp.erl">
       <provider selected="true" editor-type-id="text-editor">
@@ -587,13 +596,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-94">
           <caret line="19" column="30" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="3" lean-forward="true" selection-start-column="3" selection-end-column="3" />
         </state>
       </provider>
     </entry>
@@ -812,8 +814,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="24" column="26" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
+        <state relative-caret-position="254">
+          <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Directory/Representations/EmpresaRep.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
         </state>
       </provider>
     </entry>
