@@ -8,10 +8,18 @@ import java.util.Date;
 import java.util.List;
 
 public class LeilaoRep {
-    private Leilao leilao;
+    public Leilao leilao;
 
     @JsonCreator
     public LeilaoRep(@JsonProperty("leilao") Leilao leilao){
+        this.leilao = leilao;
+    }
+
+    public Leilao getLeilao() {
+        return leilao;
+    }
+
+    public void setLeilao(Leilao leilao) {
         this.leilao = leilao;
     }
 }

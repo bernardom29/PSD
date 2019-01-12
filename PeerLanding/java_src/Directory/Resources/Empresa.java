@@ -10,9 +10,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 public class Empresa {
-    String nome;
-    List<Leilao> historicoLeiloes;
-    List<Emissao> historicoEmissoes;
+    public String nome;
+    public List<Leilao> historicoLeiloes;
+    public List<Emissao> historicoEmissoes;
 
     public Empresa(){
         String nome = null;
@@ -52,5 +52,19 @@ public class Empresa {
         Emissao emissao = new Emissao(id,taxa,montanteTotal,this.nome,sucesso,licitacoes);
 
         historicoEmissoes.add(emissao);
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("nome: ")
+                .append(this.nome).append("\n");
+        for(Leilao leilao : this.historicoLeiloes){
+            sb.append(leilao.toString());
+        }
+        sb.append("\n");
+        for(Emissao emissao : this.historicoEmissoes){
+            sb.append(emissao.toString());
+        }
+        return sb.toString();
     }
 }

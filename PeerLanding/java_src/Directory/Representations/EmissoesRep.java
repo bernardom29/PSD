@@ -7,10 +7,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class EmissoesRep{
-    private List<Emissao> emissoes;
+    public List<Emissao> emissoes;
 
     @JsonCreator
     public EmissoesRep(@JsonProperty("emissoes") List<Emissao> emissoes){
+        this.emissoes = emissoes;
+    }
+
+    public List<Emissao> getEmissoes() {
+        return emissoes;
+    }
+
+    public void setEmissoes(List<Emissao> emissoes) {
         this.emissoes = emissoes;
     }
 }

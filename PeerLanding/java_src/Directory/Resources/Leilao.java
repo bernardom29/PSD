@@ -6,13 +6,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 public class Leilao {
-    int id;
-    int taxaMaxima;
-    int montanteTotal;
-    String empresa;
-    Date data;
-    boolean sucesso;
-    List<Licitacao> licitacoes;
+    public int id;
+    public int taxaMaxima;
+    public int montanteTotal;
+    public String empresa;
+    public Date data;
+    public boolean sucesso;
+    public List<Licitacao> licitacoes;
 
     public Leilao(){
         this.id = 0;
@@ -42,4 +42,23 @@ public class Leilao {
         return this.licitacoes.get(id);
     }
 
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("id: ")
+                .append(this.id).append("\n")
+                .append("taxaMaxima: ")
+                .append(this.taxaMaxima).append("\n")
+                .append("montanteTotal: ")
+                .append(this.montanteTotal).append("\n")
+                .append("empresa: ")
+                .append(this.empresa).append("\n")
+                .append("data: ")
+                .append(this.data).append("\n")
+                .append("sucesso: ")
+                .append(this.sucesso).append("\n");
+        for(Licitacao licitacao : this.licitacoes){
+            sb.append(licitacao.toString());
+        }
+        return sb.toString();
+    }
 }
