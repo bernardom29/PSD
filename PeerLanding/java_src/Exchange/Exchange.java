@@ -4,18 +4,21 @@ import Protos.Protocolo.Mensagem;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.zeromq.ZMQ;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
+import static java.lang.System.*;
+
 public class Exchange implements Runnable {
-    ConcurrentHashMap<String, Empresa> empresas;
-    ConcurrentHashMap<String, Leilao> leiloes;
-    ConcurrentHashMap<String, Emissao> emissoes;
-    ZMQ.Socket rep;
-    ZMQ.Socket pub;
-    ZMQ.Context context;
+    private ConcurrentHashMap<String, Empresa> empresas;
+    private ConcurrentHashMap<String, Leilao> leiloes;
+    private ConcurrentHashMap<String, Emissao> emissoes;
+    private ZMQ.Socket rep;
+    private final ZMQ.Socket pub;
+    private ZMQ.Context context;
 
 
-    public Exchange(int port) {
+    public Exchange(int port, ConcurrentHashMap<String, Empresa> empresas) {
         this.context = ZMQ.context(1);
         this.rep  = context.socket(ZMQ.REP);
         this.pub  = context.socket(ZMQ.PUB);
@@ -23,27 +26,27 @@ public class Exchange implements Runnable {
         this.pub.connect("tcp://localhost:2001");
         this.emissoes = new ConcurrentHashMap<String, Emissao>();
         this.leiloes = new ConcurrentHashMap<String, Leilao>();
-        this.empresas = new ConcurrentHashMap<String, Empresa>();
+        this.empresas = empresas;
     }
 
 
 
-    public boolean licitar(String empresa, String investidor, int quantia, int juro){
+    private boolean licitar(String empresa, String investidor, int quantia, int juro){
         Leilao leilaoAtual = leiloes.get(empresa);
-        if (leilaoAtual != null && juro < leilaoAtual.taxaMaxima) {
+        if (leilaoAtual != null && juro < leilaoAtual.getTaxaMaxima()) {
             Licitacao licitacao = new Licitacao(investidor,juro,quantia);
-            leilaoAtual.licitacoes.add(licitacao);
+            leilaoAtual.getLicitacoes().add(licitacao);
             pub.send("leilao-"+empresa+"-nova licitação de: "+investidor+ " juro: "+juro + " quantia: "+quantia);
             return true;
         }else{
             return false;
         }
     }
-    public boolean emprestimo(String empresa, String investidor, int quantia){
+    private boolean emprestimo(String empresa, String investidor, int quantia){
         Emissao emissaoAtual = emissoes.get(empresa);
         if (emissaoAtual != null) {
             Licitacao licitacao = new Licitacao(investidor,quantia);
-            emissaoAtual.licitacoes.add(licitacao);
+            emissaoAtual.getLicitacoes().add(licitacao);
             pub.send("emissao-"+empresa+"-nova licitação de: "+investidor+ " quantia: "+quantia);
             return true;
         }else{
@@ -59,9 +62,12 @@ public class Exchange implements Runnable {
             float taxaMaxima = empresaObj.taxaEmissao();
             Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa,false);
             emissoes.put(empresa,novaEmissao);
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            scheduler.schedule(new TerminaEmissao(empresa,empresas,emissoes,pub),60, TimeUnit.SECONDS);
-            this.pub.send("emissao-"+empresa+"-Começou uma emissao");
+            new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub)).start();
+
+            synchronized (this.pub)
+            {
+                this.pub.send("emissao-"+empresa+"-Começou uma emissao");
+            }
             return true;
         }
         return false;
@@ -71,19 +77,15 @@ public class Exchange implements Runnable {
         if (leilaoAtual == null &&  quantia % 1000 == 0){
             Leilao leilao = new Leilao(juro,quantia,empresa,false);
             this.leiloes.put(empresa,leilao);
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            scheduler.schedule(new TerminaLeilao(empresa,empresas,leiloes, pub),60, TimeUnit.SECONDS);
-
-            this.pub.send("leilao-"+empresa+"-Começou um leilão");
+            new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub)).start();
+            synchronized (this.pub)
+            {
+                this.pub.send("leilao-"+empresa+"-Começou um leilão");
+            }
             return true;
         }
         return false;
     }
-    public boolean notificacao(Mensagem mensagem){
-        System.out.println("notifica");
-        return true;
-    };
-
 
     public void run(){
         while(true)
@@ -92,7 +94,7 @@ public class Exchange implements Runnable {
             try {
                 Mensagem mensagem = Mensagem.parseFrom(packet);
                 String tipo = mensagem.getTipo();
-                System.out.println(mensagem);
+                out.println(mensagem);
                 boolean sucesso;
                 switch (tipo){
                     case "licitar":
@@ -133,6 +135,7 @@ public class Exchange implements Runnable {
                 this.rep.send(resposta.toByteArray());
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
+                break;
             }
         }
     }
@@ -142,18 +145,38 @@ public class Exchange implements Runnable {
         byte[] tmp;
         int len = 0;
         tmp = socket.recv();
-        System.out.println("Exchange: Pedido recebido");
+        out.println("Exchange: Pedido recebido");
         len = tmp.length;
         byte[] response = new byte[len];
-        for(int i = 0; i < len; i++)
-            response[i] = tmp[i];
+        arraycopy(tmp, 0, response, 0, len);
         return response;
 
     }
 
     public static void main(String[] args){
+        ArrayList<ConcurrentHashMap<String, Empresa>> lmap = new ArrayList<>();
+        ConcurrentHashMap<String, Empresa> map1 = new ConcurrentHashMap<String, Empresa>();
+        ConcurrentHashMap<String, Empresa> map2 = new ConcurrentHashMap<String, Empresa>();
+        ConcurrentHashMap<String, Empresa> map3 = new ConcurrentHashMap<String, Empresa>();
+        ConcurrentHashMap<String, Empresa> map4 = new ConcurrentHashMap<String, Empresa>();
+        ConcurrentHashMap<String, Empresa> map5 = new ConcurrentHashMap<String, Empresa>();
+        map1.put("CanecaLda", new Empresa("CanecaLda"));
+        map1.put("SapatoLda", new Empresa("SapatoLda"));
+        map2.put("IsqueiroLda", new Empresa("IsqueiroLda"));
+        map3.put("MesasLda", new Empresa("MesasLda"));
+        map3.put("AguaLda", new Empresa("AguaLda"));
+        map3.put("VinhoLda", new Empresa("VinhoLda"));
+        map4.put("SandesLda", new Empresa("SandesLda"));
+        map4.put("OreoLda", new Empresa("OreoLda"));
+        map5.put("MongoLda", new Empresa("MongoLda"));
+        map5.put("RelogioLda", new Empresa("RelogioLda"));
+        lmap.add(map1);
+        lmap.add(map2);
+        lmap.add(map3);
+        lmap.add(map4);
+        lmap.add(map5);
         for (int i = 0; i < 5; i++) {
-            new Thread(new Exchange(4000+i)).start();
+            new Thread(new Exchange(4000+i, lmap.get(i))).start();
         }
     }
     /*

@@ -16,22 +16,27 @@ public class Empresa {
 
     public float taxaEmissao(){
         int emissaoIdx = this.historicoEmissoes.size();
-        Emissao emissao = this.historicoEmissoes.get(emissaoIdx);
         int leilaoIdx = this.historicoLeiloes.size();
-        Emissao leilao = this.historicoEmissoes.get(leilaoIdx);
+
+
+        Emissao emissao = null;
+        emissao = this.historicoEmissoes.get(emissaoIdx);
+
+        Leilao leilao = null;
+        leilao = this.historicoLeiloes.get(leilaoIdx);
         float taxaMaxima = 0;
-        if (leilao.data.after(emissao.data) && leilao.sucesso){
-            taxaMaxima = leilao.taxa;
+        if (leilao.getData().after(emissao.getData()) && leilao.isSucesso()){
+            taxaMaxima = leilao.getTaxaMaxima();
             return taxaMaxima;
         }
-        else if (!leilao.data.after(emissao.data) && emissao.sucesso){
-            taxaMaxima = emissao.licitacoes.stream()
+        else if (!leilao.getData().after(emissao.getData()) && emissao.isSucesso()){
+            taxaMaxima = emissao.getLicitacoes().stream()
                     .map(e -> e.taxa)
-                    .reduce(Integer.MIN_VALUE, (a,b) -> Integer.max(a,b));
+                    .reduce(Integer.MIN_VALUE, Integer::max);
             return taxaMaxima;
         }
-        else if (!leilao.data.after(emissao.data) && !emissao.sucesso){
-            taxaMaxima = (float) (emissao.taxa * 1.10);
+        else if (!leilao.getData().after(emissao.getData()) && !emissao.isSucesso()){
+            taxaMaxima = (float) (emissao.getTaxa() * 1.10);
             return taxaMaxima;
         }
         return taxaMaxima;

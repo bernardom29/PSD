@@ -6,33 +6,35 @@ import java.net.Socket;
 import java.util.Scanner;
 import Protos.Protocolo.*;
 
+import static java.lang.System.*;
+
 public class Client {
-    Notifier notifier;
-    Socket socket;
-    InputStream is;
-    OutputStream os;
-    Scanner input;
-    boolean auth;
-    int type;
+    private Notifier notifier;
+    private Socket socket;
+    private InputStream is;
+    private OutputStream os;
+    private Scanner input = new Scanner(in);
+    private boolean auth;
+    private int type;
+    private String username;
 
     public Client() throws IOException {
         this.socket = new Socket("localhost", 3000);
         this.is = socket.getInputStream();
         this.os = socket.getOutputStream();
         this.auth = false;
-        this.input  = new Scanner(System.in);
     }
 
-    public void autenticacao()
+    private void autenticacao()
     {
         while(!auth)
         {
-            System.out.println("username: ");
-            String username = this.input.next();
-            System.out.println("password: ");
+            out.println("username: ");
+            this.username = this.input.next();
+            out.println("password: ");
             String password = this.input.next();
-            AuthReq authReq = AuthReq.newBuilder().setUsername(username).setPassword(password).build();
-            AuthRep authRep = null;
+            AuthReq authReq = AuthReq.newBuilder().setUsername(this.username).setPassword(password).build();
+            AuthRep authRep;
             try {
                 os.write(authReq.toByteArray());
                 os.flush();
@@ -44,14 +46,15 @@ public class Client {
                     break;
                 }
                 else
-                    System.out.println("Login invalido");
+                    out.println("Login invalido");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
     }
-    public void logout()
+
+    private void logout()
     {
         Mensagem logoutReq = Mensagem.newBuilder()
                 .setTipo("logout")
@@ -63,15 +66,73 @@ public class Client {
         }
     }
 
+    private Reply getReply() {
+        Reply rep = null;
+        try {
+            byte[] response = this.recv();
+            rep = Reply.parseFrom(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rep;
+    }
+
+    public byte[] recv(){
+        byte[] tmp = new byte[4096];
+        int len;
+        try {
+            len = is.read(tmp);
+            byte[] response = new byte[len];
+
+            arraycopy(tmp, 0, response, 0, len);
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void enviar(Mensagem packet, String tipo, String empresa){
+        try {
+            os.write(packet.toByteArray());
+            this.notifier.subscricao(tipo, empresa);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void subscrever(){
+        out.println("Tipo: ");
+        String tipo = this.input.next();
+        out.println("Empresas: ");
+        String empresas = this.input.next();
+        this.notifier.subscricao(tipo, empresas);
+    }
+
+
+    private void notificacoes(){
+        String str =this.notifier.mailbox();
+        if(str.equals("")) out.println("Não existem notificações");
+        else out.println(str);
+    }
+
+    private void resultadoOperacao(Reply rep, String mensagem){
+        if(rep != null && rep.getSucesso()) {
+            out.println("Sucesso: " + mensagem);
+        }else out.println("Insucesso: " + mensagem);
+    }
+
+
 
     public void empresa(){
         boolean flag = true;
         while(flag){
-            System.out.println(
+            out.println(
                     "1- Criar leilão\n" +
-                            "2- Emissão de taxa fixa\n" +
-                            "3- Notificações\n" +
-                            "0- Logout"
+                            "2- Criar emissão\n" +
+                            "3- Subscrições\n" +
+                            "4- Notificações\n" +
+                            "0- Logout\n"
 
             );
             String userInput = this.input.next();
@@ -83,6 +144,9 @@ public class Client {
                     this.emissao();
                     break;
                 case "3":
+                    this.subscrever();
+                    break;
+                case "4":
                     this.notificacoes();
                     break;
                 case "0":
@@ -96,51 +160,40 @@ public class Client {
 
     }
     public void leilao(){
-        System.out.println("Juro máximo: ");
+        out.println("Juro máximo: ");
         String juro = this.input.next();
-        System.out.println("Quantia total: ");
+        out.println("Quantia total: ");
         String quantia = this.input.next();
-        Reply rep = null;
-        Mensagem leilaoReq = Mensagem.newBuilder()
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
                 .setTipo("leilao")
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            os.write(leilaoReq.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.enviar(req, "leilao", this.username);
         rep = getReply();
-        if(rep != null && rep.getSucesso()) {
-            System.out.println("Sucesso no leilão");
-        }
+        this.resultadoOperacao(rep, "leilão");
     }
     public void emissao(){
-        System.out.println("Quantia: ");
-        String quantia = this.input.next();
-        Reply rep = null;
-        Mensagem emissaoReq = Mensagem.newBuilder()
+        Reply rep;
+        Mensagem req;
+        String quantia;
+        out.println("Quantia: ");
+        quantia = this.input.next();
+        req = Mensagem.newBuilder()
                 .setTipo("emissao")
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            os.write(emissaoReq.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.enviar(req,"emissao", username);
+
         rep = getReply();
-        if(rep != null && rep.getSucesso()) {
-            System.out.println("Sucesso na emissao");
-        }
+        this.resultadoOperacao(rep, "emissao");
     }
 
 
 
-
-
-    public void investidor() {
+    private void investidor() {
         boolean flag = true;
         while(flag){
-            System.out.println(
+            out.println(
                     "1- Licitar leilão\n" +
                             "2- Subscrição de empréstimo a taxa fixa\n" +
                             "3- Subscrições\n" +
@@ -170,67 +223,41 @@ public class Client {
             }
         }
     }
-    public void licitar(){
-        System.out.println("Empresa: ");
+    private void licitar(){
+        out.println("Empresa: ");
         String empresa = this.input.next();
-        System.out.println("Juro: ");
+        out.println("Juro: ");
         String juro = this.input.next();
-        System.out.println("Quantia: ");
+        out.println("Quantia: ");
         String quantia = this.input.next();
-        Reply rep = null;
-        Mensagem licitarReq = Mensagem.newBuilder()
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
                 .setTipo("licitar")
                 .setEmpresa(empresa)
                 .setJuro(Integer.parseInt(juro))
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            os.write(licitarReq.toByteArray());
-            this.notifier.subscricao("leilao", empresa);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.enviar(req, "leilao", empresa);
         rep = getReply();
-        if(rep != null && rep.getSucesso()) {
-            System.out.println("Sucesso na licitação");
-        }else System.out.println("Insucesso na licitação");
+        this.resultadoOperacao(rep, "leilao");
     }
-    public void emprestimo(){
-        System.out.println("Empresa: ");
+    private void emprestimo(){
+        out.println("Empresa: ");
         String empresa = this.input.next();
-        System.out.println("Quantia: ");
+        out.println("Quantia: ");
         String quantia = this.input.next();
-        Reply rep = null;
-        Mensagem emprestimoReq = Mensagem.newBuilder()
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
                 .setTipo("emprestimo")
                 .setEmpresa(empresa)
                 .setQuantia(Integer.parseInt(quantia)).build();
-        try {
-            os.write(emprestimoReq.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.enviar(req, "emissao", empresa);
         rep = getReply();
-        if(rep != null && rep.getSucesso()) {
-            System.out.println("Sucesso no emprestimo");
-        }else System.out.println("Insucesso no emprestimo");
+        this.resultadoOperacao(rep, "emprestimo");
     }
 
 
 
-    public void subscrever(){
-        System.out.println("Tipo: ");
-        String tipo = this.input.next();
-        System.out.println("Empresas: ");
-        String empresas = this.input.next();
-        this.notifier.subscricao(tipo, empresas);
-    }
 
-
-    public void notificacoes(){
-        String str =this.notifier.mailbox();
-        if(str.equals("")) System.out.println("Não existem notificações");
-        else System.out.println(str);
-    }
     public void run(){
 
 
@@ -257,32 +284,7 @@ public class Client {
 
     }
 
-    private Reply getReply() {
-        Reply rep = null;
-        try {
-            byte[] response = this.recv();
-            rep = Reply.parseFrom(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return rep;
-    }
 
-    public byte[] recv(){
-        byte[] tmp = new byte[4096];
-        int len = 0;
-        try {
-            len = is.read(tmp);
-            byte[] response = new byte[len];
-
-            for(int i = 0; i < len; i++)
-                response[i] = tmp[i];
-            return response;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public static void main(String[] args)
     {
@@ -292,6 +294,6 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.exit(0);
+        exit(0);
     }
 }

@@ -4,9 +4,9 @@ import org.zeromq.ZMQ;
 import java.util.Vector;
 
 public class Notifier implements Runnable{
-    ZMQ.Socket sub;
-    ZMQ.Context context;
-    Vector<String> mailbox;
+    private ZMQ.Socket sub;
+    private ZMQ.Context context;
+    private Vector<String> mailbox;
 
     public Notifier()
     {
@@ -17,10 +17,10 @@ public class Notifier implements Runnable{
     }
 
     public String mailbox(){
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for(String mail:mailbox)
-            str += mail + '\n';
-        return str;
+            str.append(mail).append('\n');
+        return str.toString();
     }
 
     @Override

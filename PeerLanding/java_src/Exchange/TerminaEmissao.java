@@ -6,10 +6,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TerminaEmissao implements Runnable {
-    String empresa;
-    ConcurrentHashMap<String, Empresa> empresas;
-    ConcurrentHashMap<String, Emissao> emissoes;
-    ZMQ.Socket pub;
+    private String empresa;
+    private ConcurrentHashMap<String, Empresa> empresas;
+    private ConcurrentHashMap<String, Emissao> emissoes;
+    private final ZMQ.Socket pub;
 
     public TerminaEmissao(String empresa, ConcurrentHashMap<String, Empresa> empresas,
                           ConcurrentHashMap<String, Emissao> emissoes, ZMQ.Socket pub) {
@@ -22,9 +22,16 @@ public class TerminaEmissao implements Runnable {
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Emissao emissao = emissoes.remove(this.empresa);
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoEmissoes.add(emissao);
-        pub.send("emissao-"+empresa+"-Terminado");
+        synchronized (this.pub){
+            pub.send("emissao-"+this.empresa+"-Terminado");
+        }
     }
 }

@@ -5,10 +5,10 @@ import org.zeromq.ZMQ;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TerminaLeilao implements Runnable {
-    String empresa;
-    ConcurrentHashMap<String, Empresa> empresas;
-    ConcurrentHashMap<String, Leilao> leiloes;
-    ZMQ.Socket pub;
+    private String empresa;
+    private ConcurrentHashMap<String, Empresa> empresas;
+    private ConcurrentHashMap<String, Leilao> leiloes;
+    private final ZMQ.Socket pub;
 
     public TerminaLeilao(String empresa,
                          ConcurrentHashMap<String, Empresa> empresas,
@@ -23,11 +23,19 @@ public class TerminaLeilao implements Runnable {
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Leilao leilao = leiloes.remove(this.empresa);
         //TODO
         //fazer verificação do sucesso
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoLeiloes.add(leilao);
-        this.pub.send("leilao-"+empresa+"-Terminado");
+        System.out.println(empresa);
+        synchronized (this.pub){
+            this.pub.send("leilao-"+this.empresa+"-Terminado");
+        }
     }
 }
