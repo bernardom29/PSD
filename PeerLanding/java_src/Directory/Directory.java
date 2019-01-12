@@ -1,16 +1,13 @@
 package Directory;
 
 import Directory.Representations.*;
-import Directory.Resources.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import Directory.Resources.Empresa;
+import Directory.Resources.Licitacao;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -61,10 +58,11 @@ public class Directory {
     @POST
     @Path("/empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
     public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxaMaxima") int taxaMaxima,
-                        @PathParam("montanteTotal") int montanteTotal, @PathParam("data") Date data, @PathParam("sucesso") boolean sucesso,
-                        @PathParam("licitacoes") List<Licitacao> licitacoes){
+                        @PathParam("montanteTotal") int montanteTotal, @PathParam("data") Date data, @PathParam("sucesso") boolean sucesso
+                        )
+    {
 
-        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome,data,sucesso,licitacoes);
+        //empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome,data,sucesso,licitacoes);
 
         return Response.status(201).build();
     }
@@ -82,12 +80,11 @@ public class Directory {
     }
 
     @POST
-    @Path("/empresa/{nome}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/{licitacoes}")
+    @Path("/empresa/{nome}/emissao/{id}/{taxa}/{montanteTotal}/{sucesso}/")
     public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxa") int taxa,
-                        @PathParam("montanteTotal") int montanteTotal, @PathParam("sucesso") boolean sucesso,
-                        @PathParam("licitacoes") List<Licitacao> licitacoes){
+                        @PathParam("montanteTotal") int montanteTotal, @PathParam("sucesso") boolean sucesso){
 
-        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,sucesso,licitacoes);
+        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,sucesso,null);
 
         return Response.status(201).build();
     }

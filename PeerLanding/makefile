@@ -45,6 +45,13 @@ Frontend: erl_src/*.erl
 	@echo Erlang Components Compiled
 	@echo Compilation done
 
+Broker:
+	@javac -d $(BIN) \
+		-classpath $(JAVA_DEPS) \
+		$(JAVA_SRC)Broker.java 
+	@echo Broker Compiled
+
+
 run_client: Client
 	java -cp bin Client.Client
 

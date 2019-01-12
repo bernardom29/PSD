@@ -35,6 +35,7 @@ run(Map, Msg, Pid) ->
               io:format("Producer: receber resposta\n"),
               PacketRecvDecode = protocolo:decode_msg(PacketRecv,'ExchangeReply'),
               Sucesso =  maps:get(sucesso,PacketRecvDecode),
+              io:format("Producer: ~s\n",[Sucesso]),
               Reply = protocolo:encode_msg(#{sucesso => Sucesso},'Reply'),
               Pid ! {producer, Reply};
               _ -> io:format("Erro a receber\n")

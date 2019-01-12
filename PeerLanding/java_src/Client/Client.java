@@ -51,11 +51,20 @@ public class Client {
 
         }
     }
+    public void logout()
+    {
+        Mensagem logoutReq = Mensagem.newBuilder()
+                .setTipo("logout")
+                .build();
+        try {
+            os.write(logoutReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public void empresa(){
-
-
         boolean flag = true;
         while(flag){
             System.out.println(
@@ -77,6 +86,7 @@ public class Client {
                     this.notificacoes();
                     break;
                 case "0":
+                    this.logout();
                     flag = false;
                     break;
                 default:
@@ -85,8 +95,6 @@ public class Client {
         }
 
     }
-
-
     public void leilao(){
         System.out.println("Juro máximo: ");
         String juro = this.input.next();
@@ -107,9 +115,6 @@ public class Client {
             System.out.println("Sucesso no leilão");
         }
     }
-
-
-
     public void emissao(){
         System.out.println("Quantia: ");
         String quantia = this.input.next();
@@ -129,13 +134,17 @@ public class Client {
     }
 
 
+
+
+
     public void investidor() {
         boolean flag = true;
         while(flag){
             System.out.println(
                     "1- Licitar leilão\n" +
                             "2- Subscrição de empréstimo a taxa fixa\n" +
-                            "3- Notificações\n" +
+                            "3- Subscrições\n" +
+                            "4- Notificações\n" +
                             "0- Logout\n"
             );
             String userInput = this.input.next();
@@ -147,6 +156,9 @@ public class Client {
                     this.emprestimo();
                     break;
                 case "3":
+                    this.subscrever();
+                    break;
+                case "4":
                     this.notificacoes();
                     break;
                 case "0":
@@ -156,10 +168,8 @@ public class Client {
                 default:
                     break;
             }
-            System.out.println(flag);
         }
     }
-
     public void licitar(){
         System.out.println("Empresa: ");
         String empresa = this.input.next();
@@ -175,15 +185,15 @@ public class Client {
                 .setQuantia(Integer.parseInt(quantia)).build();
         try {
             os.write(licitarReq.toByteArray());
+            this.notifier.subscricao("leilao", empresa);
         } catch (IOException e) {
             e.printStackTrace();
         }
         rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso na licitação");
-        }
+        }else System.out.println("Insucesso na licitação");
     }
-
     public void emprestimo(){
         System.out.println("Empresa: ");
         String empresa = this.input.next();
@@ -202,31 +212,32 @@ public class Client {
         rep = getReply();
         if(rep != null && rep.getSucesso()) {
             System.out.println("Sucesso no emprestimo");
-        }
+        }else System.out.println("Insucesso no emprestimo");
     }
 
-    public void logout()
-    {
-        Mensagem logoutReq = Mensagem.newBuilder()
-                .setTipo("logout")
-                .build();
-        System.out.println("logout");
-        try {
-            os.write(logoutReq.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+
+    public void subscrever(){
+        System.out.println("Tipo: ");
+        String tipo = this.input.next();
+        System.out.println("Empresas: ");
+        String empresas = this.input.next();
+        this.notifier.subscricao(tipo, empresas);
     }
+
 
     public void notificacoes(){
+        String str =this.notifier.mailbox();
+        if(str.equals("")) System.out.println("Não existem notificações");
+        else System.out.println(str);
     }
-
     public void run(){
 
 
         this.autenticacao();
         this.notifier = new Notifier();
-        new Thread(this.notifier).start();
+        Thread tn = new Thread(this.notifier);
+        tn.start();
         if (this.type == 1)
         {
             investidor();
@@ -238,6 +249,8 @@ public class Client {
             this.is.close();
             this.os.close();
             this.socket.close();
+            this.input.close();
+            tn.interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -279,5 +292,6 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.exit(0);
     }
 }

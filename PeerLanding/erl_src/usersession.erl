@@ -54,13 +54,13 @@ usersession(Sock, Username, Empresas) ->
           io:format("UserSession~p: emprestimo\n",[self()]),
           usersession(Sock,Username, Empresas);
         "leilao"->
-          Pedido = maps:put(investidor, Username, Msg),
+          Pedido = maps:put(empresa, Username, Msg),
           Pid = self(),
           spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
           io:format("UserSession~p: criar leilao\n",[self()]),
           usersession(Sock,Username, Empresas);
         "emissao"->
-          Pedido = maps:put(investidor, Username, Msg),
+          Pedido = maps:put(empresa, Username, Msg),
           Pid = self(),
           spawn(fun() -> producer:run(Empresas, Pedido, Pid) end),
           io:format("UserSession~p: emissao\n",[self()]),
