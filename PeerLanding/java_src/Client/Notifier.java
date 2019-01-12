@@ -12,8 +12,15 @@ public class Notifier implements Runnable{
     {
         this.context = ZMQ.context(1);
         this.sub = context.socket(ZMQ.SUB);
-        this.sub.connect("tcp://localhost:2200");
+        this.sub.connect("tcp://localhost:2000");
         mailbox = new Vector<>();
+    }
+
+    public String mailbox(){
+        String str = "";
+        for(String mail:mailbox)
+            str += mail + '\n';
+        return str;
     }
 
     @Override
@@ -30,6 +37,6 @@ public class Notifier implements Runnable{
         if (array.length == 0)
             sub.subscribe(tipo);
         for (int i = 0; i < 10 && i < array.length ;i++)
-            sub.subscribe(tipo+"-"+array[i]);
+            sub.subscribe(tipo+"-"+array[i]+"-");
     }
 }

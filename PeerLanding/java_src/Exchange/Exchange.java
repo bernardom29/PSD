@@ -1,15 +1,15 @@
 package Exchange;
-import Protos.Protocolo.*;
+import Protos.Protocolo.ExchangeReply;
+import Protos.Protocolo.Mensagem;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.zeromq.ZMQ;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.util.concurrent.*;
 
-public class Exchange implements Runnable{
-    HashMap<String, Empresa> empresas;
-    HashMap<String, Leilao> leiloes;
-    HashMap<String, Emissao> emissoes;
+public class Exchange implements Runnable {
+    ConcurrentHashMap<String, Empresa> empresas;
+    ConcurrentHashMap<String, Leilao> leiloes;
+    ConcurrentHashMap<String, Emissao> emissoes;
     ZMQ.Socket rep;
     ZMQ.Socket pub;
     ZMQ.Context context;
@@ -20,47 +20,64 @@ public class Exchange implements Runnable{
         this.rep  = context.socket(ZMQ.REP);
         this.pub  = context.socket(ZMQ.PUB);
         this.rep.bind("tcp://localhost:"+port);
-        this.pub.connect("tcp://localhost:2000");
+        this.pub.connect("tcp://localhost:2001");
+        this.emissoes = new ConcurrentHashMap<String, Emissao>();
+        this.leiloes = new ConcurrentHashMap<String, Leilao>();
+        this.empresas = new ConcurrentHashMap<String, Empresa>();
     }
 
 
 
     public boolean licitar(String empresa, String investidor, int quantia, int juro){
-        //Verificar se o juro <= taxa maxima do leilao
-        //se sim
-        // atualizar dir
-        // notificar subs
-        System.out.println("licitar");
-        return true;
+        Leilao leilaoAtual = leiloes.get(empresa);
+        if (leilaoAtual != null && juro < leilaoAtual.taxaMaxima) {
+            Licitacao licitacao = new Licitacao(investidor,juro,quantia);
+            leilaoAtual.licitacoes.add(licitacao);
+            pub.send("leilao-"+empresa+"-nova licitação de: "+investidor+ " juro: "+juro + " quantia: "+quantia);
+            return true;
+        }else{
+            return false;
+        }
     }
     public boolean emprestimo(String empresa, String investidor, int quantia){
-        // atualizar dir
-        // notificar subs
-        System.out.println("emprestimo");
-        return true;
+        Emissao emissaoAtual = emissoes.get(empresa);
+        if (emissaoAtual != null) {
+            Licitacao licitacao = new Licitacao(investidor,quantia);
+            emissaoAtual.licitacoes.add(licitacao);
+            pub.send("emissao-"+empresa+"-nova licitação de: "+investidor+ " quantia: "+quantia);
+            return true;
+        }else{
+            return false;
+        }
     }
+
+
+
     public boolean emissao(String empresa, int quantia){
-        //Verificar se a ultima acao foi leilao ou emissao
-        //se leilao && se terminou leilao com sucesso
-            //obter taxa max alocada nesse leilao
-        //se emissao && se emissao completa
-            //obter taxa da emissao
-        //se emissao && emissao incompleta
-            //taxa da emissao * 1.1
-        //executors para timeout da emissao
-        //atualizar diretorio
-        //Notificar subs
-        System.out.println("emissao");
-        return true;
+        Empresa empresaObj = empresas.get(empresa);
+        if (empresaObj != null){
+            float taxaMaxima = empresaObj.taxaEmissao();
+            Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa,false);
+            emissoes.put(empresa,novaEmissao);
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            scheduler.schedule(new TerminaEmissao(empresa,empresas,emissoes,pub),60, TimeUnit.SECONDS);
+            this.pub.send("emissao-"+empresa+"-Começou uma emissao");
+            return true;
+        }
+        return false;
     }
     public boolean leilao(String empresa, int quantia, int juro){
-        //verificar se emp tem leilao em curso
-        //quantia multiplo de 1000
-        //executors para timeout do leilao
-        //atualizar diretorio
-        //Notificar subs
-        System.out.println("leilao");
-        return true;
+        Leilao leilaoAtual = leiloes.getOrDefault(empresa,null);
+        if (leilaoAtual == null &&  quantia % 1000 == 0){
+            Leilao leilao = new Leilao(juro,quantia,empresa,false);
+            this.leiloes.put(empresa,leilao);
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            scheduler.schedule(new TerminaLeilao(empresa,empresas,leiloes, pub),60, TimeUnit.SECONDS);
+
+            this.pub.send("leilao-"+empresa+"-Começou um leilão");
+            return true;
+        }
+        return false;
     }
     public boolean notificacao(Mensagem mensagem){
         System.out.println("notifica");
@@ -114,8 +131,6 @@ public class Exchange implements Runnable{
                         .setSucesso(sucesso)
                         .build();
                 this.rep.send(resposta.toByteArray());
-                if (sucesso)
-                    notificacao(mensagem);
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }

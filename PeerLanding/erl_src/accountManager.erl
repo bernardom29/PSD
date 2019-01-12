@@ -20,7 +20,7 @@ loop(Map) ->
                 {ok, {Password, Tipo,true}} ->
                     From ! ok,
                     io:format("logo\n"),
-                    loop(maps:update(User, {Password, Tipo, false}, Map));
+                    loop(maps:update(User, {Password, Tipo, false   }, Map));
                 _ -> From ! invalid, loop(Map)
             end
     end.
