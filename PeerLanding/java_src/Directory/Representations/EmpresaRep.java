@@ -1,23 +1,24 @@
 package Directory.Representations;
 
+import Directory.Resources.Empresa;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class EmpresaRep{
-    public String nome;
+    public Empresa emp;
 
     @JsonCreator
-    public EmpresaRep (@JsonProperty("nome") String nome) {
-        this.nome = nome;
+    public EmpresaRep (@JsonProperty("empresa") Empresa emp) {
+        this.emp = emp;
     }
 
-    public String getNome() {
-        return nome;
+    public Empresa getEmpresa() {
+        return emp;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setEmpresa(Empresa emp) {
+        this.emp = emp;
     }
 
 }

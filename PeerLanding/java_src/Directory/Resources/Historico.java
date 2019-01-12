@@ -2,12 +2,25 @@ package Directory.Resources;
 
 import Directory.Representations.*;
 import com.codahale.metrics.annotation.Timed;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
+
+/*
+        Licitacao lic1 = new Licitacao(1,"manel",30,200);
+        Licitacao lic2 = new Licitacao(2,"joao",20,1000);
+        List<Licitacao> lics = new ArrayList<>();
+        lics.add(lic1);
+        lics.add(lic2);
+        Leilao lei = new Leilao(1,100,403,"jock",null,true,lics);
+        List<Leilao> leiloes = new ArrayList<>();
+        leiloes.add(lei);
+        Empresa empe = new Empresa("jock",leiloes,null);
+
+*/
+
 
 @Path("/")
 public class Historico {
@@ -20,6 +33,7 @@ public class Historico {
     public Historico(HashMap<String, Empresa> empresas) {
         this.empresas = empresas;
     }
+
 
     @GET
     @Path("empresas")
@@ -38,6 +52,7 @@ public class Historico {
         return nomes;
     }
 
+    //TODO Post não estão a funcionar
     @POST
     @Path("empresa/{nome}")
     public Response put(@PathParam("nome") String nome){
@@ -60,7 +75,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new EmpresaRep(nome);
+        EmpresaRep empresa = new EmpresaRep(empresas.get(nome));
+
+        return empresa;
     }
 
     @GET
@@ -79,7 +96,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LeiloesRep(empresas.get(nome).getLeiloes());
+        LeiloesRep leiRep = new LeiloesRep(this.empresas.get(nomeEmp).getLeiloes());
+
+        return leiRep;
     }
 
     @GET
@@ -108,9 +127,12 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LeilaoRep(empresas.get(nomeEmp).getLeilao(id));
+        LeilaoRep leilao = new LeilaoRep(this.empresas.get(nomeEmp).getLeilao(id));
+
+        return leilao;
     }
 /*
+    TODO Posts em comentário
     @POST
     @Path("empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
     public Response put(@PathParam("nome") String nome, @PathParam("id") int id, @PathParam("taxaMaxima") int taxaMaxima,
@@ -138,7 +160,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new EmissoesRep(empresas.get(nomeEmp).getEmissoes());
+        EmissoesRep emRep = new EmissoesRep(empresas.get(nomeEmp).getEmissoes());
+
+        return emRep;
     }
 
     @GET
@@ -167,7 +191,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new EmissaoRep(empresas.get(nomeEmp).getEmissao(id));
+        EmissaoRep emissao = new EmissaoRep(empresas.get(nomeEmp).getEmissao(id));
+
+        return emissao;
     }
 /*
     @POST
@@ -207,7 +233,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LicitacoesRep(empresas.get(nomeEmp).getLeilao(idL).getLicitacoes());
+        LicitacoesRep licit = new LicitacoesRep(empresas.get(nomeEmp).getLeilao(idL).getLicitacoes());
+
+        return licit;
     }
 
     @GET
@@ -236,7 +264,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LicitacoesRep(empresas.get(nomeEmp).getEmissao(idE).getLicitacoes());
+        LicitacoesRep licit = new LicitacoesRep(empresas.get(nomeEmp).getLeilao(idE).getLicitacoes());
+
+        return licit;
     }
 
     @GET
@@ -275,7 +305,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LicitacaoRep(empresas.get(nomeEmp).getLeilao(idLeilao).getLicitacao(idLic));
+        LicitacaoRep licit = new LicitacaoRep(empresas.get(nomeEmp).getLeilao(idLeilao).getLicitacao(idLic));
+
+        return licit;
     }
 
     @GET
@@ -314,6 +346,9 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        return new LicitacaoRep(empresas.get(nomeEmp).getEmissao(idEmissao).getLicitacao(idLic));
+        LicitacaoRep licit = new LicitacaoRep(empresas.get(nomeEmp).getLeilao(idEmissao).getLicitacao(idLic));
+
+
+        return licit;
     }
 }
