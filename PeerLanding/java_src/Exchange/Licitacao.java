@@ -2,10 +2,10 @@ package Exchange;
 
 public class Licitacao {
     String investidor;
-    int taxa;
+    float taxa;
     int quantia;
 
-    public Licitacao(String investidor, int taxa, int quantia) {
+    public Licitacao(String investidor, float taxa, int quantia) {
         this.investidor = investidor;
         this.taxa = taxa;
         this.quantia = quantia;

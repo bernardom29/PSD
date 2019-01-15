@@ -3,6 +3,8 @@ package Client;
 import org.zeromq.ZMQ;
 import java.util.Vector;
 
+//TODO Retirar mailbox?
+
 public class Notifier implements Runnable{
     private ZMQ.Socket sub;
     private ZMQ.Context context;
@@ -28,7 +30,8 @@ public class Notifier implements Runnable{
         while(true)
         {
             byte[] notification = this.sub.recv();
-            mailbox.add(new String(notification));
+            System.out.println(new String(notification));
+            //mailbox.add(new String(notification));
         }
     }
 

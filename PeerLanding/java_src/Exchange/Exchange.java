@@ -31,12 +31,15 @@ public class Exchange implements Runnable {
 
 
 
-    private boolean licitar(String empresa, String investidor, int quantia, int juro){
+    private boolean licitar(String empresa, String investidor, int quantia, float juro){
         Leilao leilaoAtual = leiloes.get(empresa);
-        if (leilaoAtual != null && juro < leilaoAtual.getTaxaMaxima()) {
+        if (leilaoAtual != null && juro < leilaoAtual.getTaxaMaxima() &&  quantia % 100 == 0) {
             Licitacao licitacao = new Licitacao(investidor,juro,quantia);
             leilaoAtual.getLicitacoes().add(licitacao);
-            pub.send("leilao-"+empresa+"-nova licitação de: "+investidor+ " juro: "+juro + " quantia: "+quantia);
+            synchronized (this.pub) {
+                pub.send("leilao-" + empresa + "-nova licitação de: " + investidor + " juro: " + juro + " quantia: " + quantia);
+            }
+            //TODO Fazer post de licitação
             return true;
         }else{
             return false;
@@ -44,10 +47,13 @@ public class Exchange implements Runnable {
     }
     private boolean emprestimo(String empresa, String investidor, int quantia){
         Emissao emissaoAtual = emissoes.get(empresa);
-        if (emissaoAtual != null) {
+        if (emissaoAtual != null  &&  quantia % 100 == 0) {
             Licitacao licitacao = new Licitacao(investidor,quantia);
             emissaoAtual.getLicitacoes().add(licitacao);
-            pub.send("emissao-"+empresa+"-nova licitação de: "+investidor+ " quantia: "+quantia);
+            synchronized (this.pub) {
+                pub.send("emissao-" + empresa + "-nova licitação de: " + investidor + " quantia: " + quantia);
+            }
+            //TODO Fazer post de licitação
             return true;
         }else{
             return false;
@@ -59,32 +65,46 @@ public class Exchange implements Runnable {
     public boolean emissao(String empresa, int quantia){
         Empresa empresaObj = empresas.get(empresa);
         if (empresaObj != null){
-            float taxaMaxima = empresaObj.taxaEmissao();
-            Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa,false);
-            emissoes.put(empresa,novaEmissao);
-            new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub)).start();
-
-            synchronized (this.pub)
-            {
-                this.pub.send("emissao-"+empresa+"-Começou uma emissao");
+            Leilao ultimoLeilao = empresaObj.historicoLeiloes.lastElement();
+            if(ultimoLeilao.isSucesso() &&  quantia % 1000 == 0) {
+                float taxaMaxima = empresaObj.taxaEmissao();
+                Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa);
+                emissoes.put(empresa,novaEmissao);
+                new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub)).start();
+                synchronized (this.pub) {
+                    this.pub.send("emissao-"+empresa+"-Começou uma emissao");
+                }
+                //TODO Fazer post de emissao
+                return true;
             }
+        }
+        return false;
+    }
+
+    public boolean leilao(String empresa, int quantia, float juro){
+        Leilao leilaoAtual = leiloes.getOrDefault(empresa,null);
+        if (leilaoAtual == null &&  quantia % 1000 == 0){
+            Leilao leilao = new Leilao(juro,quantia,empresa);
+            this.leiloes.put(empresa,leilao);
+            new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub)).start();
+            synchronized (this.pub) {
+                this.pub.send("leilao-"+empresa+"-Começou um leilão");
+            }
+            //TODO Fazer post de leilao
             return true;
         }
         return false;
     }
-    public boolean leilao(String empresa, int quantia, int juro){
-        Leilao leilaoAtual = leiloes.getOrDefault(empresa,null);
-        if (leilaoAtual == null &&  quantia % 1000 == 0){
-            Leilao leilao = new Leilao(juro,quantia,empresa,false);
-            this.leiloes.put(empresa,leilao);
-            new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub)).start();
-            synchronized (this.pub)
-            {
-                this.pub.send("leilao-"+empresa+"-Começou um leilão");
-            }
-            return true;
-        }
-        return false;
+
+    public byte[] recv(ZMQ.Socket socket){
+        byte[] tmp;
+        int len;
+        tmp = socket.recv();
+        out.println("Exchange: Pedido recebido");
+        len = tmp.length;
+        byte[] response = new byte[len];
+        arraycopy(tmp, 0, response, 0, len);
+        return response;
     }
 
     public void run(){
@@ -141,18 +161,6 @@ public class Exchange implements Runnable {
     }
 
 
-    public byte[] recv(ZMQ.Socket socket){
-        byte[] tmp;
-        int len = 0;
-        tmp = socket.recv();
-        out.println("Exchange: Pedido recebido");
-        len = tmp.length;
-        byte[] response = new byte[len];
-        arraycopy(tmp, 0, response, 0, len);
-        return response;
-
-    }
-
     public static void main(String[] args){
         ArrayList<ConcurrentHashMap<String, Empresa>> lmap = new ArrayList<>();
         ConcurrentHashMap<String, Empresa> map1 = new ConcurrentHashMap<String, Empresa>();
@@ -179,11 +187,4 @@ public class Exchange implements Runnable {
             new Thread(new Exchange(4000+i, lmap.get(i))).start();
         }
     }
-    /*
-     * socket zeromq pull(receber pedido) e push(enviar resposta)
-     * thread1 que faz continuamente recv de pull e inserir numa mailbox
-     * thread2 que processa pedidos da cabeça da mailbox,
-     *   fazer send pelo socket de push
-     *   dependendo do pedido fazer alterações no diretorio
-     * */
 }
