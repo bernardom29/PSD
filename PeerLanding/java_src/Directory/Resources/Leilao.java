@@ -7,24 +7,14 @@ import javax.ws.rs.core.Response;
 
 public class Leilao {
     public int id;
-    public int taxaMaxima;
+    public float taxaMaxima;
     public int montanteTotal;
     public String empresa;
     public Date data;
     public boolean sucesso;
     public List<Licitacao> licitacoes;
 
-    public Leilao(){
-        this.id = 0;
-        this.taxaMaxima = 0;
-        this.montanteTotal = 0;
-        this.empresa = null;
-        this.data = null;
-        this.sucesso = false;
-        this.licitacoes = null;
-    }
-
-    public Leilao(int id, int taxaMaxima, int montanteTotal, String empresa, Date data, boolean sucesso, List<Licitacao> licitacoes){
+    public Leilao(int id, float taxaMaxima, int montanteTotal, String empresa, Date data, boolean sucesso, List<Licitacao> licitacoes) {
         this.id = id;
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
@@ -34,12 +24,60 @@ public class Leilao {
         this.licitacoes = licitacoes;
     }
 
-    public List<Licitacao> getLicitacoes(){
-        return this.licitacoes;
+    public int getId() {
+        return id;
     }
 
-    public Licitacao getLicitacao(int id){
-        return this.licitacoes.get(id);
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public float getTaxaMaxima() {
+        return taxaMaxima;
+    }
+
+    public void setTaxaMaxima(float taxaMaxima) {
+        this.taxaMaxima = taxaMaxima;
+    }
+
+    public int getMontanteTotal() {
+        return montanteTotal;
+    }
+
+    public void setMontanteTotal(int montanteTotal) {
+        this.montanteTotal = montanteTotal;
+    }
+
+    public String getEmpresa() {
+        return empresa;
+    }
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
+    }
+
+    public boolean isSucesso() {
+        return sucesso;
+    }
+
+    public void setSucesso(boolean sucesso) {
+        this.sucesso = sucesso;
+    }
+
+    public List<Licitacao> getLicitacoes() {
+        return licitacoes;
+    }
+
+    public void setLicitacoes(List<Licitacao> licitacoes) {
+        this.licitacoes = licitacoes;
     }
 
     public String toString(){
@@ -60,5 +98,9 @@ public class Leilao {
             sb.append(licitacao.toString());
         }
         return sb.toString();
+    }
+
+    public Licitacao getLicitacao(int idLic) {
+        return licitacoes.get(idLic);
     }
 }

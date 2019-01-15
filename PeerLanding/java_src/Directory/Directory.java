@@ -3,54 +3,73 @@ package Directory;
 import Directory.Representations.*;
 import Directory.Resources.Empresa;
 import Directory.Resources.Licitacao;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import com.codahale.metrics.annotation.Timed;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-
+@Path("/")
 public class Directory {
-    HashMap<String, Empresa> empresas;
+    ConcurrentHashMap<String, Empresa> empresas;
 
 
     public Directory() {
-        this.empresas = new HashMap<String, Empresa>();
+        this.empresas = new ConcurrentHashMap<String, Empresa>();
+        this.empresas.put("CanecaLda", new Empresa("CanecaLda"));
+        this.empresas.put("SapatoLda", new Empresa("SapatoLda"));
+        this.empresas.put("IsqueiroLda", new Empresa("IsqueiroLda"));
+        this.empresas.put("MesasLda", new Empresa("MesasLda"));
+        this.empresas.put("AguaLda", new Empresa("AguaLda"));
+        this.empresas.put("VinhoLda", new Empresa("VinhoLda"));
+        this.empresas.put("SandesLda", new Empresa("SandesLda"));
+        this.empresas.put("OreoLda", new Empresa("OreoLda"));
+        this.empresas.put("MongoLda", new Empresa("MongoLda"));
+        this.empresas.put("RelogioLda", new Empresa("RelogioLda"));
+
     }
 
-    public Directory(HashMap<String,Empresa> empresas){
+    public Directory(ConcurrentHashMap<String,Empresa> empresas){
         this.empresas = empresas;
     }
 
     @GET
     @Path("/empresas")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public EmpresasRep getEmps() {
-        List<String> nomes = null;
-
+        List<String> nomes = new ArrayList<>();
+        System.out.println(empresas);
         for ( String key : empresas.keySet() ) {
             nomes.add(key);
         }
-
         return new EmpresasRep(nomes);
     }
 
     @GET
     @Path("/empresa/{nome}")
-    public EmpresaRep getEmp(@PathParam("nome") String nomeEmp){
-        return new EmpresaRep(nomeEmp);
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
+    public EmpresaRep getEmp(@PathParam("nome") String nome){
+        return new EmpresaRep(nome, this.empresas.get(nome));
     }
 
     @GET
     @Path("/empresa/{nome}/leiloes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LeiloesRep getLeiloes(@PathParam("nome") String nome){
         return new LeiloesRep(empresas.get(nome).getLeiloes());
     }
 
     @GET
     @Path("/empresa/{nome}/leilao/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LeilaoRep getLeilao(@PathParam("nome") String nome, @PathParam("id") int id){
         return new LeilaoRep(empresas.get(nome).getLeilao(id));
     }
@@ -69,12 +88,16 @@ public class Directory {
 
     @GET
     @Path("/empresa/{nome}/emissoes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public EmissoesRep getEmissoes(@PathParam("nome") String nome){
         return new EmissoesRep(empresas.get(nome).getEmissoes());
     }
 
     @GET
     @Path("/empresa/{nome}/emissao/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public EmissaoRep getEmissao(@PathParam("nome") String nome, @PathParam("id") int id){
         return new EmissaoRep(empresas.get(nome).getEmissao(id));
     }
@@ -91,24 +114,32 @@ public class Directory {
 
     @GET
     @Path("/empresa/{nome}/leilao/{id}/licitacoes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LicitacoesRep getLicitacoesLeilao(@PathParam("nome") String nome, @PathParam("id") int id){
         return new LicitacoesRep(empresas.get(nome).getLeilao(id).getLicitacoes());
     }
 
     @GET
     @Path("/empresa/{nome}/emissao/{id}/licitacoes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LicitacoesRep getLicitacoesEmissao(@PathParam("nome") String nome, @PathParam("id") int id){
         return new LicitacoesRep(empresas.get(nome).getEmissao(id).getLicitacoes());
     }
 
     @GET
     @Path("/empresa/{nome}/leilao/{idL}/licitacao/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LicitacaoRep getLicitacaoLeilao(@PathParam("nome") String nome, @PathParam("idL") int idL, @PathParam("id") int id){
         return new LicitacaoRep(empresas.get(nome).getLeilao(idL).getLicitacao(id));
     }
 
     @GET
     @Path("/empresa/{nome}/emissao/{idE}/licitacao/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public LicitacaoRep getLicitacaoEmissao(@PathParam("nome") String nome, @PathParam("idE") int idE, @PathParam("id") int id){
         return new LicitacaoRep(empresas.get(nome).getEmissao(idE).getLicitacao(id));
     }

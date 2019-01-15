@@ -3,21 +3,14 @@ package Directory.Resources;
 public class Licitacao {
     public int id;
     public String investidor;
-    public int taxa;
+    public float taxa;
     public int quantia;
 
-    public Licitacao(){
-        this.id = 0;
-        this.investidor = null;
-        this.taxa = 0;
-        this.quantia = 0;
-    }
-
-    public Licitacao(int id, String investidor, int taxa, int quantia){
+    public Licitacao(int id, String investidor, float taxa, int quantia) {
         this.id = id;
         this.investidor = investidor;
         this.taxa = taxa;
-        this.quantia = taxa;
+        this.quantia = quantia;
     }
 
     public String toString(){

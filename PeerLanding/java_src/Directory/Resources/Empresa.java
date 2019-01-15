@@ -1,21 +1,15 @@
 package Directory.Resources;
-
-import Directory.Resources.Emissao;
-import Directory.Resources.Leilao;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
 
 public class Empresa {
     public String nome;
     public List<Leilao> historicoLeiloes;
     public List<Emissao> historicoEmissoes;
 
-    public Empresa(){
-        String nome = null;
+    public Empresa(String nome){
+        this.nome = nome;
         this.historicoLeiloes = new ArrayList<>();
         this.historicoEmissoes = new ArrayList<>();
     }
@@ -42,7 +36,7 @@ public class Empresa {
         return historicoEmissoes.get(id);
     }
 
-    public void addLeilao(int id, int taxaMaxima, int montanteTotal, String empresa, Date data, boolean sucesso, List<Licitacao> licitacoes){
+    public void addLeilao(int id, float taxaMaxima, int montanteTotal, String empresa, Date data, boolean sucesso, List<Licitacao> licitacoes){
         Leilao leilao = new Leilao(id,taxaMaxima,montanteTotal,this.nome,data,sucesso,licitacoes);
 
         historicoLeiloes.add(leilao);

@@ -8,21 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
-/*
-        Licitacao lic1 = new Licitacao(1,"manel",30,200);
-        Licitacao lic2 = new Licitacao(2,"joao",20,1000);
-        List<Licitacao> lics = new ArrayList<>();
-        lics.add(lic1);
-        lics.add(lic2);
-        Leilao lei = new Leilao(1,100,403,"jock",null,true,lics);
-        List<Leilao> leiloes = new ArrayList<>();
-        leiloes.add(lei);
-        Empresa empe = new Empresa("jock",leiloes,null);
 
-*/
-
-
-@Path("/")
 public class Historico {
     private HashMap<String, Empresa> empresas;
 
@@ -35,10 +21,7 @@ public class Historico {
     }
 
 
-    @GET
-    @Path("empresas")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
+
     public EmpresasRep getEmps() {
         List<String> emp = new ArrayList<>();
 
@@ -51,7 +34,7 @@ public class Historico {
 
         return nomes;
     }
-
+/*
     //TODO Post não estão a funcionar
     @POST
     @Path("empresa/{nome}")
@@ -75,7 +58,7 @@ public class Historico {
             throw new WebApplicationException(404);
         }
 
-        EmpresaRep empresa = new EmpresaRep(empresas.get(nome));
+        EmpresaRep empresa = new EmpresaRep( empresas.get(nome).nome);
 
         return empresa;
     }
@@ -131,7 +114,7 @@ public class Historico {
 
         return leilao;
     }
-/*
+
     TODO Posts em comentário
     @POST
     @Path("empresa/{nome}/leilao/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}/{licitacoes}")
@@ -143,7 +126,7 @@ public class Historico {
 
         return Response.status(201).build();
     }
-*/
+
     @GET
     @Path("empresa/{nome}/emissoes")
     public EmissoesRep getEmissoes(@PathParam("nome") String nome) {
@@ -206,7 +189,7 @@ public class Historico {
 
         return Response.status(201).build();
     }
-*/
+
     @GET
     @Path("empresa/{nome}/leilao/{id}/licitacoes")
     public LicitacoesRep getLicitacoesLeilao(@PathParam("nome") String nome, @PathParam("id") int id) {
@@ -350,5 +333,5 @@ public class Historico {
 
 
         return licit;
-    }
+    }*/
 }
