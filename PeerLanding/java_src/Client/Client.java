@@ -7,7 +7,7 @@ import java.util.Scanner;
 import Protos.Protocolo.*;
 
 import static java.lang.System.*;
-
+//TODO Retirar opcao de notificoes?
 public class Client {
     private Notifier notifier;
     private Socket socket;
@@ -23,47 +23,6 @@ public class Client {
         this.is = socket.getInputStream();
         this.os = socket.getOutputStream();
         this.auth = false;
-    }
-
-    private void autenticacao()
-    {
-        while(!auth)
-        {
-            out.println("username: ");
-            this.username = this.input.next();
-            out.println("password: ");
-            String password = this.input.next();
-            AuthReq authReq = AuthReq.newBuilder().setUsername(this.username).setPassword(password).build();
-            AuthRep authRep;
-            try {
-                os.write(authReq.toByteArray());
-                os.flush();
-                byte [] response = this.recv();
-                authRep = AuthRep.parseFrom(response);
-                if (authRep.getSucesso()) {
-                    this.auth = true;
-                    this.type = authRep.getTipo();
-                    break;
-                }
-                else
-                    out.println("Login invalido");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
-    private void logout()
-    {
-        Mensagem logoutReq = Mensagem.newBuilder()
-                .setTipo("logout")
-                .build();
-        try {
-            os.write(logoutReq.toByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private Reply getReply() {
@@ -122,13 +81,115 @@ public class Client {
         }else out.println("Insucesso: " + mensagem);
     }
 
+    public void leilao(){
+        out.println("Juro máximo: ");
+        String juro = this.input.next();
+        out.println("Quantia total: ");
+        String quantia = this.input.next();
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
+                .setTipo("leilao")
+                .setJuro(Float.parseFloat(juro))
+                .setQuantia(Integer.parseInt(quantia)).build();
+        this.enviar(req, "leilao", this.username);
+        rep = getReply();
+        this.resultadoOperacao(rep, "leilão");
+    }
 
+    public void emissao(){
+        Reply rep;
+        Mensagem req;
+        String quantia;
+        out.println("Quantia: ");
+        quantia = this.input.next();
+        req = Mensagem.newBuilder()
+                .setTipo("emissao")
+                .setQuantia(Integer.parseInt(quantia)).build();
+        this.enviar(req,"emissao", username);
+
+        rep = getReply();
+        this.resultadoOperacao(rep, "emissao");
+    }
+
+    private void licitar(){
+        out.println("Empresa: ");
+        String empresa = this.input.next();
+        out.println("Juro: ");
+        String juro = this.input.next();
+        out.println("Quantia: ");
+        String quantia = this.input.next();
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
+                .setTipo("licitar")
+                .setEmpresa(empresa)
+                .setJuro(Float.parseFloat(juro))
+                .setQuantia(Integer.parseInt(quantia)).build();
+        this.enviar(req, "leilao", empresa);
+        rep = getReply();
+        this.resultadoOperacao(rep, "leilao");
+    }
+
+    private void emprestimo(){
+        out.println("Empresa: ");
+        String empresa = this.input.next();
+        out.println("Quantia: ");
+        String quantia = this.input.next();
+        Reply rep;
+        Mensagem req = Mensagem.newBuilder()
+                .setTipo("emprestimo")
+                .setEmpresa(empresa)
+                .setQuantia(Integer.parseInt(quantia)).build();
+        this.enviar(req, "emissao", empresa);
+        rep = getReply();
+        this.resultadoOperacao(rep, "emprestimo");
+    }
+
+    private void autenticacao()
+    {
+        while(!auth)
+        {
+            out.println("username: ");
+            this.username = this.input.next();
+            out.println("password: ");
+            String password = this.input.next();
+            AuthReq authReq = AuthReq.newBuilder().setUsername(this.username).setPassword(password).build();
+            AuthRep authRep;
+            try {
+                os.write(authReq.toByteArray());
+                os.flush();
+                byte [] response = this.recv();
+                authRep = AuthRep.parseFrom(response);
+                if (authRep.getSucesso()) {
+                    this.auth = true;
+                    this.type = authRep.getTipo();
+                    break;
+                }
+                else
+                    out.println("Login invalido");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void logout()
+    {
+        Mensagem logoutReq = Mensagem.newBuilder()
+                .setTipo("logout")
+                .build();
+        try {
+            os.write(logoutReq.toByteArray());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void empresa(){
         boolean flag = true;
         while(flag){
             out.println(
-                    "1- Criar leilão\n" +
+                            "1- Criar leilão\n" +
                             "2- Criar emissão\n" +
                             "3- Subscrições\n" +
                             "4- Notificações\n" +
@@ -159,42 +220,12 @@ public class Client {
         }
 
     }
-    public void leilao(){
-        out.println("Juro máximo: ");
-        String juro = this.input.next();
-        out.println("Quantia total: ");
-        String quantia = this.input.next();
-        Reply rep;
-        Mensagem req = Mensagem.newBuilder()
-                .setTipo("leilao")
-                .setJuro(Integer.parseInt(juro))
-                .setQuantia(Integer.parseInt(quantia)).build();
-        this.enviar(req, "leilao", this.username);
-        rep = getReply();
-        this.resultadoOperacao(rep, "leilão");
-    }
-    public void emissao(){
-        Reply rep;
-        Mensagem req;
-        String quantia;
-        out.println("Quantia: ");
-        quantia = this.input.next();
-        req = Mensagem.newBuilder()
-                .setTipo("emissao")
-                .setQuantia(Integer.parseInt(quantia)).build();
-        this.enviar(req,"emissao", username);
-
-        rep = getReply();
-        this.resultadoOperacao(rep, "emissao");
-    }
-
-
 
     private void investidor() {
         boolean flag = true;
         while(flag){
             out.println(
-                    "1- Licitar leilão\n" +
+                            "1- Licitar leilão\n" +
                             "2- Subscrição de empréstimo a taxa fixa\n" +
                             "3- Subscrições\n" +
                             "4- Notificações\n" +
@@ -223,50 +254,14 @@ public class Client {
             }
         }
     }
-    private void licitar(){
-        out.println("Empresa: ");
-        String empresa = this.input.next();
-        out.println("Juro: ");
-        String juro = this.input.next();
-        out.println("Quantia: ");
-        String quantia = this.input.next();
-        Reply rep;
-        Mensagem req = Mensagem.newBuilder()
-                .setTipo("licitar")
-                .setEmpresa(empresa)
-                .setJuro(Integer.parseInt(juro))
-                .setQuantia(Integer.parseInt(quantia)).build();
-        this.enviar(req, "leilao", empresa);
-        rep = getReply();
-        this.resultadoOperacao(rep, "leilao");
-    }
-    private void emprestimo(){
-        out.println("Empresa: ");
-        String empresa = this.input.next();
-        out.println("Quantia: ");
-        String quantia = this.input.next();
-        Reply rep;
-        Mensagem req = Mensagem.newBuilder()
-                .setTipo("emprestimo")
-                .setEmpresa(empresa)
-                .setQuantia(Integer.parseInt(quantia)).build();
-        this.enviar(req, "emissao", empresa);
-        rep = getReply();
-        this.resultadoOperacao(rep, "emprestimo");
-    }
-
-
 
 
     public void run(){
-
-
         this.autenticacao();
         this.notifier = new Notifier();
         Thread tn = new Thread(this.notifier);
         tn.start();
-        if (this.type == 1)
-        {
+        if (this.type == 1) {
             investidor();
         }
         else if (this.type == 2){

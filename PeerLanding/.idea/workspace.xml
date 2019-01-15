@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/java_src/Exchange/Leilao.java" line="68" mnemonic="8" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b5b8e20-3dd5-445f-9565-00102c254eb5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="6b5b8e20-3dd5-445f-9565-00102c254eb5" name="Default Changelist" comment="Cliente fixed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Empresa.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Empresa.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Exchange.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Exchange.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Leilao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Leilao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java_src/Exchange/Licitacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Exchange/Licitacao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java_src/Client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Client/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java_src/Client/Notifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/java_src/Client/Notifier.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,11 +19,48 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Empresa.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Empresa.java">
+      <file leaf-file-name="Exchange.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Exchange.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="35" column="16" selection-start-line="35" selection-start-column="16" selection-end-line="35" selection-end-column="16" />
+            <state relative-caret-position="1170">
+              <caret line="86" column="59" selection-start-line="86" selection-start-column="59" selection-end-line="86" selection-end-column="59" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TerminaEmissao.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="29" column="47" selection-start-line="29" selection-start-column="47" selection-end-line="29" selection-end-column="47" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Emissao.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Emissao.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="18" column="28" selection-start-line="18" selection-start-column="28" selection-end-line="18" selection-end-column="28" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#649#650#0" expanded="true" />
+                <element signature="e#687#688#0" expanded="true" />
+                <element signature="e#1088#1089#0" expanded="true" />
+                <element signature="e#1118#1119#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TerminaLeilao.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="535">
+              <caret line="40" column="9" lean-forward="true" selection-start-line="40" selection-start-column="9" selection-end-line="40" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -31,76 +68,25 @@
       <file leaf-file-name="Leilao.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/java_src/Exchange/Leilao.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-215">
-              <caret line="18" column="31" lean-forward="true" selection-start-line="18" selection-start-column="31" selection-end-line="18" selection-end-column="31" />
+            <state relative-caret-position="160">
+              <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#681#682#0" expanded="true" />
-                <element signature="e#714#715#0" expanded="true" />
-                <element signature="e#763#764#0" expanded="true" />
-                <element signature="e#807#808#0" expanded="true" />
-                <element signature="e#844#845#0" expanded="true" />
-                <element signature="e#880#881#0" expanded="true" />
-                <element signature="e#935#936#0" expanded="true" />
-                <element signature="e#985#986#0" expanded="true" />
-                <element signature="e#1019#1020#0" expanded="true" />
-                <element signature="e#1049#1050#0" expanded="true" />
-                <element signature="e#1095#1096#0" expanded="true" />
-                <element signature="e#1133#1134#0" expanded="true" />
-                <element signature="e#1162#1163#0" expanded="true" />
-                <element signature="e#1189#1190#0" expanded="true" />
-                <element signature="e#1227#1228#0" expanded="true" />
-                <element signature="e#1259#1260#0" expanded="true" />
-                <element signature="e#1293#1294#0" expanded="true" />
-                <element signature="e#1323#1324#0" expanded="true" />
-                <element signature="e#1370#1371#0" expanded="true" />
-                <element signature="e#1408#1409#0" expanded="true" />
+                <element signature="e#1579#1580#0" expanded="true" />
+                <element signature="e#1624#1625#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DirectoryApp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java_src/Directory/DirectoryApp.java">
+      <file leaf-file-name="Client.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/java_src/Client/Client.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Exchange.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Exchange.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Licitacao.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="37" lean-forward="true" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Emissao.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/java_src/Directory/Resources/Emissao.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="frontend.erl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/erl_src/frontend.erl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="35" selection-start-line="21" selection-start-column="35" selection-end-line="21" selection-end-column="35" />
+            <state relative-caret-position="135">
+              <caret line="9" column="35" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -108,8 +94,11 @@
       <file leaf-file-name="Notifier.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/java_src/Client/Notifier.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+            <state relative-caret-position="10">
+              <caret line="5" column="23" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -159,12 +148,15 @@
         <option value="$PROJECT_DIR$/erl_src/usersession.erl" />
         <option value="$PROJECT_DIR$/erl_src/manager.erl" />
         <option value="$PROJECT_DIR$/erl_src/producer.erl" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/Licitacao.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/Empresa.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/Emissao.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/Exchange.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/Leilao.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java" />
+        <option value="$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java" />
         <option value="$PROJECT_DIR$/java_src/Client/Notifier.java" />
         <option value="$PROJECT_DIR$/java_src/Client/Client.java" />
-        <option value="$PROJECT_DIR$/java_src/Exchange/Licitacao.java" />
-        <option value="$PROJECT_DIR$/java_src/Exchange/Leilao.java" />
-        <option value="$PROJECT_DIR$/java_src/Exchange/Empresa.java" />
-        <option value="$PROJECT_DIR$/java_src/Exchange/Exchange.java" />
       </list>
     </option>
   </component>
@@ -210,50 +202,7 @@
               <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
               <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
               <item name="java_src" type="462c0819:PsiDirectoryNode" />
-              <item name="Client" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="java_src" type="462c0819:PsiDirectoryNode" />
               <item name="Directory" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="java_src" type="462c0819:PsiDirectoryNode" />
-              <item name="Directory" type="462c0819:PsiDirectoryNode" />
-              <item name="Representations" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="java_src" type="462c0819:PsiDirectoryNode" />
-              <item name="Exchange" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="java_src" type="462c0819:PsiDirectoryNode" />
-              <item name="protos" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="out" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="out" type="462c0819:PsiDirectoryNode" />
-              <item name="production" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PeerLanding" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
-              <item name="out" type="462c0819:PsiDirectoryNode" />
-              <item name="production" type="462c0819:PsiDirectoryNode" />
-              <item name="PeerLanding" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -359,12 +308,27 @@
       <workItem from="1545936840774" duration="1766000" />
       <workItem from="1545946918639" duration="7280000" />
       <workItem from="1546447890190" duration="409000" />
-      <workItem from="1547568656484" duration="3708000" />
+      <workItem from="1547568656484" duration="5457000" />
     </task>
+    <task id="LOCAL-00001" summary="Exchange fixed">
+      <created>1547573569309</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1547573569309</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Exchange super fixed">
+      <created>1547574396099</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1547574396099</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13434000" />
+    <option name="totallyTimeSpent" value="15183000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1440" height="806" extended-state="6" />
@@ -415,18 +379,9 @@
       <path value="$PROJECT_DIR$/dependencies/erlzmq2" />
       <path value="$PROJECT_DIR$/dependencies/gpb" />
     </ignored-roots>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/java_src/Client/Client.java</url>
-          <line>195</line>
-          <properties />
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Exchange fixed" />
+    <MESSAGE value="Exchange super fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Exchange super fixed" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/java_src/protos/protocolo.erl" />
@@ -489,6 +444,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-8018">
           <caret line="230" selection-start-line="230" selection-end-line="230" />
+          <folding>
+            <element signature="n#component#0;n#project#0;n#!!top" />
+            <element signature="n#component#1;n#project#0;n#!!top" />
+            <element signature="n#component#2;n#project#0;n#!!top" />
+            <element signature="n#component#3;n#project#0;n#!!top" />
+            <element signature="n#component#4;n#project#0;n#!!top" />
+            <element signature="n#component#5;n#project#0;n#!!top" />
+            <element signature="n#component#6;n#project#0;n#!!top" />
+            <element signature="n#component#7;n#project#0;n#!!top" />
+            <element signature="n#component#9;n#project#0;n#!!top" />
+            <element signature="n#component#10;n#project#0;n#!!top" />
+            <element signature="n#component#11;n#project#0;n#!!top" />
+            <element signature="n#key#0;n#component#11;n#project#0;n#!!top" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -524,24 +493,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminarEmissao.java" />
-    <entry file="file://$PROJECT_DIR$/java_src/Broker.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="1" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/protos/Protocolo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
-          <folding>
-            <element signature="e#17616#17617#0" expanded="true" />
-            <element signature="e#17665#17666#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Directory/Resources/Historico.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -577,20 +528,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Client/Client.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="16" selection-start-line="5" selection-start-column="16" selection-end-line="5" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Client/Notifier.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/dependencies/jeromq-0.4.3.jar!/zmq/SocketBase.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="142">
@@ -602,23 +539,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="156">
           <caret line="1200" column="28" lean-forward="true" selection-start-line="1200" selection-start-column="28" selection-end-line="1200" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="20" column="23" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="254">
-          <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
         </state>
       </provider>
     </entry>
@@ -650,50 +570,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="37" lean-forward="true" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Leilao.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-215">
-          <caret line="18" column="31" lean-forward="true" selection-start-line="18" selection-start-column="31" selection-end-line="18" selection-end-column="31" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#681#682#0" expanded="true" />
-            <element signature="e#714#715#0" expanded="true" />
-            <element signature="e#763#764#0" expanded="true" />
-            <element signature="e#807#808#0" expanded="true" />
-            <element signature="e#844#845#0" expanded="true" />
-            <element signature="e#880#881#0" expanded="true" />
-            <element signature="e#935#936#0" expanded="true" />
-            <element signature="e#985#986#0" expanded="true" />
-            <element signature="e#1019#1020#0" expanded="true" />
-            <element signature="e#1049#1050#0" expanded="true" />
-            <element signature="e#1095#1096#0" expanded="true" />
-            <element signature="e#1133#1134#0" expanded="true" />
-            <element signature="e#1162#1163#0" expanded="true" />
-            <element signature="e#1189#1190#0" expanded="true" />
-            <element signature="e#1227#1228#0" expanded="true" />
-            <element signature="e#1259#1260#0" expanded="true" />
-            <element signature="e#1293#1294#0" expanded="true" />
-            <element signature="e#1323#1324#0" expanded="true" />
-            <element signature="e#1370#1371#0" expanded="true" />
-            <element signature="e#1408#1409#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Empresa.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" column="16" selection-start-line="35" selection-start-column="16" selection-end-line="35" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Directory/Directory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -711,22 +587,105 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Emissao.java">
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Licitacao.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="58">
-          <caret line="7" column="4" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
+        <state relative-caret-position="120">
+          <caret line="8" column="37" lean-forward="true" selection-start-line="8" selection-start-column="37" selection-end-line="8" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Empresa.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="35" column="16" selection-start-line="35" selection-start-column="16" selection-end-line="35" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaLeilao.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="535">
+          <caret line="40" column="9" lean-forward="true" selection-start-line="40" selection-start-column="9" selection-end-line="40" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Emissao.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="28" selection-start-line="18" selection-start-column="28" selection-end-line="18" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#649#650#0" expanded="true" />
+            <element signature="e#687#688#0" expanded="true" />
             <element signature="e#1088#1089#0" expanded="true" />
             <element signature="e#1118#1119#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/Leilao.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1579#1580#0" expanded="true" />
+            <element signature="e#1624#1625#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Exchange/TerminaEmissao.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="29" column="47" selection-start-line="29" selection-start-column="47" selection-end-line="29" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/java_src/Exchange/Exchange.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+        <state relative-caret-position="1170">
+          <caret line="86" column="59" selection-start-line="86" selection-start-column="59" selection-end-line="86" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/protos/Protocolo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="214">
+          <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
+          <folding>
+            <element signature="e#17616#17617#0" expanded="true" />
+            <element signature="e#17665#17666#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Broker.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="1" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Client/Notifier.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10">
+          <caret line="5" column="23" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/java_src/Client/Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="35" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
