@@ -36,7 +36,7 @@
 %% message types
 -type 'Mensagem'() ::
       #{tipo                    := iolist(),        % = 1
-        juro                    => integer(),       % = 2, 32 bits
+        juro                    => float() | integer() | infinity | '-infinity' | nan, % = 2
         quantia                 => integer(),       % = 3, 32 bits
         empresa                 => iolist(),        % = 4
         investidor              => iolist()         % = 5
@@ -52,13 +52,13 @@
        }.
 
 -type 'LeilaoReply'() ::
-      #{taxaMaximaAlocada       := integer(),       % = 1, 32 bits
-        taxaMaxima              := integer(),       % = 2, 32 bits
+      #{taxaMaximaAlocada       := float() | integer() | infinity | '-infinity' | nan, % = 1
+        taxaMaxima              := float() | integer() | infinity | '-infinity' | nan, % = 2
         sucesso                 := boolean() | 0 | 1 % = 3
        }.
 
 -type 'EmissaoReply'() ::
-      #{taxa                    := integer(),       % = 1, 32 bits
+      #{taxa                    := float() | integer() | infinity | '-infinity' | nan, % = 1
         sucesso                 := boolean() | 0 | 1 % = 2
        }.
 
@@ -75,7 +75,7 @@
 
 -type 'AddDirectoryRequest'() ::
       #{tipo                    := iolist(),        % = 1
-        juro                    => integer(),       % = 2, 32 bits
+        juro                    => float() | integer() | infinity | '-infinity' | nan, % = 2
         quantia                 => integer(),       % = 3, 32 bits
         empresa                 => iolist(),        % = 4
         investidor              => iolist()         % = 5
@@ -154,7 +154,7 @@ encode_msg_Mensagem(#{tipo := F1} = M, Bin,
 	   #{juro := F2} ->
 	       begin
 		 TrF2 = id(F2, TrUserData),
-		 e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+		 e_type_float(TrF2, <<B1/binary, 21>>, TrUserData)
 	       end;
 	   _ -> B1
 	 end,
@@ -219,11 +219,11 @@ encode_msg_LeilaoReply(#{taxaMaximaAlocada := F1,
 		       Bin, TrUserData) ->
     B1 = begin
 	   TrF1 = id(F1, TrUserData),
-	   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+	   e_type_float(TrF1, <<Bin/binary, 13>>, TrUserData)
 	 end,
     B2 = begin
 	   TrF2 = id(F2, TrUserData),
-	   e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+	   e_type_float(TrF2, <<B1/binary, 21>>, TrUserData)
 	 end,
     begin
       TrF3 = id(F3, TrUserData),
@@ -238,7 +238,7 @@ encode_msg_EmissaoReply(#{taxa := F1, sucesso := F2},
 			Bin, TrUserData) ->
     B1 = begin
 	   TrF1 = id(F1, TrUserData),
-	   e_type_int32(TrF1, <<Bin/binary, 8>>, TrUserData)
+	   e_type_float(TrF1, <<Bin/binary, 13>>, TrUserData)
 	 end,
     begin
       TrF2 = id(F2, TrUserData),
@@ -304,7 +304,7 @@ encode_msg_AddDirectoryRequest(#{tipo := F1} = M, Bin,
 	   #{juro := F2} ->
 	       begin
 		 TrF2 = id(F2, TrUserData),
-		 e_type_int32(TrF2, <<B1/binary, 16>>, TrUserData)
+		 e_type_float(TrF2, <<B1/binary, 21>>, TrUserData)
 	       end;
 	   _ -> B1
 	 end,
@@ -384,14 +384,12 @@ e_mfield_ExchangeRequest_mensagem(Msg, Bin,
     <<Bin2/binary, SubBin/binary>>.
 
 e_mfield_DirectoryReply_leilao(Msg, Bin, TrUserData) ->
-    SubBin = encode_msg_LeilaoReply(Msg, <<>>, TrUserData),
-    Bin2 = e_varint(byte_size(SubBin), Bin),
-    <<Bin2/binary, SubBin/binary>>.
+    Bin2 = <<Bin/binary, 12>>,
+    encode_msg_LeilaoReply(Msg, Bin2, TrUserData).
 
 e_mfield_DirectoryReply_emissao(Msg, Bin, TrUserData) ->
-    SubBin = encode_msg_EmissaoReply(Msg, <<>>, TrUserData),
-    Bin2 = e_varint(byte_size(SubBin), Bin),
-    <<Bin2/binary, SubBin/binary>>.
+    Bin2 = <<Bin/binary, 7>>,
+    encode_msg_EmissaoReply(Msg, Bin2, TrUserData).
 
 -compile({nowarn_unused_function,e_type_sint/3}).
 e_type_sint(Value, Bin, _TrUserData) when Value >= 0 ->
@@ -552,7 +550,7 @@ dfp_read_field_def_Mensagem(<<10, Rest/binary>>, Z1, Z2,
 			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_tipo(Rest, Z1, Z2, F@_1, F@_2, F@_3,
 			  F@_4, F@_5, TrUserData);
-dfp_read_field_def_Mensagem(<<16, Rest/binary>>, Z1, Z2,
+dfp_read_field_def_Mensagem(<<21, Rest/binary>>, Z1, Z2,
 			    F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData) ->
     d_field_Mensagem_juro(Rest, Z1, Z2, F@_1, F@_2, F@_3,
 			  F@_4, F@_5, TrUserData);
@@ -600,7 +598,7 @@ dg_read_field_def_Mensagem(<<0:1, X:7, Rest/binary>>, N,
       10 ->
 	  d_field_Mensagem_tipo(Rest, 0, 0, F@_1, F@_2, F@_3,
 				F@_4, F@_5, TrUserData);
-      16 ->
+      21 ->
 	  d_field_Mensagem_juro(Rest, 0, 0, F@_1, F@_2, F@_3,
 				F@_4, F@_5, TrUserData);
       24 ->
@@ -664,21 +662,28 @@ d_field_Mensagem_tipo(<<0:1, X:7, Rest/binary>>, N, Acc,
     dfp_read_field_def_Mensagem(RestF, 0, 0, NewFValue,
 				F@_2, F@_3, F@_4, F@_5, TrUserData).
 
-d_field_Mensagem_juro(<<1:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
-    when N < 57 ->
-    d_field_Mensagem_juro(Rest, N + 7, X bsl N + Acc, F@_1,
-			  F@_2, F@_3, F@_4, F@_5, TrUserData);
-d_field_Mensagem_juro(<<0:1, X:7, Rest/binary>>, N, Acc,
-		      F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_Mensagem(RestF, 0, 0, F@_1,
-				NewFValue, F@_3, F@_4, F@_5, TrUserData).
+d_field_Mensagem_juro(<<0:16, 128, 127, Rest/binary>>,
+		      Z1, Z2, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1,
+				id(infinity, TrUserData), F@_3, F@_4, F@_5,
+				TrUserData);
+d_field_Mensagem_juro(<<0:16, 128, 255, Rest/binary>>,
+		      Z1, Z2, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1,
+				id('-infinity', TrUserData), F@_3, F@_4, F@_5,
+				TrUserData);
+d_field_Mensagem_juro(<<_:16, 1:1, _:7, _:1, 127:7,
+			Rest/binary>>,
+		      Z1, Z2, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1,
+				id(nan, TrUserData), F@_3, F@_4, F@_5,
+				TrUserData);
+d_field_Mensagem_juro(<<Value:32/little-float,
+			Rest/binary>>,
+		      Z1, Z2, F@_1, _, F@_3, F@_4, F@_5, TrUserData) ->
+    dfp_read_field_def_Mensagem(Rest, Z1, Z2, F@_1,
+				id(Value, TrUserData), F@_3, F@_4, F@_5,
+				TrUserData).
 
 d_field_Mensagem_quantia(<<1:1, X:7, Rest/binary>>, N,
 			 Acc, F@_1, F@_2, F@_3, F@_4, F@_5, TrUserData)
@@ -1022,11 +1027,11 @@ decode_msg_LeilaoReply(Bin, TrUserData) ->
 				   id('$undef', TrUserData),
 				   id('$undef', TrUserData), TrUserData).
 
-dfp_read_field_def_LeilaoReply(<<8, Rest/binary>>, Z1,
+dfp_read_field_def_LeilaoReply(<<13, Rest/binary>>, Z1,
 			       Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_LeilaoReply_taxaMaximaAlocada(Rest, Z1, Z2,
 					  F@_1, F@_2, F@_3, TrUserData);
-dfp_read_field_def_LeilaoReply(<<16, Rest/binary>>, Z1,
+dfp_read_field_def_LeilaoReply(<<21, Rest/binary>>, Z1,
 			       Z2, F@_1, F@_2, F@_3, TrUserData) ->
     d_field_LeilaoReply_taxaMaxima(Rest, Z1, Z2, F@_1, F@_2,
 				   F@_3, TrUserData);
@@ -1052,10 +1057,10 @@ dg_read_field_def_LeilaoReply(<<0:1, X:7, Rest/binary>>,
 			      N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
+      13 ->
 	  d_field_LeilaoReply_taxaMaximaAlocada(Rest, 0, 0, F@_1,
 						F@_2, F@_3, TrUserData);
-      16 ->
+      21 ->
 	  d_field_LeilaoReply_taxaMaxima(Rest, 0, 0, F@_1, F@_2,
 					 F@_3, TrUserData);
       24 ->
@@ -1085,42 +1090,51 @@ dg_read_field_def_LeilaoReply(<<>>, 0, 0, F@_1, F@_2,
     #{taxaMaximaAlocada => F@_1, taxaMaxima => F@_2,
       sucesso => F@_3}.
 
-d_field_LeilaoReply_taxaMaximaAlocada(<<1:1, X:7,
+d_field_LeilaoReply_taxaMaximaAlocada(<<0:16, 128, 127,
 					Rest/binary>>,
-				      N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
-    d_field_LeilaoReply_taxaMaximaAlocada(Rest, N + 7,
-					  X bsl N + Acc, F@_1, F@_2, F@_3,
-					  TrUserData);
-d_field_LeilaoReply_taxaMaximaAlocada(<<0:1, X:7,
+				      Z1, Z2, _, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2,
+				   id(infinity, TrUserData), F@_2, F@_3,
+				   TrUserData);
+d_field_LeilaoReply_taxaMaximaAlocada(<<0:16, 128, 255,
 					Rest/binary>>,
-				      N, Acc, _, F@_2, F@_3, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_LeilaoReply(RestF, 0, 0, NewFValue,
-				   F@_2, F@_3, TrUserData).
+				      Z1, Z2, _, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2,
+				   id('-infinity', TrUserData), F@_2, F@_3,
+				   TrUserData);
+d_field_LeilaoReply_taxaMaximaAlocada(<<_:16, 1:1, _:7,
+					_:1, 127:7, Rest/binary>>,
+				      Z1, Z2, _, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2,
+				   id(nan, TrUserData), F@_2, F@_3, TrUserData);
+d_field_LeilaoReply_taxaMaximaAlocada(<<Value:32/little-float,
+					Rest/binary>>,
+				      Z1, Z2, _, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2,
+				   id(Value, TrUserData), F@_2, F@_3,
+				   TrUserData).
 
-d_field_LeilaoReply_taxaMaxima(<<1:1, X:7,
+d_field_LeilaoReply_taxaMaxima(<<0:16, 128, 127,
 				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, F@_3, TrUserData)
-    when N < 57 ->
-    d_field_LeilaoReply_taxaMaxima(Rest, N + 7,
-				   X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
-d_field_LeilaoReply_taxaMaxima(<<0:1, X:7,
+			       Z1, Z2, F@_1, _, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1,
+				   id(infinity, TrUserData), F@_3, TrUserData);
+d_field_LeilaoReply_taxaMaxima(<<0:16, 128, 255,
 				 Rest/binary>>,
-			       N, Acc, F@_1, _, F@_3, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_LeilaoReply(RestF, 0, 0, F@_1,
-				   NewFValue, F@_3, TrUserData).
+			       Z1, Z2, F@_1, _, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1,
+				   id('-infinity', TrUserData), F@_3,
+				   TrUserData);
+d_field_LeilaoReply_taxaMaxima(<<_:16, 1:1, _:7, _:1,
+				 127:7, Rest/binary>>,
+			       Z1, Z2, F@_1, _, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1,
+				   id(nan, TrUserData), F@_3, TrUserData);
+d_field_LeilaoReply_taxaMaxima(<<Value:32/little-float,
+				 Rest/binary>>,
+			       Z1, Z2, F@_1, _, F@_3, TrUserData) ->
+    dfp_read_field_def_LeilaoReply(Rest, Z1, Z2, F@_1,
+				   id(Value, TrUserData), F@_3, TrUserData).
 
 d_field_LeilaoReply_sucesso(<<1:1, X:7, Rest/binary>>,
 			    N, Acc, F@_1, F@_2, F@_3, TrUserData)
@@ -1180,7 +1194,7 @@ decode_msg_EmissaoReply(Bin, TrUserData) ->
 				    id('$undef', TrUserData),
 				    id('$undef', TrUserData), TrUserData).
 
-dfp_read_field_def_EmissaoReply(<<8, Rest/binary>>, Z1,
+dfp_read_field_def_EmissaoReply(<<13, Rest/binary>>, Z1,
 				Z2, F@_1, F@_2, TrUserData) ->
     d_field_EmissaoReply_taxa(Rest, Z1, Z2, F@_1, F@_2,
 			      TrUserData);
@@ -1207,7 +1221,7 @@ dg_read_field_def_EmissaoReply(<<0:1, X:7,
 			       N, Acc, F@_1, F@_2, TrUserData) ->
     Key = X bsl N + Acc,
     case Key of
-      8 ->
+      13 ->
 	  d_field_EmissaoReply_taxa(Rest, 0, 0, F@_1, F@_2,
 				    TrUserData);
       16 ->
@@ -1235,21 +1249,27 @@ dg_read_field_def_EmissaoReply(<<>>, 0, 0, F@_1, F@_2,
 			       _) ->
     #{taxa => F@_1, sucesso => F@_2}.
 
-d_field_EmissaoReply_taxa(<<1:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    d_field_EmissaoReply_taxa(Rest, N + 7, X bsl N + Acc,
-			      F@_1, F@_2, TrUserData);
-d_field_EmissaoReply_taxa(<<0:1, X:7, Rest/binary>>, N,
-			  Acc, _, F@_2, TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_EmissaoReply(RestF, 0, 0, NewFValue,
-				    F@_2, TrUserData).
+d_field_EmissaoReply_taxa(<<0:16, 128, 127,
+			    Rest/binary>>,
+			  Z1, Z2, _, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2,
+				    id(infinity, TrUserData), F@_2, TrUserData);
+d_field_EmissaoReply_taxa(<<0:16, 128, 255,
+			    Rest/binary>>,
+			  Z1, Z2, _, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2,
+				    id('-infinity', TrUserData), F@_2,
+				    TrUserData);
+d_field_EmissaoReply_taxa(<<_:16, 1:1, _:7, _:1, 127:7,
+			    Rest/binary>>,
+			  Z1, Z2, _, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2,
+				    id(nan, TrUserData), F@_2, TrUserData);
+d_field_EmissaoReply_taxa(<<Value:32/little-float,
+			    Rest/binary>>,
+			  Z1, Z2, _, F@_2, TrUserData) ->
+    dfp_read_field_def_EmissaoReply(Rest, Z1, Z2,
+				    id(Value, TrUserData), F@_2, TrUserData).
 
 d_field_EmissaoReply_sucesso(<<1:1, X:7, Rest/binary>>,
 			     N, Acc, F@_1, F@_2, TrUserData)
@@ -1641,7 +1661,7 @@ dfp_read_field_def_AddDirectoryRequest(<<10,
 				       TrUserData) ->
     d_field_AddDirectoryRequest_tipo(Rest, Z1, Z2, F@_1,
 				     F@_2, F@_3, F@_4, F@_5, TrUserData);
-dfp_read_field_def_AddDirectoryRequest(<<16,
+dfp_read_field_def_AddDirectoryRequest(<<21,
 					 Rest/binary>>,
 				       Z1, Z2, F@_1, F@_2, F@_3, F@_4, F@_5,
 				       TrUserData) ->
@@ -1705,7 +1725,7 @@ dg_read_field_def_AddDirectoryRequest(<<0:1, X:7,
       10 ->
 	  d_field_AddDirectoryRequest_tipo(Rest, 0, 0, F@_1, F@_2,
 					   F@_3, F@_4, F@_5, TrUserData);
-      16 ->
+      21 ->
 	  d_field_AddDirectoryRequest_juro(Rest, 0, 0, F@_1, F@_2,
 					   F@_3, F@_4, F@_5, TrUserData);
       24 ->
@@ -1781,27 +1801,34 @@ d_field_AddDirectoryRequest_tipo(<<0:1, X:7,
 					   NewFValue, F@_2, F@_3, F@_4, F@_5,
 					   TrUserData).
 
-d_field_AddDirectoryRequest_juro(<<1:1, X:7,
+d_field_AddDirectoryRequest_juro(<<0:16, 128, 127,
 				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, F@_3, F@_4, F@_5,
-				 TrUserData)
-    when N < 57 ->
-    d_field_AddDirectoryRequest_juro(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, F@_3, F@_4,
-				     F@_5, TrUserData);
-d_field_AddDirectoryRequest_juro(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, _, F@_3, F@_4, F@_5,
+				 Z1, Z2, F@_1, _, F@_3, F@_4, F@_5,
 				 TrUserData) ->
-    {NewFValue, RestF} = {begin
-			    <<Res:32/signed-native>> = <<(X bsl N +
-							    Acc):32/unsigned-native>>,
-			    id(Res, TrUserData)
-			  end,
-			  Rest},
-    dfp_read_field_def_AddDirectoryRequest(RestF, 0, 0,
-					   F@_1, NewFValue, F@_3, F@_4, F@_5,
-					   TrUserData).
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, id(infinity, TrUserData), F@_3,
+					   F@_4, F@_5, TrUserData);
+d_field_AddDirectoryRequest_juro(<<0:16, 128, 255,
+				   Rest/binary>>,
+				 Z1, Z2, F@_1, _, F@_3, F@_4, F@_5,
+				 TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, id('-infinity', TrUserData),
+					   F@_3, F@_4, F@_5, TrUserData);
+d_field_AddDirectoryRequest_juro(<<_:16, 1:1, _:7, _:1,
+				   127:7, Rest/binary>>,
+				 Z1, Z2, F@_1, _, F@_3, F@_4, F@_5,
+				 TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, id(nan, TrUserData), F@_3,
+					   F@_4, F@_5, TrUserData);
+d_field_AddDirectoryRequest_juro(<<Value:32/little-float,
+				   Rest/binary>>,
+				 Z1, Z2, F@_1, _, F@_3, F@_4, F@_5,
+				 TrUserData) ->
+    dfp_read_field_def_AddDirectoryRequest(Rest, Z1, Z2,
+					   F@_1, id(Value, TrUserData), F@_3,
+					   F@_4, F@_5, TrUserData).
 
 d_field_AddDirectoryRequest_quantia(<<1:1, X:7,
 				      Rest/binary>>,
@@ -2513,7 +2540,7 @@ v_msg_Mensagem(#{tipo := F1} = M, Path, TrUserData) ->
     v_type_string(F1, [tipo | Path], TrUserData),
     case M of
       #{juro := F2} ->
-	  v_type_int32(F2, [juro | Path], TrUserData);
+	  v_type_float(F2, [juro | Path], TrUserData);
       _ -> ok
     end,
     case M of
@@ -2595,9 +2622,9 @@ v_msg_LeilaoReply(#{taxaMaximaAlocada := F1,
 		    taxaMaxima := F2, sucesso := F3} =
 		      M,
 		  Path, TrUserData) ->
-    v_type_int32(F1, [taxaMaximaAlocada | Path],
+    v_type_float(F1, [taxaMaximaAlocada | Path],
 		 TrUserData),
-    v_type_int32(F2, [taxaMaxima | Path], TrUserData),
+    v_type_float(F2, [taxaMaxima | Path], TrUserData),
     v_type_bool(F3, [sucesso | Path], TrUserData),
     lists:foreach(fun (taxaMaximaAlocada) -> ok;
 		      (taxaMaxima) -> ok;
@@ -2621,7 +2648,7 @@ v_msg_LeilaoReply(X, Path, _TrUserData) ->
 -dialyzer({nowarn_function,v_msg_EmissaoReply/3}).
 v_msg_EmissaoReply(#{taxa := F1, sucesso := F2} = M,
 		   Path, TrUserData) ->
-    v_type_int32(F1, [taxa | Path], TrUserData),
+    v_type_float(F1, [taxa | Path], TrUserData),
     v_type_bool(F2, [sucesso | Path], TrUserData),
     lists:foreach(fun (taxa) -> ok;
 		      (sucesso) -> ok;
@@ -2699,7 +2726,7 @@ v_msg_AddDirectoryRequest(#{tipo := F1} = M, Path,
     v_type_string(F1, [tipo | Path], TrUserData),
     case M of
       #{juro := F2} ->
-	  v_type_int32(F2, [juro | Path], TrUserData);
+	  v_type_float(F2, [juro | Path], TrUserData);
       _ -> ok
     end,
     case M of
@@ -2817,6 +2844,19 @@ v_type_bool(1, _Path, _TrUserData) -> ok;
 v_type_bool(X, Path, _TrUserData) ->
     mk_type_error(bad_boolean_value, X, Path).
 
+-compile({nowarn_unused_function,v_type_float/3}).
+-dialyzer({nowarn_function,v_type_float/3}).
+v_type_float(N, _Path, _TrUserData) when is_float(N) ->
+    ok;
+v_type_float(N, _Path, _TrUserData)
+    when is_integer(N) ->
+    ok;
+v_type_float(infinity, _Path, _TrUserData) -> ok;
+v_type_float('-infinity', _Path, _TrUserData) -> ok;
+v_type_float(nan, _Path, _TrUserData) -> ok;
+v_type_float(X, Path, _TrUserData) ->
+    mk_type_error(bad_float_value, X, Path).
+
 -compile({nowarn_unused_function,v_type_string/3}).
 -dialyzer({nowarn_function,v_type_string/3}).
 v_type_string(S, Path, _TrUserData)
@@ -2885,7 +2925,7 @@ get_msg_defs() ->
     [{{msg, 'Mensagem'},
       [#{name => tipo, fnum => 1, rnum => 2, type => string,
 	 occurrence => required, opts => []},
-       #{name => juro, fnum => 2, rnum => 3, type => int32,
+       #{name => juro, fnum => 2, rnum => 3, type => float,
 	 occurrence => optional, opts => []},
        #{name => quantia, fnum => 3, rnum => 4, type => int32,
 	 occurrence => optional, opts => []},
@@ -2904,13 +2944,13 @@ get_msg_defs() ->
 	 occurrence => required, opts => []}]},
      {{msg, 'LeilaoReply'},
       [#{name => taxaMaximaAlocada, fnum => 1, rnum => 2,
-	 type => int32, occurrence => required, opts => []},
+	 type => float, occurrence => required, opts => []},
        #{name => taxaMaxima, fnum => 2, rnum => 3,
-	 type => int32, occurrence => required, opts => []},
+	 type => float, occurrence => required, opts => []},
        #{name => sucesso, fnum => 3, rnum => 4, type => bool,
 	 occurrence => required, opts => []}]},
      {{msg, 'EmissaoReply'},
-      [#{name => taxa, fnum => 1, rnum => 2, type => int32,
+      [#{name => taxa, fnum => 1, rnum => 2, type => float,
 	 occurrence => required, opts => []},
        #{name => sucesso, fnum => 2, rnum => 3, type => bool,
 	 occurrence => required, opts => []}]},
@@ -2931,7 +2971,7 @@ get_msg_defs() ->
      {{msg, 'AddDirectoryRequest'},
       [#{name => tipo, fnum => 1, rnum => 2, type => string,
 	 occurrence => required, opts => []},
-       #{name => juro, fnum => 2, rnum => 3, type => int32,
+       #{name => juro, fnum => 2, rnum => 3, type => float,
 	 occurrence => optional, opts => []},
        #{name => quantia, fnum => 3, rnum => 4, type => int32,
 	 occurrence => optional, opts => []},
@@ -2989,7 +3029,7 @@ fetch_enum_def(EnumName) ->
 find_msg_def('Mensagem') ->
     [#{name => tipo, fnum => 1, rnum => 2, type => string,
        occurrence => required, opts => []},
-     #{name => juro, fnum => 2, rnum => 3, type => int32,
+     #{name => juro, fnum => 2, rnum => 3, type => float,
        occurrence => optional, opts => []},
      #{name => quantia, fnum => 3, rnum => 4, type => int32,
        occurrence => optional, opts => []},
@@ -3008,13 +3048,13 @@ find_msg_def('ExchangeReply') ->
        occurrence => required, opts => []}];
 find_msg_def('LeilaoReply') ->
     [#{name => taxaMaximaAlocada, fnum => 1, rnum => 2,
-       type => int32, occurrence => required, opts => []},
+       type => float, occurrence => required, opts => []},
      #{name => taxaMaxima, fnum => 2, rnum => 3,
-       type => int32, occurrence => required, opts => []},
+       type => float, occurrence => required, opts => []},
      #{name => sucesso, fnum => 3, rnum => 4, type => bool,
        occurrence => required, opts => []}];
 find_msg_def('EmissaoReply') ->
-    [#{name => taxa, fnum => 1, rnum => 2, type => int32,
+    [#{name => taxa, fnum => 1, rnum => 2, type => float,
        occurrence => required, opts => []},
      #{name => sucesso, fnum => 2, rnum => 3, type => bool,
        occurrence => required, opts => []}];
@@ -3035,7 +3075,7 @@ find_msg_def('DirectoryRequest') ->
 find_msg_def('AddDirectoryRequest') ->
     [#{name => tipo, fnum => 1, rnum => 2, type => string,
        occurrence => required, opts => []},
-     #{name => juro, fnum => 2, rnum => 3, type => int32,
+     #{name => juro, fnum => 2, rnum => 3, type => float,
        occurrence => optional, opts => []},
      #{name => quantia, fnum => 3, rnum => 4, type => int32,
        occurrence => optional, opts => []},

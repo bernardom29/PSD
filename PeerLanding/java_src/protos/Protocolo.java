@@ -33,13 +33,13 @@ public final class Protocolo {
         getTipoBytes();
 
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
     boolean hasJuro();
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
-    int getJuro();
+    float getJuro();
 
     /**
      * <code>optional int32 quantia = 3;</code>
@@ -92,7 +92,7 @@ public final class Protocolo {
     }
     private Mensagem() {
       tipo_ = "";
-      juro_ = 0;
+      juro_ = 0F;
       quantia_ = 0;
       empresa_ = "";
       investidor_ = "";
@@ -128,9 +128,9 @@ public final class Protocolo {
               tipo_ = bs;
               break;
             }
-            case 16: {
+            case 21: {
               bitField0_ |= 0x00000002;
-              juro_ = input.readInt32();
+              juro_ = input.readFloat();
               break;
             }
             case 24: {
@@ -226,17 +226,17 @@ public final class Protocolo {
     }
 
     public static final int JURO_FIELD_NUMBER = 2;
-    private int juro_;
+    private float juro_;
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
     public boolean hasJuro() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
-    public int getJuro() {
+    public float getJuro() {
       return juro_;
     }
 
@@ -361,7 +361,7 @@ public final class Protocolo {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, tipo_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, juro_);
+        output.writeFloat(2, juro_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, quantia_);
@@ -386,7 +386,7 @@ public final class Protocolo {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, juro_);
+          .computeFloatSize(2, juro_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -421,8 +421,10 @@ public final class Protocolo {
       }
       result = result && (hasJuro() == other.hasJuro());
       if (hasJuro()) {
-        result = result && (getJuro()
-            == other.getJuro());
+        result = result && (
+            java.lang.Float.floatToIntBits(getJuro())
+            == java.lang.Float.floatToIntBits(
+                other.getJuro()));
       }
       result = result && (hasQuantia() == other.hasQuantia());
       if (hasQuantia()) {
@@ -456,7 +458,8 @@ public final class Protocolo {
       }
       if (hasJuro()) {
         hash = (37 * hash) + JURO_FIELD_NUMBER;
-        hash = (53 * hash) + getJuro();
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getJuro());
       }
       if (hasQuantia()) {
         hash = (37 * hash) + QUANTIA_FIELD_NUMBER;
@@ -605,7 +608,7 @@ public final class Protocolo {
         super.clear();
         tipo_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        juro_ = 0;
+        juro_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
         quantia_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -840,34 +843,34 @@ public final class Protocolo {
         return this;
       }
 
-      private int juro_ ;
+      private float juro_ ;
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
       public boolean hasJuro() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
-      public int getJuro() {
+      public float getJuro() {
         return juro_;
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
-      public Builder setJuro(int value) {
+      public Builder setJuro(float value) {
         bitField0_ |= 0x00000002;
         juro_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
       public Builder clearJuro() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        juro_ = 0;
+        juro_ = 0F;
         onChanged();
         return this;
       }
@@ -2354,22 +2357,22 @@ public final class Protocolo {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 taxaMaximaAlocada = 1;</code>
+     * <code>required float taxaMaximaAlocada = 1;</code>
      */
     boolean hasTaxaMaximaAlocada();
     /**
-     * <code>required int32 taxaMaximaAlocada = 1;</code>
+     * <code>required float taxaMaximaAlocada = 1;</code>
      */
-    int getTaxaMaximaAlocada();
+    float getTaxaMaximaAlocada();
 
     /**
-     * <code>required int32 taxaMaxima = 2;</code>
+     * <code>required float taxaMaxima = 2;</code>
      */
     boolean hasTaxaMaxima();
     /**
-     * <code>required int32 taxaMaxima = 2;</code>
+     * <code>required float taxaMaxima = 2;</code>
      */
-    int getTaxaMaxima();
+    float getTaxaMaxima();
 
     /**
      * <code>required bool sucesso = 3;</code>
@@ -2393,8 +2396,8 @@ public final class Protocolo {
       super(builder);
     }
     private LeilaoReply() {
-      taxaMaximaAlocada_ = 0;
-      taxaMaxima_ = 0;
+      taxaMaximaAlocada_ = 0F;
+      taxaMaxima_ = 0F;
       sucesso_ = false;
     }
 
@@ -2422,14 +2425,14 @@ public final class Protocolo {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 13: {
               bitField0_ |= 0x00000001;
-              taxaMaximaAlocada_ = input.readInt32();
+              taxaMaximaAlocada_ = input.readFloat();
               break;
             }
-            case 16: {
+            case 21: {
               bitField0_ |= 0x00000002;
-              taxaMaxima_ = input.readInt32();
+              taxaMaxima_ = input.readFloat();
               break;
             }
             case 24: {
@@ -2471,32 +2474,32 @@ public final class Protocolo {
 
     private int bitField0_;
     public static final int TAXAMAXIMAALOCADA_FIELD_NUMBER = 1;
-    private int taxaMaximaAlocada_;
+    private float taxaMaximaAlocada_;
     /**
-     * <code>required int32 taxaMaximaAlocada = 1;</code>
+     * <code>required float taxaMaximaAlocada = 1;</code>
      */
     public boolean hasTaxaMaximaAlocada() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 taxaMaximaAlocada = 1;</code>
+     * <code>required float taxaMaximaAlocada = 1;</code>
      */
-    public int getTaxaMaximaAlocada() {
+    public float getTaxaMaximaAlocada() {
       return taxaMaximaAlocada_;
     }
 
     public static final int TAXAMAXIMA_FIELD_NUMBER = 2;
-    private int taxaMaxima_;
+    private float taxaMaxima_;
     /**
-     * <code>required int32 taxaMaxima = 2;</code>
+     * <code>required float taxaMaxima = 2;</code>
      */
     public boolean hasTaxaMaxima() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 taxaMaxima = 2;</code>
+     * <code>required float taxaMaxima = 2;</code>
      */
-    public int getTaxaMaxima() {
+    public float getTaxaMaxima() {
       return taxaMaxima_;
     }
 
@@ -2542,10 +2545,10 @@ public final class Protocolo {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, taxaMaximaAlocada_);
+        output.writeFloat(1, taxaMaximaAlocada_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, taxaMaxima_);
+        output.writeFloat(2, taxaMaxima_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeBool(3, sucesso_);
@@ -2561,11 +2564,11 @@ public final class Protocolo {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, taxaMaximaAlocada_);
+          .computeFloatSize(1, taxaMaximaAlocada_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, taxaMaxima_);
+          .computeFloatSize(2, taxaMaxima_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2589,13 +2592,17 @@ public final class Protocolo {
       boolean result = true;
       result = result && (hasTaxaMaximaAlocada() == other.hasTaxaMaximaAlocada());
       if (hasTaxaMaximaAlocada()) {
-        result = result && (getTaxaMaximaAlocada()
-            == other.getTaxaMaximaAlocada());
+        result = result && (
+            java.lang.Float.floatToIntBits(getTaxaMaximaAlocada())
+            == java.lang.Float.floatToIntBits(
+                other.getTaxaMaximaAlocada()));
       }
       result = result && (hasTaxaMaxima() == other.hasTaxaMaxima());
       if (hasTaxaMaxima()) {
-        result = result && (getTaxaMaxima()
-            == other.getTaxaMaxima());
+        result = result && (
+            java.lang.Float.floatToIntBits(getTaxaMaxima())
+            == java.lang.Float.floatToIntBits(
+                other.getTaxaMaxima()));
       }
       result = result && (hasSucesso() == other.hasSucesso());
       if (hasSucesso()) {
@@ -2615,11 +2622,13 @@ public final class Protocolo {
       hash = (19 * hash) + getDescriptor().hashCode();
       if (hasTaxaMaximaAlocada()) {
         hash = (37 * hash) + TAXAMAXIMAALOCADA_FIELD_NUMBER;
-        hash = (53 * hash) + getTaxaMaximaAlocada();
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getTaxaMaximaAlocada());
       }
       if (hasTaxaMaxima()) {
         hash = (37 * hash) + TAXAMAXIMA_FIELD_NUMBER;
-        hash = (53 * hash) + getTaxaMaxima();
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getTaxaMaxima());
       }
       if (hasSucesso()) {
         hash = (37 * hash) + SUCESSO_FIELD_NUMBER;
@@ -2759,9 +2768,9 @@ public final class Protocolo {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        taxaMaximaAlocada_ = 0;
+        taxaMaximaAlocada_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000001);
-        taxaMaxima_ = 0;
+        taxaMaxima_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
         sucesso_ = false;
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -2902,66 +2911,66 @@ public final class Protocolo {
       }
       private int bitField0_;
 
-      private int taxaMaximaAlocada_ ;
+      private float taxaMaximaAlocada_ ;
       /**
-       * <code>required int32 taxaMaximaAlocada = 1;</code>
+       * <code>required float taxaMaximaAlocada = 1;</code>
        */
       public boolean hasTaxaMaximaAlocada() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 taxaMaximaAlocada = 1;</code>
+       * <code>required float taxaMaximaAlocada = 1;</code>
        */
-      public int getTaxaMaximaAlocada() {
+      public float getTaxaMaximaAlocada() {
         return taxaMaximaAlocada_;
       }
       /**
-       * <code>required int32 taxaMaximaAlocada = 1;</code>
+       * <code>required float taxaMaximaAlocada = 1;</code>
        */
-      public Builder setTaxaMaximaAlocada(int value) {
+      public Builder setTaxaMaximaAlocada(float value) {
         bitField0_ |= 0x00000001;
         taxaMaximaAlocada_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 taxaMaximaAlocada = 1;</code>
+       * <code>required float taxaMaximaAlocada = 1;</code>
        */
       public Builder clearTaxaMaximaAlocada() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        taxaMaximaAlocada_ = 0;
+        taxaMaximaAlocada_ = 0F;
         onChanged();
         return this;
       }
 
-      private int taxaMaxima_ ;
+      private float taxaMaxima_ ;
       /**
-       * <code>required int32 taxaMaxima = 2;</code>
+       * <code>required float taxaMaxima = 2;</code>
        */
       public boolean hasTaxaMaxima() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int32 taxaMaxima = 2;</code>
+       * <code>required float taxaMaxima = 2;</code>
        */
-      public int getTaxaMaxima() {
+      public float getTaxaMaxima() {
         return taxaMaxima_;
       }
       /**
-       * <code>required int32 taxaMaxima = 2;</code>
+       * <code>required float taxaMaxima = 2;</code>
        */
-      public Builder setTaxaMaxima(int value) {
+      public Builder setTaxaMaxima(float value) {
         bitField0_ |= 0x00000002;
         taxaMaxima_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 taxaMaxima = 2;</code>
+       * <code>required float taxaMaxima = 2;</code>
        */
       public Builder clearTaxaMaxima() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        taxaMaxima_ = 0;
+        taxaMaxima_ = 0F;
         onChanged();
         return this;
       }
@@ -3055,13 +3064,13 @@ public final class Protocolo {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 taxa = 1;</code>
+     * <code>required float taxa = 1;</code>
      */
     boolean hasTaxa();
     /**
-     * <code>required int32 taxa = 1;</code>
+     * <code>required float taxa = 1;</code>
      */
-    int getTaxa();
+    float getTaxa();
 
     /**
      * <code>required bool sucesso = 2;</code>
@@ -3085,7 +3094,7 @@ public final class Protocolo {
       super(builder);
     }
     private EmissaoReply() {
-      taxa_ = 0;
+      taxa_ = 0F;
       sucesso_ = false;
     }
 
@@ -3113,9 +3122,9 @@ public final class Protocolo {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 13: {
               bitField0_ |= 0x00000001;
-              taxa_ = input.readInt32();
+              taxa_ = input.readFloat();
               break;
             }
             case 16: {
@@ -3157,17 +3166,17 @@ public final class Protocolo {
 
     private int bitField0_;
     public static final int TAXA_FIELD_NUMBER = 1;
-    private int taxa_;
+    private float taxa_;
     /**
-     * <code>required int32 taxa = 1;</code>
+     * <code>required float taxa = 1;</code>
      */
     public boolean hasTaxa() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 taxa = 1;</code>
+     * <code>required float taxa = 1;</code>
      */
-    public int getTaxa() {
+    public float getTaxa() {
       return taxa_;
     }
 
@@ -3209,7 +3218,7 @@ public final class Protocolo {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, taxa_);
+        output.writeFloat(1, taxa_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBool(2, sucesso_);
@@ -3225,7 +3234,7 @@ public final class Protocolo {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, taxa_);
+          .computeFloatSize(1, taxa_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3249,8 +3258,10 @@ public final class Protocolo {
       boolean result = true;
       result = result && (hasTaxa() == other.hasTaxa());
       if (hasTaxa()) {
-        result = result && (getTaxa()
-            == other.getTaxa());
+        result = result && (
+            java.lang.Float.floatToIntBits(getTaxa())
+            == java.lang.Float.floatToIntBits(
+                other.getTaxa()));
       }
       result = result && (hasSucesso() == other.hasSucesso());
       if (hasSucesso()) {
@@ -3270,7 +3281,8 @@ public final class Protocolo {
       hash = (19 * hash) + getDescriptor().hashCode();
       if (hasTaxa()) {
         hash = (37 * hash) + TAXA_FIELD_NUMBER;
-        hash = (53 * hash) + getTaxa();
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getTaxa());
       }
       if (hasSucesso()) {
         hash = (37 * hash) + SUCESSO_FIELD_NUMBER;
@@ -3410,7 +3422,7 @@ public final class Protocolo {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        taxa_ = 0;
+        taxa_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000001);
         sucesso_ = false;
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -3541,34 +3553,34 @@ public final class Protocolo {
       }
       private int bitField0_;
 
-      private int taxa_ ;
+      private float taxa_ ;
       /**
-       * <code>required int32 taxa = 1;</code>
+       * <code>required float taxa = 1;</code>
        */
       public boolean hasTaxa() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 taxa = 1;</code>
+       * <code>required float taxa = 1;</code>
        */
-      public int getTaxa() {
+      public float getTaxa() {
         return taxa_;
       }
       /**
-       * <code>required int32 taxa = 1;</code>
+       * <code>required float taxa = 1;</code>
        */
-      public Builder setTaxa(int value) {
+      public Builder setTaxa(float value) {
         bitField0_ |= 0x00000001;
         taxa_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 taxa = 1;</code>
+       * <code>required float taxa = 1;</code>
        */
       public Builder clearTaxa() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        taxa_ = 0;
+        taxa_ = 0F;
         onChanged();
         return this;
       }
@@ -5371,13 +5383,13 @@ public final class Protocolo {
         getTipoBytes();
 
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
     boolean hasJuro();
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
-    int getJuro();
+    float getJuro();
 
     /**
      * <code>optional int32 quantia = 3;</code>
@@ -5430,7 +5442,7 @@ public final class Protocolo {
     }
     private AddDirectoryRequest() {
       tipo_ = "";
-      juro_ = 0;
+      juro_ = 0F;
       quantia_ = 0;
       empresa_ = "";
       investidor_ = "";
@@ -5466,9 +5478,9 @@ public final class Protocolo {
               tipo_ = bs;
               break;
             }
-            case 16: {
+            case 21: {
               bitField0_ |= 0x00000002;
-              juro_ = input.readInt32();
+              juro_ = input.readFloat();
               break;
             }
             case 24: {
@@ -5564,17 +5576,17 @@ public final class Protocolo {
     }
 
     public static final int JURO_FIELD_NUMBER = 2;
-    private int juro_;
+    private float juro_;
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
     public boolean hasJuro() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional int32 juro = 2;</code>
+     * <code>optional float juro = 2;</code>
      */
-    public int getJuro() {
+    public float getJuro() {
       return juro_;
     }
 
@@ -5699,7 +5711,7 @@ public final class Protocolo {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, tipo_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, juro_);
+        output.writeFloat(2, juro_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         output.writeInt32(3, quantia_);
@@ -5724,7 +5736,7 @@ public final class Protocolo {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, juro_);
+          .computeFloatSize(2, juro_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
@@ -5759,8 +5771,10 @@ public final class Protocolo {
       }
       result = result && (hasJuro() == other.hasJuro());
       if (hasJuro()) {
-        result = result && (getJuro()
-            == other.getJuro());
+        result = result && (
+            java.lang.Float.floatToIntBits(getJuro())
+            == java.lang.Float.floatToIntBits(
+                other.getJuro()));
       }
       result = result && (hasQuantia() == other.hasQuantia());
       if (hasQuantia()) {
@@ -5794,7 +5808,8 @@ public final class Protocolo {
       }
       if (hasJuro()) {
         hash = (37 * hash) + JURO_FIELD_NUMBER;
-        hash = (53 * hash) + getJuro();
+        hash = (53 * hash) + java.lang.Float.floatToIntBits(
+            getJuro());
       }
       if (hasQuantia()) {
         hash = (37 * hash) + QUANTIA_FIELD_NUMBER;
@@ -5943,7 +5958,7 @@ public final class Protocolo {
         super.clear();
         tipo_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        juro_ = 0;
+        juro_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000002);
         quantia_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -6178,34 +6193,34 @@ public final class Protocolo {
         return this;
       }
 
-      private int juro_ ;
+      private float juro_ ;
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
       public boolean hasJuro() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
-      public int getJuro() {
+      public float getJuro() {
         return juro_;
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
-      public Builder setJuro(int value) {
+      public Builder setJuro(float value) {
         bitField0_ |= 0x00000002;
         juro_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 juro = 2;</code>
+       * <code>optional float juro = 2;</code>
        */
       public Builder clearJuro() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        juro_ = 0;
+        juro_ = 0F;
         onChanged();
         return this;
       }
@@ -8387,19 +8402,19 @@ public final class Protocolo {
     java.lang.String[] descriptorData = {
       "\n\037java_src/Protos/protocolo.proto\022\006Proto" +
       "s\"\\\n\010Mensagem\022\014\n\004tipo\030\001 \002(\t\022\014\n\004juro\030\002 \001(" +
-      "\005\022\017\n\007quantia\030\003 \001(\005\022\017\n\007empresa\030\004 \001(\t\022\022\n\ni" +
+      "\002\022\017\n\007quantia\030\003 \001(\005\022\017\n\007empresa\030\004 \001(\t\022\022\n\ni" +
       "nvestidor\030\005 \001(\t\"B\n\017ExchangeRequest\022\"\n\010me" +
       "nsagem\030\001 \002(\0132\020.Protos.Mensagem\022\013\n\003pid\030\002 " +
       "\002(\014\" \n\rExchangeReply\022\017\n\007sucesso\030\001 \002(\010\"M\n" +
-      "\013LeilaoReply\022\031\n\021taxaMaximaAlocada\030\001 \002(\005\022" +
-      "\022\n\ntaxaMaxima\030\002 \002(\005\022\017\n\007sucesso\030\003 \002(\010\"-\n\014" +
-      "EmissaoReply\022\014\n\004taxa\030\001 \002(\005\022\017\n\007sucesso\030\002 " +
+      "\013LeilaoReply\022\031\n\021taxaMaximaAlocada\030\001 \002(\002\022" +
+      "\022\n\ntaxaMaxima\030\002 \002(\002\022\017\n\007sucesso\030\003 \002(\010\"-\n\014" +
+      "EmissaoReply\022\014\n\004taxa\030\001 \002(\002\022\017\n\007sucesso\030\002 " +
       "\002(\010\"m\n\016DirectoryReply\022\017\n\007success\030\001 \002(\010\022#" +
       "\n\006leilao\030\002 \001(\0132\023.Protos.LeilaoReply\022%\n\007e" +
       "missao\030\003 \001(\0132\024.Protos.EmissaoReply\"1\n\020Di" +
       "rectoryRequest\022\014\n\004tipo\030\001 \002(\t\022\017\n\007empresa\030" +
       "\002 \002(\t\"g\n\023AddDirectoryRequest\022\014\n\004tipo\030\001 \002" +
-      "(\t\022\014\n\004juro\030\002 \001(\005\022\017\n\007quantia\030\003 \001(\005\022\017\n\007emp" +
+      "(\t\022\014\n\004juro\030\002 \001(\002\022\017\n\007quantia\030\003 \001(\005\022\017\n\007emp" +
       "resa\030\004 \001(\t\022\022\n\ninvestidor\030\005 \001(\t\"-\n\007AuthRe" +
       "q\022\020\n\010username\030\001 \002(\t\022\020\n\010password\030\002 \002(\t\"(\n" +
       "\007AuthRep\022\017\n\007sucesso\030\001 \002(\010\022\014\n\004tipo\030\002 \001(\005\"" +
