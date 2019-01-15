@@ -6,14 +6,14 @@ import java.util.Date;
 import java.util.List;
 
 public class Leilao {
-    private int taxaMaxima;
+    private float taxaMaxima;
     private int montanteTotal;
     private String empresa;
     private Date data;
     private boolean sucesso;
     private List<Licitacao> licitacoes;
 
-    public Leilao(int taxaMaxima, int montanteTotal, String empresa, boolean sucesso) {
+    public Leilao(float taxaMaxima, int montanteTotal, String empresa, boolean sucesso) {
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
@@ -22,11 +22,11 @@ public class Leilao {
         this.licitacoes = new ArrayList<Licitacao>();
     }
 
-    public int getTaxaMaxima() {
+    public float getTaxaMaxima() {
         return taxaMaxima;
     }
 
-    public void setTaxaMaxima(int taxaMaxima) {
+    public void setTaxaMaxima(float taxaMaxima) {
         this.taxaMaxima = taxaMaxima;
     }
 
@@ -60,6 +60,10 @@ public class Leilao {
 
     public void setSucesso(boolean sucesso) {
         this.sucesso = sucesso;
+    }
+
+    public float getTaxaLicitacaoMaxima () {
+        return licitacoes.stream().map(a -> a.taxa).reduce(Float.MIN_VALUE,Float::max);
     }
 
     public List<Licitacao> getLicitacoes() {
