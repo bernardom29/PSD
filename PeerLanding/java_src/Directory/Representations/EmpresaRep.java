@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class EmpresaRep{
@@ -16,7 +17,14 @@ public class EmpresaRep{
     @JsonCreator
     public EmpresaRep (@JsonProperty("nome") String nome, Empresa empresa) {
         this.nome = nome;
-        this.leiloes = new ArrayList<>();
-        this.emissoes = new ArrayList<>();
+        this.leiloes = empresa.historicoLeiloes.stream().map(e -> new LeilaoRep(e)).collect(Collectors.toList());
+        this.emissoes = empresa.historicoEmissoes.stream().map(e -> new EmissaoRep(e)).collect(Collectors.toList());
+    }
+
+    @JsonCreator
+    public EmpresaRep(Empresa value) {
+        this.nome = value.nome;
+        this.leiloes = value.historicoLeiloes.stream().map(e -> new LeilaoRep(e)).collect(Collectors.toList());
+        this.emissoes = value.historicoEmissoes.stream().map(e -> new EmissaoRep(e)).collect(Collectors.toList());
     }
 }

@@ -1,11 +1,10 @@
 package Directory;
 
-import Directory.Resources.Historico;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 
 // import com.codahale.metrics.health.HealthCheck;
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import io.dropwizard.setup.Bootstrap;
 
 public class DirectoryApp extends Application<DirectoryConf>{
     public static void main(String[] args) throws Exception {

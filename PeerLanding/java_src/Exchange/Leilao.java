@@ -1,15 +1,14 @@
 package Exchange;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class Leilao {
     private float taxaMaxima;
     private int montanteTotal;
     private String empresa;
-    private Date data;
+    private LocalDateTime data;
     private boolean sucesso;
     private List<Licitacao> licitacoes;
 
@@ -17,7 +16,7 @@ public class Leilao {
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
-        this.data = new Date();
+        this.data = LocalDateTime.now();
         this.sucesso = false;
         this.licitacoes = new ArrayList<Licitacao>();
     }
@@ -46,11 +45,11 @@ public class Leilao {
         this.empresa = empresa;
     }
 
-    public Date getData() {
+    public LocalDateTime getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(LocalDateTime data) {
         this.data = data;
     }
 

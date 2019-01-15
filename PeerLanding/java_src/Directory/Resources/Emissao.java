@@ -13,18 +13,10 @@ public class Emissao{
     public boolean sucesso;
     public List<Licitacao> licitacoes;
 
-    public Emissao(){
-        this.id = 0;
-        this.taxa = 0;
-        this.montanteTotal = 0;
-        this.empresa = null;
-        this.sucesso = false;
-        this.licitacoes = null;
-    }
 
     public Emissao(int id, int taxaMaxima, int montanteTotal, String empresa, boolean sucesso, List<Licitacao> licitacoes){
         this.id = id;
-        this.taxa = taxa;
+        this.taxa = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
         this.sucesso = sucesso;
@@ -43,7 +35,7 @@ public class Emissao{
         StringBuilder sb = new StringBuilder();
         sb.append("id: ")
                 .append(this.id).append("\n")
-                .append("taxa: ")
+                .append("taxa:")
                 .append(this.taxa).append("\n")
                 .append("montanteTotal: ")
                 .append(this.montanteTotal).append("\n")

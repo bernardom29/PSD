@@ -14,15 +14,14 @@ public class Licitacao {
     }
 
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("id: ")
-                .append(this.id).append("\n")
-                .append("investidor: ")
-                .append(this.investidor).append("\n")
-                .append("taxa: ")
-                .append(this.taxa).append("\n")
-                .append("quantia: ")
-                .append(this.quantia).append("\n");
-        return sb.toString();
+        String sb = "id: " +
+                this.id + "\n" +
+                "investidor: " +
+                this.investidor + "\n" +
+                "taxa: " +
+                this.taxa + "\n" +
+                "quantia: " +
+                this.quantia + "\n";
+        return sb;
     }
 }

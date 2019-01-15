@@ -1,7 +1,7 @@
 package Exchange;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Emissao {
@@ -9,7 +9,7 @@ public class Emissao {
     private int montanteTotal;
     private String empresa;
     private boolean sucesso;
-    private Date data;
+    private LocalDateTime data;
     private List<Licitacao> licitacoes;
 
     public Emissao(float taxa, int montanteTotal, String empresa) {
@@ -17,7 +17,7 @@ public class Emissao {
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
         this.sucesso = false;
-        this.data = new Date();
+        this.data = LocalDateTime.now();
         this.licitacoes = new ArrayList<Licitacao>();
     }
 
@@ -41,11 +41,11 @@ public class Emissao {
         this.empresa = empresa;
     }
 
-    public Date getData() {
+    public LocalDateTime getData() {
         return data;
     }
 
-    public void setData(Date data) {
+    public void setData(LocalDateTime data) {
         this.data = data;
     }
 

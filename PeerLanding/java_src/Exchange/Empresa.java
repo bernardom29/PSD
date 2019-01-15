@@ -18,13 +18,13 @@ public class Empresa {
         Emissao emissao = this.historicoEmissoes.lastElement();
         Leilao leilao = this.historicoLeiloes.lastElement();
         if(leilao!=null && emissao!=null) {
-            if (leilao.getData().after(emissao.getData()) && leilao.isSucesso()){
+            if (leilao.getData().isAfter(emissao.getData()) && leilao.isSucesso()){
                 return leilao.getTaxaLicitacaoMaxima();
             }
-            else if (!leilao.getData().after(emissao.getData()) && emissao.isSucesso()){
+            else if (!leilao.getData().isAfter(emissao.getData()) && emissao.isSucesso()){
                 return emissao.getTaxa();
             }
-            else if (!leilao.getData().after(emissao.getData()) && !emissao.isSucesso()){
+            else if (!leilao.getData().isAfter(emissao.getData()) && !emissao.isSucesso()){
                 return (float) (emissao.getTaxa() * 1.10);
             }
         } else if (leilao != null) {
