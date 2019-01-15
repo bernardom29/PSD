@@ -29,13 +29,16 @@ public class TerminaLeilao implements Runnable {
             e.printStackTrace();
         }
         Leilao leilao = leiloes.remove(this.empresa);
-        //TODO
-        //fazer verificação do sucesso
+        if(leilao.getMontanteTotal()<=leilao.getInvestimentoTotal()) {
+            leilao.setSucesso(true);
+            System.out.println("O Leilão foi um sucesso.");
+        }
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoLeiloes.add(leilao);
         System.out.println(empresa);
         synchronized (this.pub){
             this.pub.send("leilao-"+this.empresa+"-Terminado");
         }
+        //TODO Post de fim de leilao
     }
 }

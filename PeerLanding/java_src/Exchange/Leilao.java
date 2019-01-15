@@ -13,12 +13,12 @@ public class Leilao {
     private boolean sucesso;
     private List<Licitacao> licitacoes;
 
-    public Leilao(float taxaMaxima, int montanteTotal, String empresa, boolean sucesso) {
+    public Leilao(float taxaMaxima, int montanteTotal, String empresa) {
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
         this.data = new Date();
-        this.sucesso = sucesso;
+        this.sucesso = false;
         this.licitacoes = new ArrayList<Licitacao>();
     }
 
@@ -64,6 +64,10 @@ public class Leilao {
 
     public float getTaxaLicitacaoMaxima () {
         return licitacoes.stream().map(a -> a.taxa).reduce(Float.MIN_VALUE,Float::max);
+    }
+
+    public int getInvestimentoTotal () {
+        return licitacoes.stream().map(a -> a.quantia).reduce(Integer::sum).get();
     }
 
     public List<Licitacao> getLicitacoes() {

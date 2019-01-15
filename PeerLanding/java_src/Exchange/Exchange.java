@@ -68,7 +68,7 @@ public class Exchange implements Runnable {
             Leilao ultimoLeilao = empresaObj.historicoLeiloes.lastElement();
             if(ultimoLeilao.isSucesso() &&  quantia % 1000 == 0) {
                 float taxaMaxima = empresaObj.taxaEmissao();
-                Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa,false);
+                Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa);
                 emissoes.put(empresa,novaEmissao);
                 new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub)).start();
                 synchronized (this.pub) {
@@ -84,7 +84,7 @@ public class Exchange implements Runnable {
     public boolean leilao(String empresa, int quantia, float juro){
         Leilao leilaoAtual = leiloes.getOrDefault(empresa,null);
         if (leilaoAtual == null &&  quantia % 1000 == 0){
-            Leilao leilao = new Leilao(juro,quantia,empresa,false);
+            Leilao leilao = new Leilao(juro,quantia,empresa);
             this.leiloes.put(empresa,leilao);
             new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub)).start();
             synchronized (this.pub) {

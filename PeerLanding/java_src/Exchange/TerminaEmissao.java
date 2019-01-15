@@ -27,11 +27,14 @@ public class TerminaEmissao implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("A emissão terminou.");
         Emissao emissao = emissoes.remove(this.empresa);
+        emissao.setSucesso(true);
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoEmissoes.add(emissao);
         synchronized (this.pub){
             pub.send("emissao-"+this.empresa+"-Terminado");
         }
+        //TODO Post de fim de emissão
     }
 }

@@ -12,13 +12,17 @@ public class Emissao {
     private Date data;
     private List<Licitacao> licitacoes;
 
-    public Emissao(float taxa, int montanteTotal, String empresa, boolean sucesso) {
+    public Emissao(float taxa, int montanteTotal, String empresa) {
         this.taxa = taxa;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
-        this.sucesso = sucesso;
+        this.sucesso = false;
         this.data = new Date();
         this.licitacoes = new ArrayList<Licitacao>();
+    }
+
+    public void setSucesso(boolean sucesso) {
+        this.sucesso = sucesso;
     }
 
     public int getMontanteTotal() {
