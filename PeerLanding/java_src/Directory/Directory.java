@@ -110,26 +110,30 @@ public class Directory {
     }
 
     @PUT
-    @Path("/empresas/{nome}/leiloes/{id}/{sucesso}")
-    public Response postLeilaoSucesso(
+    @Path("/empresas/{nome}/leiloes/{id}/{sucesso}/{ativo}")
+    public Response putLeilaoSucesso(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
-            @PathParam("sucesso") boolean sucesso
+            @PathParam("sucesso") boolean sucesso,
+            @PathParam("ativo") boolean ativo
     ){
         Leilao leilao = empresas.get(nome).getLeilao(id);
         leilao.sucesso = sucesso;
+        leilao.ativo=ativo;
         return Response.status(201).build();
     }
 
     @PUT
-    @Path("/empresas/{nome}/emissoes/{id}/{sucesso}")
-    public Response postEmissaoSucesso(
+    @Path("/empresas/{nome}/emissoes/{id}/{sucesso}/{ativo}")
+    public Response putEmissaoSucesso(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
-            @PathParam("sucesso") boolean sucesso
+            @PathParam("sucesso") boolean sucesso,
+            @PathParam("ativo") boolean ativo
     ){
         Emissao emissao = empresas.get(nome).getEmissao(id);
         emissao.sucesso = sucesso;
+        emissao.ativo=ativo;
         return Response.status(201).build();
     }
 

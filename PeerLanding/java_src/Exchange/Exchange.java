@@ -49,7 +49,6 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("leilao-" + empresa + "-nova licitação de: " + investidor + " juro: " + juro + " quantia: " + quantia);
             }
-            ///empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}
             this.postDiretorioInvestidor("licitar", empresa,empresas.get(empresa).historicoLeiloes.size() + 1, leilaoAtual.getLicitacoes().size() + 1, investidor, juro, quantia);
             return true;
         }else{
@@ -65,7 +64,6 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("emissao-" + empresa + "-nova licitação de: " + investidor + " quantia: " + quantia);
             }
-            ///empresas/{nome}/emissoes/{idL}/{id}/{investidor}⁄{quantia}
             this.postDiretorioInvestidor("emprestimo", empresa,empresas.get(empresa).historicoEmissoes.size() + 1, emissaoAtual.getLicitacoes().size() +1, investidor, 0, quantia);
             return true;
         } else {
@@ -79,14 +77,14 @@ public class Exchange implements Runnable {
             Leilao ultimoLeilao = empresaObj.historicoLeiloes.lastElement();
             if(ultimoLeilao.isSucesso() &&  quantia % 1000 == 0) {
                 float taxaMaxima = empresaObj.taxaEmissao();
+                int idL = empresas.get(empresa).historicoLeiloes.size() + 1;
                 Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa);
                 emissoes.put(empresa,novaEmissao);
-                new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub)).start();
+                new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub,idL)).start();
                 synchronized (this.pub) {
                     this.pub.send("emissao-"+empresa+"-Começou uma emissao");
                 }
-                ///empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}/
-                this.postDiretorioEmpresa("emissao", empresa,empresas.get(empresa).historicoEmissoes.size() + 1, taxaMaxima, quantia);
+                this.postDiretorioEmpresa("emissao", empresa,idL, taxaMaxima, quantia);
                 return true;
             }
         }
@@ -99,11 +97,12 @@ public class Exchange implements Runnable {
         if (leilaoAtual == null &&  quantia % 1000 == 0){
             Leilao leilao = new Leilao(juro,quantia,empresa);
             this.leiloes.put(empresa,leilao);
-            new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub)).start();
+            int idL = empresas.get(empresa).historicoLeiloes.size() + 1;
+            new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub,idL)).start();
             synchronized (this.pub) {
                 this.pub.send("leilao-"+empresa+"-Começou um leilão");
             }
-            this.postDiretorioEmpresa("leilao", empresa,empresas.get(empresa).historicoLeiloes.size() + 1, juro, quantia);
+            this.postDiretorioEmpresa("leilao", empresa,idL, juro, quantia);
             return true;
         }
         return false;
@@ -112,47 +111,34 @@ public class Exchange implements Runnable {
     private void postDiretorioEmpresa (String tipo, String empresa, int idL, float taxaMaxima, int quantia) {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost=null;
-        List<NameValuePair> params = new ArrayList<>();
-
         if(tipo.equals("leilao")) {
-            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}");
+            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + taxaMaxima + "/" + quantia;
+            httppost = new HttpPost(uri);
         } else if (tipo.equals("emissao")) {
-            httppost = new HttpPost("http://localhost/empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}");
+            String uri = "http://localhost/empresas/" + empresa + "/emissoes/" + idL + "/" + taxaMaxima + "/" + quantia;
+            httppost = new HttpPost(uri);
         }
 
-        params.add(new BasicNameValuePair("nome", empresa));
-        params.add(new BasicNameValuePair("id", Integer.toString(idL)));
-        params.add(new BasicNameValuePair("taxaMaxima", Float.toString(taxaMaxima)));
-        params.add(new BasicNameValuePair("montanteTotal", Integer.toString(quantia)));
-
-        sendPost(httpclient,httppost,params);
+        sendPost(httpclient,httppost);
 
     }
 
     private void postDiretorioInvestidor(String tipo, String empresa, int idL, int id, String investidor, float juro, int quantia) {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost=null;
-        List<NameValuePair> params = new ArrayList<>();
         if(tipo.equals("licitar")) {
-            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}");
-            params.add(new BasicNameValuePair("taxa", Float.toString(juro)));
+            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor +"⁄"+ juro + "⁄" + quantia;
+            httppost = new HttpPost(uri);
         } else if (tipo.equals("emprestimo")) {
-            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{quantia}");
+            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor + "⁄" + quantia;
+            httppost = new HttpPost(uri);
         }
-
-        params.add(new BasicNameValuePair("nome", empresa));
-        params.add(new BasicNameValuePair("idL", Integer.toString(idL)));
-        params.add(new BasicNameValuePair("id", Integer.toString(id)));
-        params.add(new BasicNameValuePair("quantia", Integer.toString(quantia)));
-        params.add(new BasicNameValuePair("investidor", investidor));
-
-        sendPost(httpclient,httppost,params);
+        sendPost(httpclient,httppost);
     }
 
-    private void sendPost(HttpClient httpclient, HttpPost httppost, List<NameValuePair> params) {
+    public static void sendPost(HttpClient httpclient, HttpPost httppost) {
         try {
             //send post
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
             HttpResponse response = httpclient.execute(httppost);
 
             //receive response

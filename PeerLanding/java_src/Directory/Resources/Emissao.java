@@ -11,6 +11,7 @@ public class Emissao{
     public int montanteTotal;
     public String empresa;
     public boolean sucesso;
+    public boolean ativo;
     public List<Licitacao> licitacoes;
 
 
@@ -21,6 +22,7 @@ public class Emissao{
         this.empresa = empresa;
         this.sucesso = sucesso;
         this.licitacoes = licitacoes;
+        this.ativo=true;
     }
 
     public List<Licitacao> getLicitacoes(){
@@ -42,7 +44,9 @@ public class Emissao{
                 .append("empresa: ")
                 .append(this.empresa).append("\n")
                 .append("sucesso: ")
-                .append(this.sucesso).append("\n");
+                .append(this.sucesso).append("\n")
+                .append("ativo: ")
+                .append(this.ativo).append("\n");
         for(Licitacao licitacao : this.licitacoes){
             sb.append(licitacao.toString());
         }

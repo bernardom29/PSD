@@ -11,6 +11,7 @@ public class Leilao {
     public String empresa;
     public LocalDateTime data;
     public boolean sucesso;
+    public boolean ativo;
     public List<Licitacao> licitacoes;
 
     public Leilao(int id, float taxaMaxima, int montanteTotal, String empresa, LocalDateTime data, boolean sucesso) {
@@ -20,16 +21,7 @@ public class Leilao {
         this.empresa = empresa;
         this.data = data;
         this.sucesso = sucesso;
-    }
-
-    public Leilao(int id, float taxaMaxima, int montanteTotal, String empresa, LocalDateTime data, boolean sucesso, List<Licitacao> licitacoes) {
-        this.id = id;
-        this.taxaMaxima = taxaMaxima;
-        this.montanteTotal = montanteTotal;
-        this.empresa = empresa;
-        this.data = data;
-        this.sucesso = sucesso;
-        this.licitacoes = licitacoes;
+        this.ativo=true;
     }
 
     public int getId() {
@@ -101,7 +93,9 @@ public class Leilao {
                 .append("data: ")
                 .append(DateTimeFormatter.ofPattern("ss:mm:HH dd-MM-yyyy").format(this.data)).append("\n")
                 .append("sucesso: ")
-                .append(this.sucesso).append("\n");
+                .append(this.sucesso).append("\n")
+                .append("ativo: ")
+                .append(this.ativo).append("\n");
         for(Licitacao licitacao : this.licitacoes){
             sb.append(licitacao.toString());
         }
