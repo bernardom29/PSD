@@ -1,6 +1,7 @@
 package Directory;
 
 import Directory.Representations.*;
+import Directory.Resources.Emissao;
 import Directory.Resources.Empresa;
 import Directory.Resources.Leilao;
 import Directory.Resources.Licitacao;
@@ -95,33 +96,42 @@ public class Directory {
     }
 
     @POST
-    @Path("/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}/{sucesso}")
+    @Path("/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}")
     public Response postLeilao(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
             @PathParam("taxaMaxima") float taxaMaxima,
-            @PathParam("montanteTotal") int montanteTotal,
-            @PathParam("sucesso") boolean sucesso
+            @PathParam("montanteTotal") int montanteTotal
     ){
 
         LocalDateTime date = LocalDateTime.now();
-        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome, date,sucesso);
+        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome, date,false);
         return Response.status(201).build();
     }
 
     @PUT
     @Path("/empresas/{nome}/leiloes/{id}/{sucesso}")
-    public Response postLeilao(
+    public Response postLeilaoSucesso(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
             @PathParam("sucesso") boolean sucesso
     ){
-
         Leilao leilao = empresas.get(nome).getLeilao(id);
         leilao.sucesso = sucesso;
         return Response.status(201).build();
     }
 
+    @PUT
+    @Path("/empresas/{nome}/emissoes/{id}/{sucesso}")
+    public Response postEmissaoSucesso(
+            @PathParam("nome") String nome,
+            @PathParam("id") int id,
+            @PathParam("sucesso") boolean sucesso
+    ){
+        Emissao emissao = empresas.get(nome).getEmissao(id);
+        emissao.sucesso = sucesso;
+        return Response.status(201).build();
+    }
 
     @GET
     @Path("/empresas/{nome}/emissoes")
@@ -142,15 +152,15 @@ public class Directory {
     }
 
     @POST
-    @Path("/empresas/{nome}/emissoes/{id}/{taxa}/{montanteTotal}/{sucesso}/")
+    @Path("/empresas/{nome}/emissoes/{id}/{taxa}/{montanteTotal}/")
     public Response put(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
             @PathParam("taxa") int taxa,
-            @PathParam("montanteTotal") int montanteTotal,
-            @PathParam("sucesso") boolean sucesso){
+            @PathParam("montanteTotal") int montanteTotal
+            ){
 
-        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,sucesso,null);
+        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,false,null);
 
         return Response.status(201).build();
     }
