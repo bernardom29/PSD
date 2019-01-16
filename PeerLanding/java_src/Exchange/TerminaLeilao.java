@@ -1,11 +1,15 @@
 package Exchange;
 
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TerminaLeilao implements Runnable {
@@ -35,20 +39,19 @@ public class TerminaLeilao implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         //Update Diretorio
         HttpClient httpclient = HttpClients.createDefault();
         String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/";
-        HttpPost httppost;
+        HttpPut httpput;
 
         Leilao leilao = leiloes.remove(this.empresa);
         if(leilao.getMontanteTotal()<=leilao.getInvestimentoTotal()) {
             leilao.setSucesso(true);
             System.out.println("O Leilão foi um sucesso.");
-            httppost= new HttpPost(uri+ true + "/" + false);
+            httpput= new HttpPut(uri+ true + "/" + false);
         } else {
             System.out.println("O Leilão não foi um sucesso.");
-            httppost= new HttpPost(uri+ false + "/" + false);
+            httpput= new HttpPut(uri+ false + "/" + false);
         }
 
         Empresa empresa = empresas.get(this.empresa);
@@ -58,7 +61,18 @@ public class TerminaLeilao implements Runnable {
             this.pub.send("leilao-"+this.empresa+"-Terminado");
         }
 
-        //TODO Isto está mal?
-        Exchange.sendPost(httpclient,httppost);
+        try {
+            //send post
+            HttpResponse response = httpclient.execute(httpput);
+
+            //receive response
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                System.out.println("Resposta recebida " + entity.toString());
+            }
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }

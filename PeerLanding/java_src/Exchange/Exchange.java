@@ -136,7 +136,7 @@ public class Exchange implements Runnable {
         sendPost(httpclient,httppost);
     }
 
-    public static void sendPost(HttpClient httpclient, HttpPost httppost) {
+    private void sendPost(HttpClient httpclient, HttpPost httppost) {
         try {
             //send post
             HttpResponse response = httpclient.execute(httppost);

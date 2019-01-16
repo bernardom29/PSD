@@ -6,6 +6,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.zeromq.ZMQ;
@@ -52,8 +53,20 @@ public class TerminaEmissao implements Runnable {
         //Update Diretorio
         HttpClient httpclient = HttpClients.createDefault();
         String uri = "http://localhost/empresas/" + empresa + "/emissoes/" + idL + "/" + true + "/" + false;
-        HttpPost httppost= new HttpPost(uri);
-        //TODO Isto está mal?
-        Exchange.sendPost(httpclient,httppost);
+        HttpPut httpput = new HttpPut(uri);
+
+        try {
+            //send post
+            HttpResponse response = httpclient.execute(httpput);
+
+            //receive response
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                System.out.println("Resposta recebida " + entity.toString());
+            }
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }
