@@ -46,13 +46,14 @@ public class TerminaEmissao implements Runnable {
         emissao.setSucesso(true);
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoEmissoes.add(emissao);
+
         synchronized (this.pub){
             pub.send("emissao-"+this.empresa+"-Terminado");
         }
 
         //Update Diretorio
         HttpClient httpclient = HttpClients.createDefault();
-        String uri = "http://localhost/empresas/" + empresa + "/emissoes/" + idL + "/" + true + "/" + false;
+        String uri = "http://localhost:8080/empresas/" + this.empresa + "/emissoes/" + idL + "/" + true + "/" + false;
         HttpPut httpput = new HttpPut(uri);
 
         try {

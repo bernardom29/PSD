@@ -4,7 +4,6 @@ package Exchange;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
@@ -41,7 +40,7 @@ public class TerminaLeilao implements Runnable {
         }
         //Update Diretorio
         HttpClient httpclient = HttpClients.createDefault();
-        String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/";
+        String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/";
         HttpPut httpput;
 
         Leilao leilao = leiloes.remove(this.empresa);

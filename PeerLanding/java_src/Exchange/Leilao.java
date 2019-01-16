@@ -66,7 +66,7 @@ public class Leilao {
     }
 
     public int getInvestimentoTotal () {
-        return licitacoes.stream().map(a -> a.quantia).reduce(Integer::sum).get();
+        return licitacoes.stream().map(a -> a.quantia).reduce(0,Integer::sum);
     }
 
     public List<Licitacao> getLicitacoes() {

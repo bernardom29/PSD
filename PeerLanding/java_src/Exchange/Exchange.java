@@ -4,22 +4,17 @@ import Protos.Protocolo.Mensagem;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.System.*;
+import static java.lang.System.arraycopy;
+import static java.lang.System.out;
 
 public class Exchange implements Runnable {
     private ConcurrentHashMap<String, Empresa> empresas;
@@ -49,7 +44,7 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("leilao-" + empresa + "-nova licitação de: " + investidor + " juro: " + juro + " quantia: " + quantia);
             }
-            this.postDiretorioInvestidor("licitar", empresa,empresas.get(empresa).historicoLeiloes.size() + 1, leilaoAtual.getLicitacoes().size() + 1, investidor, juro, quantia);
+            this.postDiretorioInvestidor("licitar", empresa,empresas.get(empresa).historicoLeiloes.size(), leilaoAtual.getLicitacoes().size()-1, investidor, juro, quantia);
             return true;
         }else{
             return false;
@@ -64,7 +59,7 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("emissao-" + empresa + "-nova licitação de: " + investidor + " quantia: " + quantia);
             }
-            this.postDiretorioInvestidor("emprestimo", empresa,empresas.get(empresa).historicoEmissoes.size() + 1, emissaoAtual.getLicitacoes().size() +1, investidor, 0, quantia);
+            this.postDiretorioInvestidor("emprestimo", empresa,empresas.get(empresa).historicoEmissoes.size(), emissaoAtual.getLicitacoes().size()-1, investidor, 0, quantia);
             return true;
         } else {
             return false;
@@ -73,11 +68,11 @@ public class Exchange implements Runnable {
 
     public boolean emissao(String empresa, int quantia){
         Empresa empresaObj = empresas.get(empresa);
-        if (empresaObj != null){
+        if (empresaObj != null && empresaObj.historicoLeiloes.size() > 0){
             Leilao ultimoLeilao = empresaObj.historicoLeiloes.lastElement();
             if(ultimoLeilao.isSucesso() &&  quantia % 1000 == 0) {
                 float taxaMaxima = empresaObj.taxaEmissao();
-                int idL = empresas.get(empresa).historicoLeiloes.size() + 1;
+                int idL = empresas.get(empresa).historicoEmissoes.size();
                 Emissao novaEmissao = new Emissao(taxaMaxima,quantia,empresa);
                 emissoes.put(empresa,novaEmissao);
                 new Thread(new TerminaEmissao(empresa,empresas,emissoes, pub,idL)).start();
@@ -97,7 +92,7 @@ public class Exchange implements Runnable {
         if (leilaoAtual == null &&  quantia % 1000 == 0){
             Leilao leilao = new Leilao(juro,quantia,empresa);
             this.leiloes.put(empresa,leilao);
-            int idL = empresas.get(empresa).historicoLeiloes.size() + 1;
+            int idL = empresas.get(empresa).historicoLeiloes.size();
             new Thread(new TerminaLeilao(empresa,empresas,leiloes, pub,idL)).start();
             synchronized (this.pub) {
                 this.pub.send("leilao-"+empresa+"-Começou um leilão");
@@ -112,10 +107,10 @@ public class Exchange implements Runnable {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost=null;
         if(tipo.equals("leilao")) {
-            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + taxaMaxima + "/" + quantia;
+            String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/" + taxaMaxima + "/" + quantia;
             httppost = new HttpPost(uri);
         } else if (tipo.equals("emissao")) {
-            String uri = "http://localhost/empresas/" + empresa + "/emissoes/" + idL + "/" + taxaMaxima + "/" + quantia;
+            String uri = "http://localhost:8080/empresas/" + empresa + "/emissoes/" + idL + "/" + taxaMaxima + "/" + quantia;
             httppost = new HttpPost(uri);
         }
 
@@ -127,10 +122,10 @@ public class Exchange implements Runnable {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost=null;
         if(tipo.equals("licitar")) {
-            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor +"⁄"+ juro + "⁄" + quantia;
+            String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor +"⁄"+ juro + "⁄" + quantia;
             httppost = new HttpPost(uri);
         } else if (tipo.equals("emprestimo")) {
-            String uri = "http://localhost/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor + "⁄" + quantia;
+            String uri = "http://localhost:8080/empresas/" + empresa + "/emissoes/" + idL + "/" + id + "/" + investidor + "⁄" + quantia;
             httppost = new HttpPost(uri);
         }
         sendPost(httpclient,httppost);

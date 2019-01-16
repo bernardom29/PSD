@@ -1,7 +1,6 @@
 package Directory.Resources;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Empresa {
@@ -37,13 +36,13 @@ public class Empresa {
         return historicoEmissoes.get(id);
     }
 
-    public void addLeilao(int id, float taxaMaxima, int montanteTotal, String empresa, LocalDateTime data, boolean sucesso){
+    public void addLeilao(int id, float taxaMaxima, int montanteTotal, LocalDateTime data, boolean sucesso){
         Leilao leilao = new Leilao(id,taxaMaxima,montanteTotal,this.nome,data,sucesso);
 
         historicoLeiloes.add(leilao);
     }
 
-    public void addEmissao(int id, int taxa, int montanteTotal, String name, boolean sucesso, List<Licitacao> licitacoes) {
+    public void addEmissao(int id, float taxa, int montanteTotal, boolean sucesso, List<Licitacao> licitacoes) {
         Emissao emissao = new Emissao(id,taxa,montanteTotal,this.nome,sucesso,licitacoes);
 
         historicoEmissoes.add(emissao);

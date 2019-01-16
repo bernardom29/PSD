@@ -2,6 +2,7 @@ package Directory.Resources;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Leilao {
@@ -22,6 +23,7 @@ public class Leilao {
         this.data = data;
         this.sucesso = sucesso;
         this.ativo=true;
+        this.licitacoes = new ArrayList<>();
     }
 
     public int getId() {

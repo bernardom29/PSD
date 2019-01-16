@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response;
 
 public class Emissao{
     public int id;
-    public int taxa;
+    public float taxa;
     public int montanteTotal;
     public String empresa;
     public boolean sucesso;
@@ -15,7 +15,7 @@ public class Emissao{
     public List<Licitacao> licitacoes;
 
 
-    public Emissao(int id, int taxaMaxima, int montanteTotal, String empresa, boolean sucesso, List<Licitacao> licitacoes){
+    public Emissao(int id, float taxaMaxima, int montanteTotal, String empresa, boolean sucesso, List<Licitacao> licitacoes){
         this.id = id;
         this.taxa = taxaMaxima;
         this.montanteTotal = montanteTotal;

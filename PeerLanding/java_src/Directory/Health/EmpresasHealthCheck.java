@@ -1,13 +1,8 @@
 package Directory.Health;
 
 import Directory.Resources.Empresa;
-import Directory.Resources.Historico;
 import com.codahale.metrics.health.HealthCheck;
 
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.HashMap;
 
 public class EmpresasHealthCheck extends HealthCheck{

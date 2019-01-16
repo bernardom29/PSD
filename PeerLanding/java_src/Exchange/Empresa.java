@@ -15,9 +15,10 @@ public class Empresa {
     }
 
     public float taxaEmissao(){
-        Emissao emissao = this.historicoEmissoes.lastElement();
+
         Leilao leilao = this.historicoLeiloes.lastElement();
-        if(leilao!=null && emissao!=null) {
+        if(leilao!=null && this.historicoEmissoes.size()>0) {
+            Emissao emissao = this.historicoEmissoes.lastElement();
             if (leilao.getData().isAfter(emissao.getData()) && leilao.isSucesso()){
                 return leilao.getTaxaLicitacaoMaxima();
             }

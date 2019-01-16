@@ -46,7 +46,6 @@ public class Directory {
     @Timed
     public List<EmpresaRep> getEmps() {
         List<EmpresaRep> lista = new ArrayList<>();
-        System.out.println(empresas);
         for ( Map.Entry<String, Empresa> obj : empresas.entrySet()) {
             lista.add(new EmpresaRep(obj.getValue()));
         }
@@ -105,7 +104,7 @@ public class Directory {
     ){
 
         LocalDateTime date = LocalDateTime.now();
-        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome, date,false);
+        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal, date,false);
         return Response.status(201).build();
     }
 
@@ -160,11 +159,11 @@ public class Directory {
     public Response put(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
-            @PathParam("taxaMaxima") int taxaMaxima,
+            @PathParam("taxaMaxima") float taxaMaxima,
             @PathParam("montanteTotal") int montanteTotal
             ){
 
-        empresas.get(nome).addEmissao(id,taxaMaxima,montanteTotal,nome,false,null);
+        empresas.get(nome).addEmissao(id, taxaMaxima,montanteTotal,false,new ArrayList<>());
 
         return Response.status(201).build();
     }
@@ -212,8 +211,6 @@ public class Directory {
             @PathParam("nome") String nome,
             @PathParam("idL")  int idL,
             @PathParam("id")   int id){
-        System.out.println(empresas.get(nome).getLeilao(idL));
-        System.out.println(empresas.get(nome).getLeilao(idL).getLicitacao(id));
         return new LicitacaoRep(empresas.get(nome).getLeilao(idL).getLicitacao(id));
     }
 
