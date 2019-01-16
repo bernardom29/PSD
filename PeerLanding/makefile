@@ -10,7 +10,7 @@ PROTO_DIR = java_src/Protos/protocolo.proto
 
 all: compile
 
-compile: Client Exchange Frontend
+compile: Client Frontend
 
 Protos: $(SERIAL)
 	@protoc -I=. --java_out=$(JAVA_SRC) $(PROTO_DIR) 
@@ -68,7 +68,7 @@ install:
 	@mkdir -p $(BIN)frontend
 	@mkdir -p $(BIN)Client
 	@mkdir -p $(BIN)Directory
-	@cp -r dependencies/erlzmq2/priv $(BIN)
+	@cp -rf priv $(BIN)
 	@echo Creating dirs
 
 
