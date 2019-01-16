@@ -2,6 +2,7 @@ package Directory;
 
 import Directory.Representations.*;
 import Directory.Resources.Empresa;
+import Directory.Resources.Leilao;
 import Directory.Resources.Licitacao;
 import com.codahale.metrics.annotation.Timed;
 import javax.ws.rs.*;
@@ -94,22 +95,33 @@ public class Directory {
     }
 
     @POST
-    @Path("/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}/{data}/{sucesso}")
+    @Path("/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}/{sucesso}")
     public Response postLeilao(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
-            @PathParam("taxaMaxima") int taxaMaxima,
+            @PathParam("taxaMaxima") float taxaMaxima,
             @PathParam("montanteTotal") int montanteTotal,
-            @PathParam("data") long data,
             @PathParam("sucesso") boolean sucesso
-                        )
-    {
+    ){
 
-        LocalDateTime date =
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(data), ZoneId.systemDefault());
+        LocalDateTime date = LocalDateTime.now();
         empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal,nome, date,sucesso);
         return Response.status(201).build();
     }
+
+    @PUT
+    @Path("/empresas/{nome}/leiloes/{id}/{sucesso}")
+    public Response postLeilao(
+            @PathParam("nome") String nome,
+            @PathParam("id") int id,
+            @PathParam("sucesso") boolean sucesso
+    ){
+
+        Leilao leilao = empresas.get(nome).getLeilao(id);
+        leilao.sucesso = sucesso;
+        return Response.status(201).build();
+    }
+
 
     @GET
     @Path("/empresas/{nome}/emissoes")
