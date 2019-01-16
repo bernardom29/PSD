@@ -3,7 +3,7 @@ package Exchange;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+//TODO Add ativo?
 public class Emissao {
     private float taxa;
     private int montanteTotal;
@@ -55,6 +55,10 @@ public class Emissao {
 
     public float getTaxa() {
         return taxa;
+    }
+
+    public int getInvestimentoTotal () {
+        return licitacoes.stream().map(a -> a.quantia).reduce(0,Integer::sum);
     }
 
     public void setTaxa(float taxa) {

@@ -47,14 +47,24 @@ public class TerminaEmissao implements Runnable {
         Empresa empresa = empresas.get(this.empresa);
         empresa.historicoEmissoes.add(emissao);
 
+        //Update Diretorio
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPut httpput;
+        String uri = "http://localhost:8080/empresas/" + this.empresa + "/emissoes/" + idL + "/";
+
         synchronized (this.pub){
             pub.send("emissao-"+this.empresa+"-Terminado");
         }
 
-        //Update Diretorio
-        HttpClient httpclient = HttpClients.createDefault();
-        String uri = "http://localhost:8080/empresas/" + this.empresa + "/emissoes/" + idL + "/" + true + "/" + false;
-        HttpPut httpput = new HttpPut(uri);
+        if(emissao.getMontanteTotal()<=emissao.getInvestimentoTotal()) {
+            emissao.setSucesso(true);
+            System.out.println("A emissão foi um sucesso.");
+            httpput= new HttpPut(uri+ true + "/" + false);
+        } else {
+            emissao.setSucesso(false);
+            System.out.println("A emissão não foi um sucesso.");
+            httpput= new HttpPut(uri+ false + "/" + false);
+        }
 
         try {
             //send post

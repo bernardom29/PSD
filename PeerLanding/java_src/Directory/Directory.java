@@ -6,6 +6,10 @@ import Directory.Resources.Empresa;
 import Directory.Resources.Leilao;
 import Directory.Resources.Licitacao;
 import com.codahale.metrics.annotation.Timed;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.apache.http.HttpEntity;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,7 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Directory {
     ConcurrentHashMap<String, Empresa> empresas;
 
-
+    //TODO Utilizar QueryParam para fazer parsing dos argumentos
+    //TODO Alterar pedidos do lado das Exchanges para passar os argumentos direito
     public Directory() {
         this.empresas = new ConcurrentHashMap<String, Empresa>();
         this.empresas.put("SapatoLda", new Empresa("SapatoLda"));
@@ -136,6 +141,16 @@ public class Directory {
         return Response.status(201).build();
     }
 
+    @PUT
+    @Path("/empresas/{nome}/leiloes/{idL}/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response putLicitadoresAlocados(
+            @PathParam("nome") String nome,
+            @PathParam("idL") int id
+    ){
+        return Response.status(201).build();
+    }
+
     @GET
     @Path("/empresas/{nome}/emissoes")
     @Produces(MediaType.APPLICATION_JSON)
@@ -156,7 +171,7 @@ public class Directory {
 
     @POST
     @Path("/empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}/")
-    public Response put(
+    public Response post(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
             @PathParam("taxaMaxima") float taxaMaxima,

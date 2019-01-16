@@ -3,7 +3,9 @@ package Exchange;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+//TODO Add ativo?
 public class Leilao {
     private float taxaMaxima;
     private int montanteTotal;
@@ -63,6 +65,28 @@ public class Leilao {
 
     public float getTaxaLicitacaoMaxima () {
         return licitacoes.stream().map(a -> a.taxa).reduce(Float.MIN_VALUE,Float::max);
+    }
+
+    public boolean alocaInvestidores () {
+        ArrayList<Licitacao> alocados = new ArrayList<Licitacao>();
+        ArrayList<Licitacao> licitacaoSort = (ArrayList<Licitacao>) licitacoes.stream()
+                        .sorted((o1, o2)->Float.compare(o1.taxa,o2.taxa))
+                        .collect(Collectors.toList());
+        int sum=0;
+        for(Licitacao l : licitacaoSort) {
+            sum+=l.quantia;
+            alocados.add(l);
+            if(sum>=montanteTotal) {
+                break;
+            }
+        }
+
+        if(this.licitacoes.size()==alocados.size()) {
+            return false;
+        } else {
+            this.licitacoes=alocados;
+            return true;
+        }
     }
 
     public int getInvestimentoTotal () {

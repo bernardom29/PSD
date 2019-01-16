@@ -1,14 +1,20 @@
 package Exchange;
 
 
+import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TerminaLeilao implements Runnable {
@@ -48,6 +54,19 @@ public class TerminaLeilao implements Runnable {
             leilao.setSucesso(true);
             System.out.println("O Leilão foi um sucesso.");
             httpput= new HttpPut(uri+ true + "/" + false);
+            if(leilao.alocaInvestidores()) {
+
+                //Update dos investidores alocados
+                String uriL = "http://localhost:8080/empresas/"+empresa + "/leiloes/" + idL;// put in your url
+                Gson gson = new Gson();
+                HttpPut httpputL = new HttpPut(uriL);
+                /*Type listType = new TypeToken<ArrayList<Licitacao>>() {}.getType();
+                String json = gson.toJson(leilao.getLicitacoes(),listType);
+                StringEntity stringEntity  = new StringEntity(json, "utf-8");
+                httpputL.setEntity(stringEntity);
+                httpputL.setHeader("Content-type", "application/json");*/
+                sendPut(httpclient,httpputL);
+            }
         } else {
             System.out.println("O Leilão não foi um sucesso.");
             httpput= new HttpPut(uri+ false + "/" + false);
@@ -60,6 +79,10 @@ public class TerminaLeilao implements Runnable {
             this.pub.send("leilao-"+this.empresa+"-Terminado");
         }
 
+        sendPut(httpclient, httpput);
+    }
+
+    public void sendPut(HttpClient httpclient, HttpPut httpput) {
         try {
             //send post
             HttpResponse response = httpclient.execute(httpput);
