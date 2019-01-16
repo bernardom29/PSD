@@ -2,9 +2,21 @@ package Exchange;
 import Protos.Protocolo.ExchangeReply;
 import Protos.Protocolo.Mensagem;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 import static java.lang.System.*;
@@ -29,8 +41,6 @@ public class Exchange implements Runnable {
         this.empresas = empresas;
     }
 
-
-
     private boolean licitar(String empresa, String investidor, int quantia, float juro){
         Leilao leilaoAtual = leiloes.get(empresa);
         if (leilaoAtual != null && juro < leilaoAtual.getTaxaMaxima() &&  quantia % 100 == 0) {
@@ -39,12 +49,14 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("leilao-" + empresa + "-nova licitação de: " + investidor + " juro: " + juro + " quantia: " + quantia);
             }
-            //TODO Fazer post de licitação
+            ///empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}
+            this.postDiretorioInvestidor("licitar", empresa,empresas.get(empresa).historicoLeiloes.size() + 1, leilaoAtual.getLicitacoes().size() + 1, investidor, juro, quantia);
             return true;
         }else{
             return false;
         }
     }
+
     private boolean emprestimo(String empresa, String investidor, int quantia){
         Emissao emissaoAtual = emissoes.get(empresa);
         if (emissaoAtual != null  &&  quantia % 100 == 0) {
@@ -53,14 +65,13 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 pub.send("emissao-" + empresa + "-nova licitação de: " + investidor + " quantia: " + quantia);
             }
-            //TODO Fazer post de licitação
+            ///empresas/{nome}/emissoes/{idL}/{id}/{investidor}⁄{quantia}
+            this.postDiretorioInvestidor("emprestimo", empresa,empresas.get(empresa).historicoEmissoes.size() + 1, emissaoAtual.getLicitacoes().size() +1, investidor, 0, quantia);
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-
-
 
     public boolean emissao(String empresa, int quantia){
         Empresa empresaObj = empresas.get(empresa);
@@ -74,12 +85,14 @@ public class Exchange implements Runnable {
                 synchronized (this.pub) {
                     this.pub.send("emissao-"+empresa+"-Começou uma emissao");
                 }
-                //TODO Fazer post de emissao
+                ///empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}/
+                this.postDiretorioEmpresa("emissao", empresa,empresas.get(empresa).historicoEmissoes.size() + 1, taxaMaxima, quantia);
                 return true;
             }
         }
         return false;
     }
+
 
     public boolean leilao(String empresa, int quantia, float juro){
         Leilao leilaoAtual = leiloes.getOrDefault(empresa,null);
@@ -90,13 +103,70 @@ public class Exchange implements Runnable {
             synchronized (this.pub) {
                 this.pub.send("leilao-"+empresa+"-Começou um leilão");
             }
-            //TODO Fazer post de leilao
+            this.postDiretorioEmpresa("leilao", empresa,empresas.get(empresa).historicoLeiloes.size() + 1, juro, quantia);
             return true;
         }
         return false;
     }
 
-    public byte[] recv(ZMQ.Socket socket){
+    private void postDiretorioEmpresa (String tipo, String empresa, int idL, float taxaMaxima, int quantia) {
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost=null;
+        List<NameValuePair> params = new ArrayList<>();
+
+        if(tipo.equals("leilao")) {
+            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}");
+        } else if (tipo.equals("emissao")) {
+            httppost = new HttpPost("http://localhost/empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}");
+        }
+
+        params.add(new BasicNameValuePair("nome", empresa));
+        params.add(new BasicNameValuePair("id", Integer.toString(idL)));
+        params.add(new BasicNameValuePair("taxaMaxima", Float.toString(taxaMaxima)));
+        params.add(new BasicNameValuePair("montanteTotal", Integer.toString(quantia)));
+
+        sendPost(httpclient,httppost,params);
+
+    }
+
+    private void postDiretorioInvestidor(String tipo, String empresa, int idL, int id, String investidor, float juro, int quantia) {
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost=null;
+        List<NameValuePair> params = new ArrayList<>();
+        if(tipo.equals("licitar")) {
+            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}");
+            params.add(new BasicNameValuePair("taxa", Float.toString(juro)));
+        } else if (tipo.equals("emprestimo")) {
+            httppost = new HttpPost("http://localhost/empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{quantia}");
+        }
+
+        params.add(new BasicNameValuePair("nome", empresa));
+        params.add(new BasicNameValuePair("idL", Integer.toString(idL)));
+        params.add(new BasicNameValuePair("id", Integer.toString(id)));
+        params.add(new BasicNameValuePair("quantia", Integer.toString(quantia)));
+        params.add(new BasicNameValuePair("investidor", investidor));
+
+        sendPost(httpclient,httppost,params);
+    }
+
+    private void sendPost(HttpClient httpclient, HttpPost httppost, List<NameValuePair> params) {
+        try {
+            //send post
+            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            HttpResponse response = httpclient.execute(httppost);
+
+            //receive response
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                System.out.println("Resposta recebida " + entity.toString());
+            }
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public byte[] recv(ZMQ.Socket socket) {
         byte[] tmp;
         int len;
         tmp = socket.recv();
@@ -107,7 +177,7 @@ public class Exchange implements Runnable {
         return response;
     }
 
-    public void run(){
+    public void run() {
         while(true)
         {
             byte[] packet = this.recv(this.rep);
