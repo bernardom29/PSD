@@ -6,6 +6,12 @@ public class Licitacao {
     public float taxa;
     public int quantia;
 
+    public Licitacao(int id, String investidor, int quantia) {
+        this.id = id;
+        this.investidor = investidor;
+        this.quantia = quantia;
+    }
+
     public Licitacao(int id, String investidor, float taxa, int quantia) {
         this.id = id;
         this.investidor = investidor;

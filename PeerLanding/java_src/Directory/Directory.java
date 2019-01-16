@@ -152,32 +152,31 @@ public class Directory {
     }
 
     @POST
-    @Path("/empresas/{nome}/emissoes/{id}/{taxa}/{montanteTotal}/")
+    @Path("/empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}/")
     public Response put(
             @PathParam("nome") String nome,
             @PathParam("id") int id,
-            @PathParam("taxa") int taxa,
+            @PathParam("taxaMaxima") int taxaMaxima,
             @PathParam("montanteTotal") int montanteTotal
             ){
 
-        empresas.get(nome).addEmissao(id,taxa,montanteTotal,nome,false,null);
+        empresas.get(nome).addEmissao(id,taxaMaxima,montanteTotal,nome,false,null);
 
         return Response.status(201).build();
     }
 
     @POST
-    @Path("/empresas/{nome}/emissoes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}")
+    @Path("/empresas/{nome}/emissoes/{idL}/{id}/{investidor}⁄{quantia}")
     public Response postEmissaoLicitacao(
             @PathParam("nome") String nome,
             @PathParam("idL") int idL,
             @PathParam("id") int id,
             @PathParam("investidor") String investidor,
-            @PathParam("taxa") float taxa,
             @PathParam("quantia") int quantia
     )
     {
         empresas.get(nome).historicoEmissoes.get(idL).licitacoes.add(
-                new Licitacao(id,investidor,taxa,quantia));
+                new Licitacao(id,investidor,quantia));
         return Response.status(201).build();
     }
 
