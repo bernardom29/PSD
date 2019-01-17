@@ -1,7 +1,7 @@
 package Exchange;
 
 
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -9,13 +9,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
-import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.System.out;
 
 public class TerminaLeilao implements Runnable {
     private String empresa;
@@ -44,32 +43,21 @@ public class TerminaLeilao implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //Update Diretorio
-        HttpClient httpclient = HttpClients.createDefault();
-        String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/";
-        HttpPut httpput;
 
+        String uri = "http://localhost:8080/empresa/leilao";
+        RestRequest rr = null;
         Leilao leilao = leiloes.remove(this.empresa);
         if(leilao.getMontanteTotal()<=leilao.getInvestimentoTotal()) {
             leilao.setSucesso(true);
             System.out.println("O Leilão foi um sucesso.");
-            httpput= new HttpPut(uri+ true + "/" + false);
             if(leilao.alocaInvestidores()) {
-
-                //Update dos investidores alocados
-                String uriL = "http://localhost:8080/empresas/"+empresa + "/leiloes/" + idL;// put in your url
-                Gson gson = new Gson();
-                HttpPut httpputL = new HttpPut(uriL);
-                /*Type listType = new TypeToken<ArrayList<Licitacao>>() {}.getType();
-                String json = gson.toJson(leilao.getLicitacoes(),listType);
-                StringEntity stringEntity  = new StringEntity(json, "utf-8");
-                httpputL.setEntity(stringEntity);
-                httpputL.setHeader("Content-type", "application/json");*/
-                sendPut(httpclient,httpputL);
+                rr = new RestRequest(this.empresa, this.idL,false,true, leilao.getLicitacoes());
+            } else {
+                rr = new RestRequest(this.empresa, this.idL, false, true);
             }
         } else {
             System.out.println("O Leilão não foi um sucesso.");
-            httpput= new HttpPut(uri+ false + "/" + false);
+            rr = new RestRequest(this.empresa, this.idL,false,false);
         }
 
         Empresa empresa = empresas.get(this.empresa);
@@ -79,21 +67,19 @@ public class TerminaLeilao implements Runnable {
             this.pub.send("leilao-"+this.empresa+"-Terminado");
         }
 
-        sendPut(httpclient, httpput);
     }
 
-    public void sendPut(HttpClient httpclient, HttpPut httpput) {
+    private void sendPut(String postUrl, String data) {
+        URL url = null;
+        out.println(data);
         try {
-            //send post
-            HttpResponse response = httpclient.execute(httpput);
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPut put = new HttpPut(postUrl);
 
-            //receive response
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                System.out.println("Resposta recebida " + entity.toString());
-            }
-        } catch (IOException | NullPointerException e) {
+            put.setHeader("Content-Type","application/json");
+            put.setEntity(new StringEntity(data));
+            HttpResponse response = httpclient.execute(put);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,15 +1,19 @@
 package Exchange;
 import Protos.Protocolo.ExchangeReply;
 import Protos.Protocolo.Mensagem;
+import com.google.gson.Gson;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
 
-import java.io.IOException;
+import java.io.DataOutputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -104,48 +108,47 @@ public class Exchange implements Runnable {
     }
 
     private void postDiretorioEmpresa (String tipo, String empresa, int idL, float taxaMaxima, int quantia) {
-        HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost=null;
+        String urlRequest = null;
+        RestRequest rr = new RestRequest(empresa, idL, taxaMaxima, quantia);
+        String data = new Gson().toJson(rr);
         if(tipo.equals("leilao")) {
-            String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/" + taxaMaxima + "/" + quantia;
-            httppost = new HttpPost(uri);
+            urlRequest = "http://localhost:8080/empresa/leilao";
         } else if (tipo.equals("emissao")) {
-            String uri = "http://localhost:8080/empresas/" + empresa + "/emissoes/" + idL + "/" + taxaMaxima + "/" + quantia;
-            httppost = new HttpPost(uri);
+            urlRequest = "http://localhost:8080/empresa/emissao";
         }
-
-        sendPost(httpclient,httppost);
-
+        sendPost(urlRequest, data);
     }
 
     private void postDiretorioInvestidor(String tipo, String empresa, int idL, int id, String investidor, float juro, int quantia) {
-        HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost=null;
+        String urlRequest = null;
+        RestRequest rr = null;
         if(tipo.equals("licitar")) {
-            String uri = "http://localhost:8080/empresas/" + empresa + "/leiloes/" + idL + "/" + id + "/" + investidor +"⁄"+ juro + "⁄" + quantia;
-            httppost = new HttpPost(uri);
+            urlRequest = "http://localhost:8080/empresa/leilao/licitacao";
+            rr = new RestRequest(empresa, idL, id, investidor,juro, quantia);
         } else if (tipo.equals("emprestimo")) {
-            String uri = "http://localhost:8080/empresas/" + empresa + "/emissoes/" + idL + "/" + id + "/" + investidor + "⁄" + quantia;
-            httppost = new HttpPost(uri);
+            rr = new RestRequest(empresa, idL, id, investidor, quantia);
+            urlRequest = "http://localhost:8080/empresa/emissao/licitacao";
         }
-        sendPost(httpclient,httppost);
+        String data = new Gson().toJson(rr);
+        sendPost(urlRequest, data);
     }
 
-    private void sendPost(HttpClient httpclient, HttpPost httppost) {
+    private void sendPost(String postUrl, String data) {
+        URL url = null;
+        out.println(data);
         try {
-            //send post
-            HttpResponse response = httpclient.execute(httppost);
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost post = new HttpPost(postUrl);
 
-            //receive response
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                System.out.println("Resposta recebida " + entity.toString());
-            }
-        } catch (IOException | NullPointerException e) {
+            post.setHeader("Content-Type","application/json");
+            post.setEntity(new StringEntity(data));
+            HttpResponse response = httpclient.execute(post);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     public byte[] recv(ZMQ.Socket socket) {
         byte[] tmp;

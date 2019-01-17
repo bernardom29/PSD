@@ -1,5 +1,6 @@
 package Exchange;
 
+import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -7,15 +8,19 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.zeromq.ZMQ;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.System.out;
 
 public class TerminaEmissao implements Runnable {
     private String empresa;
@@ -48,35 +53,35 @@ public class TerminaEmissao implements Runnable {
         empresa.historicoEmissoes.add(emissao);
 
         //Update Diretorio
-        HttpClient httpclient = HttpClients.createDefault();
-        HttpPut httpput;
-        String uri = "http://localhost:8080/empresas/" + this.empresa + "/emissoes/" + idL + "/";
-
+        String uri = "http://localhost:8080/empresa/emissao";
         synchronized (this.pub){
             pub.send("emissao-"+this.empresa+"-Terminado");
         }
+        RestRequest rr = null;
 
         if(emissao.getMontanteTotal()<=emissao.getInvestimentoTotal()) {
             emissao.setSucesso(true);
             System.out.println("A emissão foi um sucesso.");
-            httpput= new HttpPut(uri+ true + "/" + false);
+            rr = new RestRequest(this.empresa, this.idL, false, true);
         } else {
             emissao.setSucesso(false);
             System.out.println("A emissão não foi um sucesso.");
-            httpput= new HttpPut(uri+ false + "/" + false);
+            rr = new RestRequest(this.empresa, this.idL, false, false);
         }
-
+        String data = new Gson().toJson(rr);
+        sendPut(uri,data);
+    }
+    private void sendPut(String postUrl, String data) {
+        URL url = null;
+        out.println(data);
         try {
-            //send post
-            HttpResponse response = httpclient.execute(httpput);
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPut put = new HttpPut(postUrl);
 
-            //receive response
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                System.out.println("Resposta recebida " + entity.toString());
-            }
-        } catch (IOException | NullPointerException e) {
+            put.setHeader("Content-Type","application/json");
+            put.setEntity(new StringEntity(data));
+            HttpResponse response = httpclient.execute(put);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

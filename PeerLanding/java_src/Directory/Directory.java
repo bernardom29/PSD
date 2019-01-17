@@ -1,34 +1,36 @@
 package Directory;
 
 import Directory.Representations.*;
-import Directory.Resources.Emissao;
+
 import Directory.Resources.Empresa;
+import Directory.Resources.RestRequest;
+import Directory.Resources.Emissao;
 import Directory.Resources.Leilao;
 import Directory.Resources.Licitacao;
-import com.codahale.metrics.annotation.Timed;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.http.HttpEntity;
 
+import com.codahale.metrics.annotation.Timed;
+
+
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Path("/")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class Directory {
-    ConcurrentHashMap<String, Empresa> empresas;
+    private ConcurrentHashMap<String, Empresa> empresas;
 
     //TODO Utilizar QueryParam para fazer parsing dos argumentos
     //TODO Alterar pedidos do lado das Exchanges para passar os argumentos direito
     public Directory() {
-        this.empresas = new ConcurrentHashMap<String, Empresa>();
+        this.empresas = new ConcurrentHashMap<>();
         this.empresas.put("SapatoLda", new Empresa("SapatoLda"));
         this.empresas.put("IsqueiroLda", new Empresa("IsqueiroLda"));
         this.empresas.put("MesasLda", new Empresa("MesasLda"));
@@ -45,198 +47,235 @@ public class Directory {
         this.empresas = empresas;
     }
 
+
     @GET
     @Path("/empresas")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public List<EmpresaRep> getEmps() {
+    public Response getEmps() {
         List<EmpresaRep> lista = new ArrayList<>();
         for ( Map.Entry<String, Empresa> obj : empresas.entrySet()) {
             lista.add(new EmpresaRep(obj.getValue()));
         }
-        return lista;
+        return Response.ok().entity(lista).build();
     }
 
     @GET
-    @Path("/empresas/{nome}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public EmpresaRep getEmp(@PathParam("nome") String nome){
-        return new EmpresaRep(nome, this.empresas.get(nome));
+    @Path("/empresa")
+    public Response getEmp(@QueryParam("nome") String nome){
+
+        if (nome == null) {
+            return Response.status(404).build();
+        }
+
+        return Response.ok().entity(new EmpresaRep(nome, this.empresas.get(nome))).build();
     }
 
     @GET
-    @Path("/empresas/{nome}/leiloes")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public LeiloesRep getLeiloes(@PathParam("nome") String nome){
-        return new LeiloesRep(empresas.get(nome).getLeiloes());
+    @Path("/empresa/leiloes")
+    public Response getLeiloes(
+            @QueryParam("nome") String nome)
+    {
+        if (nome == null){
+           return Response.status(404).build();
+        }
+        return Response.ok().entity(new LeiloesRep(empresas.get(nome).getLeiloes())).build();
     }
 
     @GET
-    @Path("/empresas/{nome}/leiloes/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/empresa/leilao/")
     @Timed
-    public LeilaoRep getLeilao(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id){
-        return new LeilaoRep(empresas.get(nome).getLeilao(id));
+    public Response getLeilao(
+            @QueryParam("nome") String nome,
+            @QueryParam("id") Integer id)
+    {
+        if (nome == null || id >= empresas.get(nome).historicoLeiloes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = new LeilaoRep(empresas.get(nome).getLeilao(id.intValue()));
+        return Response.ok().entity(obj).build();
+    }
+
+
+
+    @GET
+    @Path("/empresa/emissoes")
+    @Timed
+    public Response getEmissoes(@QueryParam("nome") String nome){
+        if (nome == null){
+            return Response.status(404).build();
+        }
+        return Response.ok().entity(new EmissoesRep(empresas.get(nome).getEmissoes())).build();
+    }
+
+
+
+    @GET
+    @Path("/empresa/emissao/")
+    @Timed
+    public Response getEmissao(
+            @QueryParam("nome") String nome,
+            @QueryParam("id") int id){
+        if (nome == null || id >= empresas.get(nome).historicoEmissoes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = new EmissaoRep(empresas.get(nome).getEmissao(id));
+        return Response.ok().entity(obj).build();
+    }
+
+
+
+    @GET
+    @Path("/empresa/leilao/licitacoes")
+    @Timed
+    public Response getLicitacoesLeilao(
+            @QueryParam("nome") String nome,
+            @QueryParam("id") int id){
+        if (nome == null || id >= empresas.get(nome).historicoLeiloes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = empresas.get(nome).getLeiloes().get(id).licitacoes;
+        return Response.ok().entity(obj).build();
+    }
+
+    @GET
+    @Path("/empresa/emissao/licitacoes/")
+    @Timed
+    public Response getLicitacoesEmissao(
+            @QueryParam("nome") String nome,
+            @QueryParam("id") int id){
+        if (nome == null || id >= empresas.get(nome).historicoEmissoes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = empresas.get(nome).getEmissoes().get(id).licitacoes;
+        return Response.ok().entity(obj).build();
+    }
+
+
+
+    @GET
+    @Path("/empresa/leilao/licitacao/")
+    @Timed
+    public Response getLicitacaoLeilao(
+            @QueryParam("nome") String nome,
+            @QueryParam("idL")  int idL,
+            @QueryParam("id")   int id){
+        if (nome == null
+                || idL >= empresas.get(nome).historicoLeiloes.size()
+                || id  >=empresas.get(nome).historicoLeiloes.get(idL).licitacoes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = empresas.get(nome).getLeiloes().get(idL).licitacoes.get(id);
+        return Response.ok().entity(obj).build();
+    }
+
+    @GET
+    @Path("/empresa/emissao/licitacao")
+    @Timed
+    public Response getLicitacaoEmissao(
+            @QueryParam("nome") String nome,
+            @QueryParam("idE") int idE,
+            @QueryParam("id") int id){
+        if (nome == null
+                || idE >= empresas.get(nome).historicoEmissoes.size()
+                || id >= empresas.get(nome).historicoEmissoes.get(idE).licitacoes.size()){
+            return Response.status(404).build();
+        }
+        Object obj = empresas.get(nome).getEmissoes().get(idE).licitacoes.get(id);
+        return Response.ok().entity(obj).build();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @POST
+    @Path("/empresa/leilao/")
+    public Response postLeilao(
+            @NotNull RestRequest restRequest
+    ){
+        System.out.println(restRequest);
+        LocalDateTime date = LocalDateTime.now();
+        empresas.get(restRequest.getNome()).addLeilao(restRequest.getId(),restRequest.getJuro(),restRequest.getMontanteTotal(), date,false);
+        return Response.status(201).build();
     }
 
     @POST
-    @Path("/empresas/{nome}/leiloes/{idL}/{id}/{investidor}⁄{taxa}⁄{quantia}")
+    @Path("/empresa/leilao/licitacao")
     public Response postLeilaoLicitacao(
-            @PathParam("nome") String nome,
-            @PathParam("idL") int idL,
-            @PathParam("id") int id,
-            @PathParam("investidor") String investidor,
-            @PathParam("taxa") float taxa,
-            @PathParam("quantia") int quantia
+            @NotNull RestRequest restRequest
     )
     {
-        empresas.get(nome).historicoLeiloes.get(idL).licitacoes.add(
-                new Licitacao(id,investidor,taxa,quantia));
-        return Response.status(201).build();
-    }
-
-    @POST
-    @Path("/empresas/{nome}/leiloes/{id}/{taxaMaxima}/{montanteTotal}")
-    public Response postLeilao(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id,
-            @PathParam("taxaMaxima") float taxaMaxima,
-            @PathParam("montanteTotal") int montanteTotal
-    ){
-
-        LocalDateTime date = LocalDateTime.now();
-        empresas.get(nome).addLeilao(id,taxaMaxima,montanteTotal, date,false);
+        empresas.get(restRequest.getNome()).historicoLeiloes.get(restRequest.getId()).licitacoes.add(
+                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),restRequest.getTaxaMaxima(), restRequest.getQuantia()));
         return Response.status(201).build();
     }
 
     @PUT
-    @Path("/empresas/{nome}/leiloes/{id}/{sucesso}/{ativo}")
+    @Path("/empresa/leilao")
     public Response putLeilaoSucesso(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id,
-            @PathParam("sucesso") boolean sucesso,
-            @PathParam("ativo") boolean ativo
-    ){
-        Leilao leilao = empresas.get(nome).getLeilao(id);
-        leilao.sucesso = sucesso;
-        leilao.ativo=ativo;
+            @NotNull RestRequest restRequest
+            ){
+        Leilao leilao = empresas.get(restRequest.getNome()).getLeilao(restRequest.getId());
+        leilao.sucesso = restRequest.isSucesso();
+        leilao.ativo = restRequest.isAtivo();
         return Response.status(201).build();
     }
 
-    @PUT
-    @Path("/empresas/{nome}/emissoes/{id}/{sucesso}/{ativo}")
-    public Response putEmissaoSucesso(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id,
-            @PathParam("sucesso") boolean sucesso,
-            @PathParam("ativo") boolean ativo
-    ){
-        Emissao emissao = empresas.get(nome).getEmissao(id);
-        emissao.sucesso = sucesso;
-        emissao.ativo=ativo;
-        return Response.status(201).build();
-    }
 
-    @PUT
-    @Path("/empresas/{nome}/leiloes/{idL}/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response putLicitadoresAlocados(
-            @PathParam("nome") String nome,
-            @PathParam("idL") int id
-    ){
-        return Response.status(201).build();
-    }
 
-    @GET
-    @Path("/empresas/{nome}/emissoes")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public EmissoesRep getEmissoes(@PathParam("nome") String nome){
-        return new EmissoesRep(empresas.get(nome).getEmissoes());
-    }
 
-    @GET
-    @Path("/empresas/{nome}/emissoes/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public EmissaoRep getEmissao(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id){
-        return new EmissaoRep(empresas.get(nome).getEmissao(id));
-    }
+
+
+
+
+
 
     @POST
-    @Path("/empresas/{nome}/emissoes/{id}/{taxaMaxima}/{montanteTotal}/")
+    @Path("/empresa/emissao")
     public Response post(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id,
-            @PathParam("taxaMaxima") float taxaMaxima,
-            @PathParam("montanteTotal") int montanteTotal
+            @NotNull RestRequest restRequest
             ){
 
-        empresas.get(nome).addEmissao(id, taxaMaxima,montanteTotal,false,new ArrayList<>());
+        empresas.get(restRequest.getNome()).addEmissao(restRequest.getId(), restRequest.getTaxaMaxima(), restRequest.getMontanteTotal(),false,new ArrayList<>());
 
         return Response.status(201).build();
     }
 
     @POST
-    @Path("/empresas/{nome}/emissoes/{idL}/{id}/{investidor}⁄{quantia}")
+    @Path("/empresa/emissao/licitacao")
     public Response postEmissaoLicitacao(
-            @PathParam("nome") String nome,
-            @PathParam("idL") int idL,
-            @PathParam("id") int id,
-            @PathParam("investidor") String investidor,
-            @PathParam("quantia") int quantia
+            @NotNull RestRequest restRequest
     )
     {
-        empresas.get(nome).historicoEmissoes.get(idL).licitacoes.add(
-                new Licitacao(id,investidor,quantia));
+        empresas.get(restRequest.getNome()).historicoEmissoes.get(restRequest.getId()).licitacoes.add(
+                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),restRequest.getQuantia()));
         return Response.status(201).build();
     }
 
-    @GET
-    @Path("/empresas/{nome}/leiloes/{id}/licitacoes")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public LicitacoesRep getLicitacoesLeilao(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id){
-        return new LicitacoesRep(empresas.get(nome).getLeilao(id).getLicitacoes());
+
+    @PUT
+    @Path("/empresa/emissao")
+    public Response putEmissaoSucesso(
+            @NotNull RestRequest restRequest
+    ){
+        Emissao emissao = empresas.get(restRequest.getNome()).getEmissao(restRequest.getIdL());
+        emissao.sucesso = restRequest.isSucesso();
+        emissao.ativo= restRequest.isAtivo();
+        return Response.status(201).build();
     }
 
-    @GET
-    @Path("/empresas/{nome}/emissoes/{id}/licitacoes")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public LicitacoesRep getLicitacoesEmissao(
-            @PathParam("nome") String nome,
-            @PathParam("id") int id){
-        return new LicitacoesRep(empresas.get(nome).getEmissao(id).getLicitacoes());
-    }
 
-    @GET
-    @Path("/empresas/{nome}/leiloes/{idL}/licitacoes/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public LicitacaoRep getLicitacaoLeilao(
-            @PathParam("nome") String nome,
-            @PathParam("idL")  int idL,
-            @PathParam("id")   int id){
-        return new LicitacaoRep(empresas.get(nome).getLeilao(idL).getLicitacao(id));
-    }
-
-    @GET
-    @Path("/empresas/{nome}/emissoes/{idE}/licitacoes/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Timed
-    public LicitacaoRep getLicitacaoEmissao(
-            @PathParam("nome") String nome,
-            @PathParam("idE") int idE,
-            @PathParam("id") int id){
-        return new LicitacaoRep(empresas.get(nome).getEmissao(idE).getLicitacao(id));
-    }
 }
+
