@@ -20,36 +20,6 @@ message ExchangeReply {
     required bool sucesso = 1;
 }
 
-message LeilaoReply {
-    required float taxaMaximaAlocada = 1;
-    required float taxaMaxima = 2;
-    required bool sucesso = 3;
-}
-
-message EmissaoReply{
-    required float taxa = 1;
-    required bool sucesso = 2;
-}
-
-message DirectoryReply{
-    required bool success = 1;
-    optional LeilaoReply leilao = 2;
-    optional EmissaoReply emissao = 3;
-}
-
-message DirectoryRequest{
-    required string tipo = 1;
-    required string empresa = 2;
-}
-
-message AddDirectoryRequest{
-    required string tipo = 1;
-    optional float juro = 2;
-    optional int32 quantia = 3;
-    optional string empresa = 4;
-    optional string investidor = 5;
-}
-
 message AuthReq {
     required string username = 1;
     required string password = 2;
