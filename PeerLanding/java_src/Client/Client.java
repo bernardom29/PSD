@@ -110,7 +110,6 @@ public class Client {
                 .setTipo("emissao")
                 .setQuantia(Integer.parseInt(quantia)).build();
         this.enviar(req,"emissao", username);
-
         rep = getReply();
         this.resultadoOperacao(rep, "emissao");
     }

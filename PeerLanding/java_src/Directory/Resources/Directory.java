@@ -40,7 +40,7 @@ public class Directory {
     @Path("/empresas")
     public Response getEmps() {
 
-        return Response.ok().entity(this.empresas.values()).build();
+        return Response.status(200).entity(this.empresas.values()).build();
     }
 
     @GET
@@ -51,7 +51,7 @@ public class Directory {
             return Response.status(404).build();
         }
 
-        return Response.ok().entity(this.empresas.get(nome)).build();
+        return Response.status(200).entity(this.empresas.get(nome)).build();
     }
 
     @GET
@@ -62,7 +62,7 @@ public class Directory {
         if (nome == null){
            return Response.status(404).build();
         }
-        return Response.ok().entity(empresas.get(nome).getLeiloes()).build();
+        return Response.status(200).entity(empresas.get(nome).getLeiloes()).build();
     }
 
     @GET
@@ -76,7 +76,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Object obj = empresas.get(nome).getLeilao(id);
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
 
@@ -88,7 +88,7 @@ public class Directory {
         if (nome == null){
             return Response.status(404).build();
         }
-        return Response.ok().entity(empresas.get(nome).getEmissoes()).build();
+        return Response.status(200).entity(empresas.get(nome).getEmissoes()).build();
     }
 
 
@@ -103,7 +103,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Emissao obj = empresas.get(nome).getEmissao(id).clone();
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
 
@@ -118,7 +118,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Object obj = empresas.get(nome).getLeiloes().get(id).licitacoes;
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
     @GET
@@ -131,7 +131,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Object obj = empresas.get(nome).getEmissoes().get(id).licitacoes;
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
 
@@ -149,7 +149,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Object obj = empresas.get(nome).getLeiloes().get(idL).licitacoes.get(id);
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
     @GET
@@ -165,7 +165,7 @@ public class Directory {
             return Response.status(404).build();
         }
         Object obj = empresas.get(nome).getEmissoes().get(idE).licitacoes.get(id);
-        return Response.ok().entity(obj).build();
+        return Response.status(200).entity(obj).build();
     }
 
 
