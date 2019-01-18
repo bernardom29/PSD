@@ -1,6 +1,6 @@
 package Directory.Health;
 
-import Directory.Resources.Empresa;
+import Directory.Representations.Empresa;
 import com.codahale.metrics.health.HealthCheck;
 
 import java.util.HashMap;

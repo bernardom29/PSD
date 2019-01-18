@@ -1,23 +1,13 @@
 package Exchange;
 
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.zeromq.ZMQ;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.out;
@@ -72,7 +62,6 @@ public class TerminaEmissao implements Runnable {
         sendPut(uri,data);
     }
     private void sendPut(String postUrl, String data) {
-        URL url = null;
         out.println(data);
         try {
             HttpClient httpclient = HttpClients.createDefault();
@@ -81,6 +70,7 @@ public class TerminaEmissao implements Runnable {
             put.setHeader("Content-Type","application/json");
             put.setEntity(new StringEntity(data));
             HttpResponse response = httpclient.execute(put);
+            out.println(response);
         } catch (Exception e) {
             e.printStackTrace();
         }

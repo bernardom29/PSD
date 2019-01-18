@@ -1,29 +1,39 @@
-package Directory.Resources;
+package Directory.Representations;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Leilao {
-    public int id;
-    public float taxaMaxima;
-    public int montanteTotal;
-    public String empresa;
-    public LocalDateTime data;
-    public boolean sucesso;
-    public boolean ativo;
-    public List<Licitacao> licitacoes;
+    @JsonProperty("id") public int id;
+    @JsonProperty("taxaMaxima") public float taxaMaxima;
+    @JsonProperty("montanteTotal") public int montanteTotal;
+    @JsonProperty("empresa") public String empresa;
+    @JsonProperty("data") public LocalDateTime data;
+    @JsonProperty("sucesso") public boolean sucesso;
+    @JsonProperty("ativo") public boolean ativo;
+    @JsonProperty("licitacoes") public List<Licitacao> licitacoes;
 
-    public Leilao(int id, float taxaMaxima, int montanteTotal, String empresa, LocalDateTime data, boolean sucesso) {
+    @JsonCreator
+    public Leilao(@JsonProperty("id") int id,
+            @JsonProperty("taxaMaxima") float taxaMaxima,
+    @JsonProperty("montanteTotal") int montanteTotal,
+    @JsonProperty("empresa") String empresa,
+    @JsonProperty("data") LocalDateTime data,
+    @JsonProperty("sucesso") boolean sucesso,
+    @JsonProperty("ativo") boolean ativo,
+    @JsonProperty("licitacoes") List<Licitacao> licitacoes) {
         this.id = id;
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
         this.data = data;
         this.sucesso = sucesso;
-        this.ativo=true;
-        this.licitacoes = new ArrayList<>();
+        this.ativo=ativo;
+        this.licitacoes = licitacoes;
     }
 
     public int getId() {

@@ -1,13 +1,17 @@
 package Client;
+import Protos.Protocolo.AuthRep;
+import Protos.Protocolo.AuthReq;
+import Protos.Protocolo.Mensagem;
+import Protos.Protocolo.Reply;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
-import Protos.Protocolo.*;
 
 import static java.lang.System.*;
-//TODO Retirar opcao de notificoes?
+
 public class Client {
     private Notifier notifier;
     private Socket socket;

@@ -1,6 +1,6 @@
 package Directory;
 
-import Directory.Resources.Empresa;
+import Directory.Representations.Empresa;
 
 import io.dropwizard.Configuration;
 

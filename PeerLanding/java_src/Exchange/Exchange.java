@@ -10,9 +10,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
 
-import java.io.DataOutputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,6 +140,7 @@ public class Exchange implements Runnable {
             post.setHeader("Content-Type","application/json");
             post.setEntity(new StringEntity(data));
             HttpResponse response = httpclient.execute(post);
+            out.println(response);
         } catch (Exception e) {
             e.printStackTrace();
         }

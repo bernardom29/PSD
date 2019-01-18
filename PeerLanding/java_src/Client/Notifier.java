@@ -31,7 +31,7 @@ public class Notifier implements Runnable{
         {
             byte[] notification = this.sub.recv();
             System.out.println(new String(notification));
-            //mailbox.add(new String(notification));
+            mailbox.add(new String(notification));
         }
     }
 

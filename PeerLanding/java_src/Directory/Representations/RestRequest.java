@@ -1,7 +1,9 @@
-package Directory.Resources;
+package Directory.Representations;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
 
 public class RestRequest {
     @JsonProperty("nome") private final String nome;
@@ -14,6 +16,7 @@ public class RestRequest {
     @JsonProperty("quantia") private final int quantia;
     @JsonProperty("sucesso") private final boolean sucesso;
     @JsonProperty("ativo") private final boolean ativo;
+    @JsonProperty("licitacaos") private final List<Licitacao> licitacaos;
 
     @JsonCreator
     public RestRequest(
@@ -26,7 +29,8 @@ public class RestRequest {
             @JsonProperty("juro") float juro,
             @JsonProperty("quantia") int quantia,
             @JsonProperty("sucesso") boolean sucesso,
-            @JsonProperty("ativo") boolean ativo)
+            @JsonProperty("ativo") boolean ativo,
+            @JsonProperty("licitacaos") List<Licitacao> licitacaos)
     {
         this.nome = nome;
         this.id = id;
@@ -38,6 +42,7 @@ public class RestRequest {
         this.quantia = quantia;
         this.sucesso = sucesso;
         this.ativo = ativo;
+        this.licitacaos = licitacaos;
     }
 
     public String getNome() {
@@ -78,5 +83,9 @@ public class RestRequest {
 
     public boolean isAtivo() {
         return ativo;
+    }
+
+    public List<Licitacao> getLicitacaos() {
+        return licitacaos;
     }
 }

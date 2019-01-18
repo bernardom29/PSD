@@ -2,7 +2,6 @@ package Exchange;
 
 
 import com.google.gson.Gson;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
@@ -10,8 +9,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.zeromq.ZMQ;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.out;
@@ -66,11 +63,10 @@ public class TerminaLeilao implements Runnable {
         synchronized (this.pub){
             this.pub.send("leilao-"+this.empresa+"-Terminado");
         }
-
+        sendPut(uri, new Gson().toJson(rr));
     }
 
     private void sendPut(String postUrl, String data) {
-        URL url = null;
         out.println(data);
         try {
             HttpClient httpclient = HttpClients.createDefault();
@@ -79,6 +75,7 @@ public class TerminaLeilao implements Runnable {
             put.setHeader("Content-Type","application/json");
             put.setEntity(new StringEntity(data));
             HttpResponse response = httpclient.execute(put);
+            out.println(response);
         } catch (Exception e) {
             e.printStackTrace();
         }

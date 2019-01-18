@@ -1,12 +1,15 @@
-package Directory.Resources;
+package Directory.Representations;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Empresa {
-    public String nome;
-    public List<Leilao> historicoLeiloes;
-    public List<Emissao> historicoEmissoes;
+    @JsonProperty("nome") public String nome;
+    @JsonProperty("leiloes") public List<Leilao> historicoLeiloes;
+    @JsonProperty("emissoes") public List<Emissao> historicoEmissoes;
 
     public Empresa(String nome){
         this.nome = nome;
@@ -14,10 +17,13 @@ public class Empresa {
         this.historicoEmissoes = new ArrayList<>();
     }
 
-    public Empresa(String nome, List<Leilao> leiloes, List<Emissao> emissoes){
+    @JsonCreator
+    public Empresa(@JsonProperty("nome") String nome,
+            @JsonProperty("leiloes") List<Leilao> historicoLeiloes,
+    @JsonProperty("emissoes") List<Emissao> historicoEmissoes) {
         this.nome = nome;
-        this.historicoLeiloes = leiloes;
-        this.historicoEmissoes = emissoes;
+        this.historicoLeiloes = historicoLeiloes;
+        this.historicoEmissoes = historicoEmissoes;
     }
 
     public List<Leilao> getLeiloes(){
@@ -37,7 +43,7 @@ public class Empresa {
     }
 
     public void addLeilao(int id, float taxaMaxima, int montanteTotal, LocalDateTime data, boolean sucesso){
-        Leilao leilao = new Leilao(id,taxaMaxima,montanteTotal,this.nome,data,sucesso);
+        Leilao leilao = new Leilao(id,taxaMaxima,montanteTotal,this.nome,data,sucesso,true, new ArrayList<>());
 
         historicoLeiloes.add(leilao);
     }

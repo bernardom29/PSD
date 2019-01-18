@@ -1,15 +1,7 @@
-package Directory;
+package Directory.Resources;
 
 import Directory.Representations.*;
-
-import Directory.Resources.Empresa;
-import Directory.Resources.RestRequest;
-import Directory.Resources.Emissao;
-import Directory.Resources.Leilao;
-import Directory.Resources.Licitacao;
-
 import com.codahale.metrics.annotation.Timed;
-
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
@@ -17,8 +9,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Path("/")
@@ -27,8 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Directory {
     private ConcurrentHashMap<String, Empresa> empresas;
 
-    //TODO Utilizar QueryParam para fazer parsing dos argumentos
-    //TODO Alterar pedidos do lado das Exchanges para passar os argumentos direito
     public Directory() {
         this.empresas = new ConcurrentHashMap<>();
         this.empresas.put("SapatoLda", new Empresa("SapatoLda"));
@@ -51,11 +39,8 @@ public class Directory {
     @GET
     @Path("/empresas")
     public Response getEmps() {
-        List<EmpresaRep> lista = new ArrayList<>();
-        for ( Map.Entry<String, Empresa> obj : empresas.entrySet()) {
-            lista.add(new EmpresaRep(obj.getValue()));
-        }
-        return Response.ok().entity(lista).build();
+
+        return Response.ok().entity(this.empresas.values()).build();
     }
 
     @GET
@@ -66,7 +51,7 @@ public class Directory {
             return Response.status(404).build();
         }
 
-        return Response.ok().entity(new EmpresaRep(nome, this.empresas.get(nome))).build();
+        return Response.ok().entity(this.empresas.get(nome)).build();
     }
 
     @GET
@@ -77,7 +62,7 @@ public class Directory {
         if (nome == null){
            return Response.status(404).build();
         }
-        return Response.ok().entity(new LeiloesRep(empresas.get(nome).getLeiloes())).build();
+        return Response.ok().entity(empresas.get(nome).getLeiloes()).build();
     }
 
     @GET
@@ -85,12 +70,12 @@ public class Directory {
     @Timed
     public Response getLeilao(
             @QueryParam("nome") String nome,
-            @QueryParam("id") Integer id)
+            @QueryParam("id") int id)
     {
         if (nome == null || id >= empresas.get(nome).historicoLeiloes.size()){
             return Response.status(404).build();
         }
-        Object obj = new LeilaoRep(empresas.get(nome).getLeilao(id.intValue()));
+        Object obj = empresas.get(nome).getLeilao(id);
         return Response.ok().entity(obj).build();
     }
 
@@ -103,7 +88,7 @@ public class Directory {
         if (nome == null){
             return Response.status(404).build();
         }
-        return Response.ok().entity(new EmissoesRep(empresas.get(nome).getEmissoes())).build();
+        return Response.ok().entity(empresas.get(nome).getEmissoes()).build();
     }
 
 
@@ -117,7 +102,7 @@ public class Directory {
         if (nome == null || id >= empresas.get(nome).historicoEmissoes.size()){
             return Response.status(404).build();
         }
-        Object obj = new EmissaoRep(empresas.get(nome).getEmissao(id));
+        Emissao obj = empresas.get(nome).getEmissao(id).clone();
         return Response.ok().entity(obj).build();
     }
 
@@ -184,22 +169,6 @@ public class Directory {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @POST
     @Path("/empresa/leilao/")
     public Response postLeilao(
@@ -218,7 +187,7 @@ public class Directory {
     )
     {
         empresas.get(restRequest.getNome()).historicoLeiloes.get(restRequest.getId()).licitacoes.add(
-                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),restRequest.getTaxaMaxima(), restRequest.getQuantia()));
+                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),restRequest.getJuro(), restRequest.getQuantia()));
         return Response.status(201).build();
     }
 
@@ -230,16 +199,11 @@ public class Directory {
         Leilao leilao = empresas.get(restRequest.getNome()).getLeilao(restRequest.getId());
         leilao.sucesso = restRequest.isSucesso();
         leilao.ativo = restRequest.isAtivo();
+        if (restRequest.getLicitacaos() != null){
+            leilao.licitacoes = restRequest.getLicitacaos();
+        }
         return Response.status(201).build();
     }
-
-
-
-
-
-
-
-
 
 
     @POST
@@ -260,7 +224,7 @@ public class Directory {
     )
     {
         empresas.get(restRequest.getNome()).historicoEmissoes.get(restRequest.getId()).licitacoes.add(
-                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),restRequest.getQuantia()));
+                new Licitacao(restRequest.getIdL(),restRequest.getInvestidor(),0,restRequest.getQuantia()));
         return Response.status(201).build();
     }
 
@@ -270,7 +234,7 @@ public class Directory {
     public Response putEmissaoSucesso(
             @NotNull RestRequest restRequest
     ){
-        Emissao emissao = empresas.get(restRequest.getNome()).getEmissao(restRequest.getIdL());
+        Emissao emissao = empresas.get(restRequest.getNome()).getEmissao(restRequest.getId());
         emissao.sucesso = restRequest.isSucesso();
         emissao.ativo= restRequest.isAtivo();
         return Response.status(201).build();
