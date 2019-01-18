@@ -12,7 +12,7 @@ public class Leilao {
     @JsonProperty("taxaMaxima") public float taxaMaxima;
     @JsonProperty("montanteTotal") public int montanteTotal;
     @JsonProperty("empresa") public String empresa;
-    @JsonProperty("data") public LocalDateTime data;
+    @JsonProperty("data") public String data;
     @JsonProperty("sucesso") public boolean sucesso;
     @JsonProperty("ativo") public boolean ativo;
     @JsonProperty("licitacoes") public List<Licitacao> licitacoes;
@@ -30,7 +30,7 @@ public class Leilao {
         this.taxaMaxima = taxaMaxima;
         this.montanteTotal = montanteTotal;
         this.empresa = empresa;
-        this.data = data;
+        this.data = DateTimeFormatter.ofPattern("ss:mm:HH dd-MM-yyyy").format(data);
         this.sucesso = sucesso;
         this.ativo=ativo;
         this.licitacoes = licitacoes;
@@ -68,11 +68,11 @@ public class Leilao {
         this.empresa = empresa;
     }
 
-    public LocalDateTime getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(String data) {
         this.data = data;
     }
 
@@ -103,7 +103,7 @@ public class Leilao {
                 .append("empresa: ")
                 .append(this.empresa).append("\n")
                 .append("data: ")
-                .append(DateTimeFormatter.ofPattern("ss:mm:HH dd-MM-yyyy").format(this.data)).append("\n")
+                .append(data).append("\n")
                 .append("sucesso: ")
                 .append(this.sucesso).append("\n")
                 .append("ativo: ")

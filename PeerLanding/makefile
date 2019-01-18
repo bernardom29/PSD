@@ -40,7 +40,6 @@ Frontend: erl_src/*.erl
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq_nif.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/erlzmq.erl 
 	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/producer.erl 
-	@erlc -I $(ERLANG_ZMQ) -o $(BIN)/frontend erl_src/consumer.erl
 	@erlc -o $(BIN)/frontend/ erl_src/accountManager.erl erl_src/usersession.erl erl_src/frontend.erl
 	@echo Erlang Components Compiled
 	@echo Compilation done
