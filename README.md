@@ -1,9 +1,12 @@
-# Fault Tolerant Stock Exchange
+# TrustPet
 
-Stock exchange service with fault tolerance that allows for the purchase and sale of stocks. A solution based on passive software-based replication was used to ensure service availability if at least one server is online.
+Distributed Systems Paradigms (2018/2019), Informatics Engineering, Universidade do Minho, Portugal
 
-## Technologies Used
+Auction intermediary service with components developed with various distributed systems paradigms. The client sends a request to the front-end server (Erlang) which forwards it to the exchange servers (Java). The client can consult the directory (RESTful Service) for information on the companies and is notified about auction they've shown interest in (ZeroMQ).
 
+##Technologies Used
 - Java
-- Spread Toolkit
+- Erlang
+- ZeroMQ
+- Protocol Buffers
 - Atomix
