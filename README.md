@@ -1,4 +1,4 @@
-# TrustPet
+# PeerLending
 
 Distributed Systems Paradigms (2018/2019), Informatics Engineering, Universidade do Minho, Portugal
 
